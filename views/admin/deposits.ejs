@@ -1,0 +1,67 @@
+<% pageTitle = 'Admin — Deposits' %>
+<%- include('../partials/head') %>
+<%- include('../partials/nav') %>
+<div class="admin-layout">
+  <nav class="admin-sidebar">
+    <div class="sidebar-title">Admin Panel</div>
+    <a href="/admin"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
+    <a href="/admin/plans"><i class="fas fa-layer-group"></i> Plans</a>
+    <a href="/admin/plan-requests"><i class="fas fa-tasks"></i> Plan Requests</a>
+    <a href="/admin/deposits" class="active"><i class="fas fa-plus-circle"></i> Deposits</a>
+    <a href="/admin/withdrawals"><i class="fas fa-minus-circle"></i> Withdrawals</a>
+    <a href="/admin/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+    <div class="sidebar-title">Site</div>
+    <a href="/admin/settings"><i class="fas fa-cog"></i> Settings</a>
+    <a href="/admin/customize"><i class="fas fa-paint-brush"></i> Customizer</a>
+    <a href="/dashboard"><i class="fas fa-home"></i> Front End</a>
+    <a href="/logout" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </nav>
+  <div class="admin-main">
+    <div class="page-header"><h1><i class="fas fa-plus-circle"></i> Deposits</h1></div>
+    <div class="tabs mb-3">
+      <% [['pending','Pending'],['confirmed','Confirmed'],['rejected','Rejected'],['all','All']].forEach(([s,l])=>{%>
+      <a href="/admin/deposits?status=<%= s %>" class="tab-btn <%= filter===s?'active':'' %>" style="text-decoration:none;"><%= l %></a>
+      <%})%>
+    </div>
+    <div class="card">
+      <% if (!deps.length) { %><div class="empty-state"><i class="fas fa-inbox"></i><p>No deposits.</p></div>
+      <% } else { %>
+      <div class="table-responsive"><table class="table">
+        <thead><tr><th>User</th><th>Amount</th><th>Crypto</th><th>TX Hash / ID</th><th>Plan</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody>
+          <% deps.forEach(d=>{%>
+          <tr>
+            <td><%= d.username %></td>
+            <td><strong>$<%= d.amountUsd.toFixed(2) %></strong></td>
+            <td><%= d.cryptoType %></td>
+            <td style="max-width:260px;">
+              <% if (d.txHash) { %>
+              <div style="font-family:monospace;font-size:.72rem;word-break:break-all;color:var(--text);line-height:1.4;"><%= d.txHash %></div>
+              <button type="button" data-hash="<%= d.txHash %>"
+                onclick="var h=this.dataset.hash;navigator.clipboard.writeText(h).then(()=>{this.innerHTML='<i class=\'fas fa-check\'></i> Copied';setTimeout(()=>{this.innerHTML='<i class=\'fas fa-copy\'></i> Copy'},1600)}).catch(()=>{});"
+                style="background:none;border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--blue);font-size:.68rem;padding:1px 6px;margin-top:.25rem;display:inline-flex;align-items:center;gap:.25rem;">
+                <i class="fas fa-copy"></i> Copy
+              </button>
+              <% } else { %>
+              <span style="color:var(--text-muted);font-size:.78rem;font-style:italic;"><i class="fas fa-hourglass-half" style="margin-right:.3rem;"></i>Not submitted yet</span>
+              <% } %>
+            </td>
+            <td style="font-size:.82rem;"><%= d.planName||'—' %></td>
+            <td><%- badge(d.status)%></td>
+            <td style="font-size:.8rem;color:var(--text-muted);"><%= new Date(d.createdAt).toLocaleDateString() %></td>
+            <td>
+              <% if(d.status==='pending'){%>
+              <form method="POST" action="/admin/deposits/action" style="display:inline;" onsubmit="return confirm('Confirm deposit?')"><input type="hidden" name="deposit_id" value="<%= d._id %>"><input type="hidden" name="action" value="confirm"><button class="btn btn-success btn-sm"><i class="fas fa-check"></i></button></form>
+              <form method="POST" action="/admin/deposits/action" style="display:inline;" onsubmit="return confirm('Reject?')"><input type="hidden" name="deposit_id" value="<%= d._id %>"><input type="hidden" name="action" value="reject"><button class="btn btn-danger btn-sm"><i class="fas fa-times"></i></button></form>
+              <%}%>
+            </td>
+          </tr>
+          <%})%>
+        </tbody>
+      </table></div>
+      <% } %>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

@@ -1,0 +1,40 @@
+<% pageTitle = 'Transactions' %>
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+<div class="container">
+  <div class="page-header"><h1><i class="fas fa-history"></i> Transaction History</h1></div>
+  <div class="tabs mb-3">
+    <% [['all','All'],['click_earning','Click Earnings'],['roi_earning','ROI'],['deposit','Deposits'],['withdrawal','Withdrawals'],['referral_earning','Referrals'],['plan_purchase','Plans']].forEach(([k,l]) => { %>
+    <a href="/transactions?type=<%= k %>" class="tab-btn <%= filter===k?'active':'' %>" style="text-decoration:none;display:inline-block;"><%= l %></a>
+    <% }) %>
+  </div>
+  <div class="card">
+    <% if (!txs.length) { %><div class="empty-state"><i class="fas fa-receipt"></i><p>No transactions found.</p></div>
+    <% } else { %>
+    <div class="table-responsive"><table class="table">
+      <thead><tr><th>#</th><th>Type</th><th>Description</th><th>Amount</th><th>Date</th></tr></thead>
+      <tbody>
+        <% txs.forEach(tx => {
+          const isDebit = ['withdrawal','plan_purchase'].includes(tx.type);
+          const icons = {deposit:'fas fa-plus-circle',withdrawal:'fas fa-minus-circle',click_earning:'fas fa-mouse-pointer',roi_earning:'fas fa-chart-line',referral_earning:'fas fa-users',plan_purchase:'fas fa-layer-group'};
+        %>
+        <tr>
+          <td style="color:var(--text-muted);font-size:.8rem;"><%= tx._id.slice(-6) %></td>
+          <td><i class="<%= icons[tx.type]||'fas fa-circle' %>" style="color:<%= isDebit?'var(--danger)':'var(--success)' %>;margin-right:.4rem;"></i><span style="font-size:.85rem;"><%= tx.type.replace(/_/g,' ') %></span></td>
+          <td style="color:var(--text-secondary);font-size:.88rem;"><%= tx.description||'' %></td>
+          <td style="font-weight:700;" class="<%= isDebit?'text-danger':'text-success' %>"><%= isDebit?'-':'+' %>$<%= (tx.amount||0).toFixed(4) %></td>
+          <td style="color:var(--text-muted);font-size:.8rem;"><%= fmtDate(tx.createdAt) %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table></div>
+    <% if (pages>1) { %>
+    <div style="display:flex;gap:.5rem;justify-content:center;margin-top:1.5rem;flex-wrap:wrap;">
+      <% for (let i=1;i<=pages;i++) { %><a href="/transactions?type=<%= filter %>&page=<%= i %>" class="btn <%= i===page?'btn-primary':'btn-outline' %> btn-sm"><%= i %></a><% } %>
+    </div>
+    <% } %>
+    <div style="margin-top:1rem;font-size:.82rem;color:var(--text-muted);text-align:center;">Showing <%= txs.length %> of <%= total %></div>
+    <% } %>
+  </div>
+</div>
+<%- include('partials/footer') %>

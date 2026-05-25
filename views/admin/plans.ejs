@@ -1,0 +1,248 @@
+<% pageTitle = 'Admin — Plans' %>
+<%- include('../partials/head') %>
+<%- include('../partials/nav') %>
+<div class="admin-layout">
+  <nav class="admin-sidebar">
+    <div class="sidebar-title">Admin Panel</div>
+    <a href="/admin"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
+    <a href="/admin/plans" class="active"><i class="fas fa-layer-group"></i> Plans</a>
+    <a href="/admin/plan-requests"><i class="fas fa-tasks"></i> Plan Requests</a>
+    <a href="/admin/deposits"><i class="fas fa-plus-circle"></i> Deposits</a>
+    <a href="/admin/withdrawals"><i class="fas fa-minus-circle"></i> Withdrawals</a>
+    <a href="/admin/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+    <div class="sidebar-title">Site</div>
+    <a href="/admin/settings"><i class="fas fa-cog"></i> Settings</a>
+    <a href="/admin/customize"><i class="fas fa-paint-brush"></i> Customizer</a>
+    <a href="/dashboard"><i class="fas fa-home"></i> Front End</a>
+    <a href="/logout" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </nav>
+  <div class="admin-main">
+    <div class="page-header"><h1><i class="fas fa-layer-group"></i> Investment Plans</h1></div>
+
+    <div style="display:grid;grid-template-columns:420px 1fr;gap:1.5rem;align-items:start;">
+
+      <!-- ── ADD / EDIT FORM ── -->
+      <div class="card" style="position:sticky;top:1.5rem;">
+        <div class="card-header">
+          <span class="card-title">
+            <i class="fas fa-<%= editPlan ? 'edit' : 'plus-circle' %>"></i>
+            <%= editPlan ? 'Edit Plan' : 'Add New Plan' %>
+          </span>
+          <% if (editPlan) { %>
+            <a href="/admin/plans" class="btn btn-outline btn-sm"><i class="fas fa-times"></i> Cancel</a>
+          <% } %>
+        </div>
+
+        <form method="POST" action="/admin/plans/save">
+          <% if (editPlan) { %>
+            <input type="hidden" name="plan_id" value="<%= editPlan._id %>">
+          <% } %>
+
+          <!-- Plan Name -->
+          <div class="form-group">
+            <label class="form-label">Plan Name <span style="color:var(--red)">*</span></label>
+            <input type="text" name="name" class="form-control" required
+              placeholder="e.g. Gold Plan"
+              value="<%= editPlan ? editPlan.name : '' %>">
+          </div>
+
+          <!-- Investment Range -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label class="form-label">Min Investment ($) <span style="color:var(--red)">*</span></label>
+              <input type="number" name="price" class="form-control" min="0" step="0.01" required
+                placeholder="e.g. 500"
+                value="<%= editPlan ? editPlan.price : '' %>">
+              <p class="form-text">Minimum deposit to join</p>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Max Investment ($)</label>
+              <input type="number" name="maxPrice" class="form-control" min="0" step="0.01"
+                placeholder="0 = unlimited"
+                value="<%= editPlan ? (editPlan.maxPrice || '') : '' %>">
+              <p class="form-text">0 means no upper limit</p>
+            </div>
+          </div>
+
+          <!-- Annual ROI + Duration -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label class="form-label">Annual ROI (%) <span style="color:var(--red)">*</span></label>
+              <div style="position:relative;">
+                <input type="number" name="annualRoi" id="annualRoi" class="form-control"
+                  min="0" step="0.01" required
+                  placeholder="e.g. 24"
+                  value="<%= editPlan ? (editPlan.annualRoi !== undefined ? editPlan.annualRoi : (editPlan.dailyRoi||0)) : '' %>"
+                  oninput="updateRoiPreview()">
+                <span style="position:absolute;right:.8rem;top:50%;transform:translateY(-50%);color:var(--text3);font-size:.82rem;">%/yr</span>
+              </div>
+              <p class="form-text" id="roiPreviewText" style="color:var(--green);font-weight:600;"></p>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Duration (days) <span style="color:var(--red)">*</span></label>
+              <input type="number" name="durationDays" class="form-control" min="1" required
+                placeholder="e.g. 365"
+                value="<%= editPlan ? editPlan.durationDays : 365 %>"
+                oninput="updateRoiPreview()">
+              <p class="form-text">Plan term length</p>
+            </div>
+          </div>
+
+          <!-- Withdrawal Frequency -->
+          <div class="form-group">
+            <label class="form-label">Withdrawal Frequency</label>
+            <select name="withdrawalFreq" class="form-control">
+              <% ['Daily','Weekly','Monthly','Quarterly','On Maturity'].forEach(function(f){ %>
+              <option value="<%= f %>" <%= (editPlan ? (editPlan.withdrawalFreq||'Monthly') : 'Monthly') === f ? 'selected' : '' %>><%= f %></option>
+              <% }); %>
+            </select>
+            <p class="form-text">How often investors can withdraw returns</p>
+          </div>
+
+          <!-- Features -->
+          <div class="form-group">
+            <label class="form-label">Plan Features</label>
+            <textarea name="features" class="form-control" rows="5"
+              placeholder="One feature per line, e.g.&#10;Capital protection guarantee&#10;Dedicated account manager&#10;Priority withdrawal processing&#10;Compound interest option"><%= editPlan ? (editPlan.features || '') : '' %></textarea>
+            <p class="form-text">One feature per line — shown as bullet points on the plans page</p>
+          </div>
+
+          <!-- Visual: Color + Icon -->
+          <div style="display:grid;grid-template-columns:80px 1fr;gap:1rem;align-items:end;">
+            <div class="form-group">
+              <label class="form-label">Color</label>
+              <input type="color" name="color" class="form-control" style="height:42px;padding:4px;cursor:pointer;"
+                value="<%= editPlan ? editPlan.color : '#3d8ef0' %>">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Icon <span style="font-size:.78rem;color:var(--text3)">(Font Awesome class)</span></label>
+              <input type="text" name="icon" class="form-control"
+                placeholder="fas fa-star"
+                value="<%= editPlan ? editPlan.icon : 'fas fa-star' %>">
+            </div>
+          </div>
+          <p class="form-text" style="margin-top:-.5rem;margin-bottom:1rem;">
+            Browse icons at <a href="https://fontawesome.com/icons" target="_blank" style="color:var(--blue);">fontawesome.com/icons</a>
+            — e.g. <code>fas fa-gem</code>, <code>fas fa-crown</code>, <code>fas fa-rocket</code>
+          </p>
+
+          <!-- Active toggle -->
+          <div class="form-group" style="display:flex;align-items:center;gap:.65rem;padding:.65rem;background:var(--bg2);border-radius:8px;">
+            <input type="checkbox" name="active" id="plan_active"
+              <%= (!editPlan || editPlan.active) ? 'checked' : '' %>>
+            <label for="plan_active" class="form-label" style="margin:0;cursor:pointer;">
+              <strong>Active</strong> — visible to investors on the plans page
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top:1rem;padding:.8rem;">
+            <i class="fas fa-save"></i> <%= editPlan ? 'Update Plan' : 'Create Plan' %>
+          </button>
+        </form>
+      </div>
+
+      <!-- ── PLANS TABLE ── -->
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-list"></i> All Plans (<%= plans.length %>)</span>
+          </div>
+
+          <% if (!plans.length) { %>
+          <div class="empty-state"><i class="fas fa-layer-group"></i><p>No plans yet. Add your first plan.</p></div>
+          <% } else { %>
+          <div style="display:flex;flex-direction:column;gap:1rem;padding:.5rem 0;">
+            <% plans.forEach(function(p) {
+              const annRoi = p.annualRoi !== undefined ? p.annualRoi : (p.dailyRoi || 0);
+              const minInv = p.price || 0;
+              const maxInv = p.maxPrice || 0;
+              const feats  = (p.features || '').split('\n').map(f=>f.trim()).filter(Boolean);
+            %>
+            <div style="border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;background:var(--card);border-left:4px solid <%= p.color||'#3d8ef0' %>;">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+                <!-- Left: name + badges -->
+                <div style="display:flex;align-items:center;gap:.75rem;flex:1;min-width:0;">
+                  <div style="width:38px;height:38px;border-radius:50%;background:<%= p.color||'#3d8ef0' %>22;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="<%= p.icon||'fas fa-star' %>" style="color:<%= p.color||'#3d8ef0' %>;font-size:1rem;"></i>
+                  </div>
+                  <div>
+                    <div style="font-weight:800;font-size:1rem;"><%= p.name %></div>
+                    <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.25rem;">
+                      <%- p.active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-secondary">Inactive</span>' %>
+                      <span class="badge badge-info"><%= p.withdrawalFreq || 'Monthly' %> withdrawals</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Right: actions -->
+                <div style="display:flex;gap:.5rem;flex-shrink:0;">
+                  <a href="/admin/plans?edit=<%= p._id %>" class="btn btn-outline btn-sm"><i class="fas fa-edit"></i> Edit</a>
+                  <form method="POST" action="/admin/plans/delete" style="display:inline;" onsubmit="return confirm('Delete plan &quot;<%= p.name %>&quot;?')">
+                    <input type="hidden" name="plan_id" value="<%= p._id %>">
+                    <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Stats row -->
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin-top:1rem;">
+                <div style="background:var(--bg2);border-radius:8px;padding:.55rem .75rem;text-align:center;">
+                  <div style="font-size:.66rem;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.2rem;">Annual ROI</div>
+                  <div style="font-size:1.2rem;font-weight:900;color:<%= p.color||'#3d8ef0' %>;"><%= annRoi %>%</div>
+                </div>
+                <div style="background:var(--bg2);border-radius:8px;padding:.55rem .75rem;text-align:center;">
+                  <div style="font-size:.66rem;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.2rem;">Min Invest</div>
+                  <div style="font-size:1rem;font-weight:800;color:var(--green);">$<%= minInv.toLocaleString() %></div>
+                </div>
+                <div style="background:var(--bg2);border-radius:8px;padding:.55rem .75rem;text-align:center;">
+                  <div style="font-size:.66rem;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.2rem;">Max Invest</div>
+                  <div style="font-size:1rem;font-weight:800;"><%= maxInv > 0 ? '$'+maxInv.toLocaleString() : 'Unlimited' %></div>
+                </div>
+                <div style="background:var(--bg2);border-radius:8px;padding:.55rem .75rem;text-align:center;">
+                  <div style="font-size:.66rem;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.2rem;">Duration</div>
+                  <div style="font-size:1rem;font-weight:800;"><%= p.durationDays %> days</div>
+                </div>
+              </div>
+
+              <!-- Earnings estimate -->
+              <% const dailyEst = (minInv * annRoi / 100 / 365).toFixed(4); %>
+              <% const totalEst = (minInv * annRoi / 100 * (p.durationDays/365)).toFixed(2); %>
+              <div style="margin-top:.75rem;padding:.55rem .75rem;background:var(--green)09;border:1px solid var(--green)22;border-radius:8px;font-size:.8rem;color:var(--text2);">
+                <i class="fas fa-calculator" style="color:var(--green);margin-right:.4rem;"></i>
+                On $<%= minInv.toLocaleString() %> min: <strong style="color:var(--green);">+$<%= dailyEst %>/day</strong> &bull; <strong style="color:var(--green);">+$<%= Number(totalEst).toLocaleString() %> total</strong> over <%= p.durationDays %> days
+              </div>
+
+              <!-- Features -->
+              <% if (feats.length) { %>
+              <div style="margin-top:.75rem;display:flex;flex-wrap:wrap;gap:.3rem;">
+                <% feats.slice(0,4).forEach(function(f){ %>
+                <span style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;font-size:.72rem;padding:.2rem .55rem;color:var(--text2);"><i class="fas fa-check" style="color:var(--green);margin-right:.25rem;font-size:.6rem;"></i><%= f %></span>
+                <% }); %>
+                <% if (feats.length > 4) { %><span style="font-size:.72rem;color:var(--text3);padding:.2rem .4rem;">+<%= feats.length - 4 %> more</span><% } %>
+              </div>
+              <% } %>
+            </div>
+            <% }); %>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function updateRoiPreview() {
+  var roi  = parseFloat(document.getElementById('annualRoi').value) || 0;
+  var el   = document.getElementById('roiPreviewText');
+  if (roi > 0) {
+    var daily = (roi / 365).toFixed(4);
+    el.textContent = '≈ ' + daily + '% per day';
+  } else {
+    el.textContent = '';
+  }
+}
+document.addEventListener('DOMContentLoaded', updateRoiPreview);
+</script>
+
+<%- include('../partials/footer') %>

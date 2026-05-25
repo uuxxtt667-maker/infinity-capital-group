@@ -1,0 +1,58 @@
+<% pageTitle = 'Click Ads' %>
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+<!-- csrf for ad clicks injected via hidden input in footer -->
+<script>window.__adCsrf = '<%= csrf %>';</script>
+<div class="container">
+  <div class="page-header"><h1><i class="fas fa-mouse-pointer"></i> Click Ads</h1><p>View ads to earn crypto. <strong class="text-accent"><%= clicksLeft %></strong> clicks remaining today.</p></div>
+
+  <div class="card mb-3">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;"><span style="font-size:.88rem;">Daily Progress</span><span style="font-size:.88rem;color:var(--text-muted);"><%= user.clicksToday %>/<%= plan.dailyClicks||5 %></span></div>
+    <% const pct = Math.round((user.clicksToday/(plan.dailyClicks||5))*100) %>
+    <div class="progress"><div class="progress-bar" style="width:<%= pct %>%"></div></div>
+    <div style="margin-top:.5rem;font-size:.82rem;color:var(--text-muted);"><%= clicksLeft %> ads left &bull; Earn $<%= (plan.clickValue||0.001).toFixed(6) %> per click</div>
+  </div>
+
+  <% if (!planActive && user.planId !== 'plan1') { %><div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> Your plan has expired. <a href="/plans">Renew your plan</a></div><% } %>
+  <% if (clicksLeft === 0) { %><div class="alert alert-info"><i class="fas fa-check-circle"></i> You've used all your clicks for today. Come back tomorrow!</div><% } %>
+
+  <% if (!ads.length) { %>
+  <div class="card"><div class="empty-state"><i class="fas fa-ad"></i><p>No ads available. Check back soon!</p></div></div>
+  <% } else { %>
+  <div class="ads-grid">
+    <% ads.forEach(ad => {
+      const canClick = !ad.clickedToday && clicksLeft > 0 && (planActive || user.planId === 'plan1');
+    %>
+    <div class="ad-card">
+      <div class="ad-title"><%= ad.title %></div>
+      <div class="ad-meta">
+        <span><i class="fas fa-clock"></i><%= ad.viewSeconds %>s view</span>
+        <span><i class="fas fa-hand-pointer"></i><%= (ad.clicksAvailable-ad.clicksDone).toLocaleString() %> remaining</span>
+      </div>
+      <div class="ad-earnings"><i class="fas fa-coins"></i> +$<%= ad.credit.toFixed(6) %></div>
+      <div class="ad-timer-container" id="timer-<%= ad._id %>">
+        <div class="timer-bar"><div class="timer-fill" id="timer-fill-<%= ad._id %>"></div></div>
+        <div class="timer-text" id="timer-text-<%= ad._id %>">Loading…</div>
+      </div>
+      <% if (ad.clickedToday) { %>
+        <button class="btn btn-success btn-block" disabled><i class="fas fa-check"></i> Completed</button>
+      <% } else if (!canClick) { %>
+        <button class="btn btn-outline btn-block" disabled><i class="fas fa-lock"></i> <%= clicksLeft===0?'Limit Reached':'Unavailable' %></button>
+      <% } else { %>
+        <button class="btn btn-primary btn-block" id="btn-<%= ad._id %>"
+          onclick="openAd('<%= ad._id %>','<%= ad.url %>',<%= ad.viewSeconds %>,this,'$<%= ad.credit.toFixed(6) %>')">
+          <i class="fas fa-play"></i> View Ad
+        </button>
+      <% } %>
+    </div>
+    <% }) %>
+  </div>
+  <% } %>
+</div>
+<script>
+function openAd(adId, url, seconds, btn, earningStr) {
+  window.open(url, '_blank', 'noopener');
+  startAdTimer(adId, seconds, btn, earningStr);
+}
+</script>
+<%- include('partials/footer') %>

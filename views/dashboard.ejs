@@ -1,0 +1,482 @@
+<% pageTitle = 'Dashboard' %>
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+<style>
+.dash-wrap{max-width:1280px;margin:0 auto;padding:1.5rem 1.5rem 3rem}
+
+/* ── Portfolio Mix — same layout as landing page ── */
+.ap-portfolio-inner{display:flex;align-items:center;gap:1.25rem;margin-bottom:.25rem}
+.ap-donut-wrap{position:relative;width:150px;height:150px;flex-shrink:0}
+.ap-donut-wrap canvas{position:absolute;top:0;left:0;width:150px!important;height:150px!important}
+.ap-donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none}
+.ap-donut-center .dlbl{font-size:.62rem;color:var(--text3)}
+.ap-donut-center .dval{font-size:1.1rem;font-weight:900;color:var(--text);line-height:1.2}
+.ap-legend{display:flex;flex-direction:column;gap:.5rem;flex:1}
+.ap-leg-item{display:flex;align-items:center;justify-content:space-between;font-size:.75rem;color:var(--text2)}
+.ap-leg-left{display:flex;align-items:center;gap:.5rem}
+.ap-leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.ap-leg-pct{font-weight:700;color:var(--text)}
+</style>
+
+<div class="dash-wrap">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem;flex-wrap:wrap;gap:.75rem">
+    <div>
+      <h1 style="font-size:1.5rem;font-weight:800">Invest Smarter Across <span style="color:var(--gold)">Every Market</span></h1>
+      <div style="font-size:.82rem;color:var(--text2)">Top Crypto Markets &mdash; Live via Binance &nbsp;|&nbsp; Welcome, <strong style="color:var(--text)"><%= user.username %></strong></div>
+    </div>
+    <a href="/deposit" class="btn btn-gold"><i class="fas fa-plus"></i> Deposit Funds</a>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon gold"><i class="fas fa-wallet"></i></div>
+      <div class="stat-info">
+        <div class="stat-label">Available Balance</div>
+        <div class="stat-value" data-balance>$<%= (user.balance||0).toFixed(4) %></div>
+        <div class="stat-sub"><a href="/withdraw" style="color:var(--gold)">Withdraw</a></div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green"><i class="fas fa-chart-line"></i></div>
+      <div class="stat-info">
+        <div class="stat-label">Total Earned</div>
+        <div class="stat-value">$<%= (user.totalEarned||0).toFixed(4) %></div>
+        <div class="stat-sub">All-time earnings</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon blue"><i class="fas fa-layer-group"></i></div>
+      <div class="stat-info">
+        <div class="stat-label">Total Invested</div>
+        <div class="stat-value">$<%= (user.totalInvested||0).toFixed(2) %></div>
+        <div class="stat-sub"><a href="/plans" style="color:var(--blue)">View plans</a></div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple"><i class="fas fa-users"></i></div>
+      <div class="stat-info">
+        <div class="stat-label">Referral Earnings</div>
+        <div class="stat-value">$<%= (user.referralEarnings||0).toFixed(4) %></div>
+        <div class="stat-sub"><%= refCount %> referral<%= refCount!==1?'s':'' %></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Market Cards -->
+  <div style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:.75rem">Live Crypto Markets &mdash; <span style="color:#00e676;font-style:normal">Binance Real-Time</span></div>
+  <div class="market-cards">
+    <div class="market-card">
+      <div class="mc-header"><span class="mc-label">BITCOIN</span><span class="mc-icon" style="background:#f7931a;color:#fff">&#8383;</span></div>
+      <div class="mc-price" id="mc-btc-price">$77,525</div>
+      <div class="mc-change up" id="mc-btc-chg">&#9650; 2.41% BTC</div>
+      <div class="mc-sub">BTC/USDT 7-day trend</div>
+      <canvas class="mini-chart" id="dash-chart-btc"></canvas>
+    </div>
+    <div class="market-card">
+      <div class="mc-header"><span class="mc-label">ETHEREUM</span><span class="mc-icon" style="background:#627eea;color:#fff;font-size:1rem;font-weight:900">&#926;</span></div>
+      <div class="mc-price" id="mc-eth-price">$2,116</div>
+      <div class="mc-change up" id="mc-eth-chg">&#9650; 1.82% ETH</div>
+      <div class="mc-sub">ETH/USDT 7-day trend</div>
+      <canvas class="mini-chart" id="dash-chart-eth"></canvas>
+    </div>
+    <div class="market-card">
+      <div class="mc-header"><span class="mc-label">BNB</span><span class="mc-icon" style="background:#f3ba2f;color:#000;font-size:.6rem;font-weight:900">BNB</span></div>
+      <div class="mc-price" id="mc-bnb-price">$661</div>
+      <div class="mc-change up" id="mc-bnb-chg">&#9650; 0.93% BNB</div>
+      <div class="mc-sub">BNB/USDT 7-day trend</div>
+      <canvas class="mini-chart" id="dash-chart-bnb"></canvas>
+    </div>
+    <div class="market-card">
+      <div class="mc-header"><span class="mc-label">SOLANA</span><span class="mc-icon" style="background:#9945ff;color:#fff;font-size:.6rem;font-weight:900">SOL</span></div>
+      <div class="mc-price" id="mc-sol-price">$86</div>
+      <div class="mc-change up" id="mc-sol-chg">&#9650; 3.14% SOL</div>
+      <div class="mc-sub">SOL/USDT 7-day trend</div>
+      <canvas class="mini-chart" id="dash-chart-sol"></canvas>
+    </div>
+  </div>
+
+  <!-- Portfolio + Performance + CTAs -->
+  <div class="dash-bottom">
+    <% var _dsc = siteCustomize; %>
+    <div class="portfolio-card">
+      <h4>Portfolio Mix</h4>
+      <div class="ap-portfolio-inner">
+        <div class="ap-donut-wrap">
+          <canvas id="donutChart"></canvas>
+          <div class="ap-donut-center">
+            <span class="dlbl">Total</span>
+            <span class="dval"><%- _dsc.mixTotal||'$124K' %></span>
+          </div>
+        </div>
+        <div class="ap-legend">
+          <div class="ap-leg-item"><div class="ap-leg-left"><span class="ap-leg-dot" style="background:#f5a623"></span><%- _dsc.mix1Name||'Crypto' %></div><span class="ap-leg-pct"><%- _dsc.mix1Pct||'37' %>%</span></div>
+          <div class="ap-leg-item"><div class="ap-leg-left"><span class="ap-leg-dot" style="background:#3d8ef0"></span><%- _dsc.mix2Name||'Forex' %></div><span class="ap-leg-pct"><%- _dsc.mix2Pct||'23' %>%</span></div>
+          <div class="ap-leg-item"><div class="ap-leg-left"><span class="ap-leg-dot" style="background:#9b59b6"></span><%- _dsc.mix3Name||'Stocks' %></div><span class="ap-leg-pct"><%- _dsc.mix3Pct||'20' %>%</span></div>
+          <div class="ap-leg-item"><div class="ap-leg-left"><span class="ap-leg-dot" style="background:#00e676"></span><%- _dsc.mix4Name||'Real Est.' %></div><span class="ap-leg-pct"><%- _dsc.mix4Pct||'12' %>%</span></div>
+          <div class="ap-leg-item"><div class="ap-leg-left"><span class="ap-leg-dot" style="background:#00d4ff"></span><%- _dsc.mix5Name||'Commod.' %></div><span class="ap-leg-pct"><%- _dsc.mix5Pct||'8' %>%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="perf-card">
+      <h4>Performance &mdash; 6 months</h4>
+      <div class="perf-badge" id="dashPerfBadge"><%- _dsc.perfBadge||'+24.8%' %></div>
+      <canvas class="perf-chart" id="perfChart"></canvas>
+    </div>
+    <div class="cta-col">
+      <div class="cta-card cta-invest">
+        <div style="font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:.35rem">Start Investing</div>
+        <h5>Deposit Now</h5>
+        <p>Add funds to your account</p>
+        <a href="/deposit" class="cta-arrow" style="color:var(--blue)">Open deposit &rarr;</a>
+      </div>
+      <div class="cta-card cta-demo">
+        <div style="font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(0,230,118,.4);margin-bottom:.35rem">Earn More</div>
+        <h5>Refer &amp; Earn</h5>
+        <p>Earn <%= referralRate %>% on every referral deposit</p>
+        <a href="/referrals" class="cta-arrow" style="color:var(--green)">View referrals &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plan + Quick Actions -->
+  <div class="dashboard-grid">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><i class="fas fa-layer-group"></i> Active Plan</span>
+        <a href="/plans" class="btn btn-outline btn-sm">Upgrade</a>
+      </div>
+      <div style="text-align:center;padding:.75rem 0">
+        <div style="font-size:2.5rem;color:<%= plan.color||'var(--gold)' %>;margin-bottom:.5rem">
+          <i class="<%= plan.icon||'fas fa-star' %>"></i>
+        </div>
+        <div style="font-size:1.35rem;font-weight:800"><%= plan.name||'Free' %></div>
+        <% if (user.planId==='plan1') { %>
+          <span class="badge badge-secondary">Free Plan</span>
+        <% } else if (planActive(user)) { %>
+          <span class="badge badge-success">Active</span>
+          <div style="color:var(--text3);font-size:.78rem;margin-top:.4rem">
+            Expires: <%= user.planExpires ? new Date(user.planExpires).toLocaleDateString() : '—' %>
+          </div>
+        <% } else { %>
+          <span class="badge badge-danger">Expired</span>
+        <% } %>
+
+        <%
+          const annRoi = plan.annualRoi !== undefined ? plan.annualRoi : (plan.dailyRoi || 0);
+          const dailyEst = user.totalInvested > 0 ? (user.totalInvested * annRoi / 100 / 365).toFixed(4) : '0.0000';
+        %>
+        <div style="margin-top:1.25rem;display:grid;grid-template-columns:1fr 1fr;gap:.65rem;text-align:left">
+          <div style="background:var(--bg2);padding:.65rem;border-radius:8px">
+            <div style="font-size:.68rem;color:var(--text3)">Annual ROI</div>
+            <div style="font-weight:700;color:var(--gold)"><%= annRoi %>%</div>
+          </div>
+          <div style="background:var(--bg2);padding:.65rem;border-radius:8px">
+            <div style="font-size:.68rem;color:var(--text3)">Daily Earnings</div>
+            <div style="font-weight:700;color:var(--green)">$<%= dailyEst %></div>
+          </div>
+          <div style="background:var(--bg2);padding:.65rem;border-radius:8px">
+            <div style="font-size:.68rem;color:var(--text3)">Invested</div>
+            <div style="font-weight:700;">$<%= (user.totalInvested||0).toFixed(2) %></div>
+          </div>
+          <div style="background:var(--bg2);padding:.65rem;border-radius:8px">
+            <div style="font-size:.68rem;color:var(--text3)">Withdrawal</div>
+            <div style="font-weight:700;font-size:.88rem;"><%= plan.withdrawalFreq || 'Monthly' %></div>
+          </div>
+        </div>
+
+        <% if (user.planId === 'plan1') { %>
+        <a href="/plans" class="btn btn-gold btn-block" style="margin-top:1.25rem;">
+          <i class="fas fa-arrow-up"></i> Upgrade to Earn More
+        </a>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fas fa-bolt"></i> Quick Actions</span></div>
+      <div style="display:flex;flex-direction:column;gap:.65rem">
+        <a href="/deposit"   class="btn btn-gold btn-block"><i class="fas fa-plus-circle"></i> Deposit Funds</a>
+        <a href="/withdraw"  class="btn btn-outline btn-block"><i class="fas fa-minus-circle"></i> Withdraw Earnings</a>
+        <a href="/referrals" class="btn btn-outline btn-block"><i class="fas fa-users"></i> Refer &amp; Earn <%= referralRate %>%</a>
+        <a href="/plans"     class="btn btn-outline btn-block"><i class="fas fa-layer-group"></i> Investment Plans</a>
+        <a href="/transactions" class="btn btn-outline btn-block"><i class="fas fa-history"></i> Transaction History</a>
+      </div>
+      <% if (pendingDeps > 0) { %>
+      <div class="alert alert-info mt-3">
+        <i class="fas fa-clock"></i> <%= pendingDeps %> pending deposit(s) awaiting confirmation.
+      </div>
+      <% } %>
+      <% if (pendingPlanReq) { %>
+      <div class="alert alert-warning mt-2" style="border-left:3px solid var(--gold)">
+        <i class="fas fa-tasks" style="color:var(--gold)"></i>
+        <strong><%= pendingPlanReq.planName %></strong> plan activation request pending —
+        <span style="color:var(--text2);font-size:.82rem">$<%= (pendingPlanReq.amountUsd||0).toFixed(2) %> held &middot; awaiting admin review.</span>
+      </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Recent Transactions -->
+  <div class="card mt-3">
+    <div class="card-header">
+      <span class="card-title"><i class="fas fa-history"></i> Recent Transactions</span>
+      <a href="/transactions" class="btn btn-outline btn-sm">View All</a>
+    </div>
+    <% if (!recentTx.length) { %>
+    <div class="empty-state"><i class="fas fa-receipt"></i><p>No transactions yet. Make a deposit to get started.</p></div>
+    <% } else { %>
+    <div class="table-responsive"><table class="table">
+      <thead><tr><th>Type</th><th>Description</th><th>Amount</th><th>Date</th></tr></thead>
+      <tbody>
+        <% recentTx.forEach(function(tx) {
+          const isDebit = ['withdrawal','plan_purchase'].includes(tx.type);
+          const icons = {
+            deposit:          'fas fa-plus-circle',
+            withdrawal:       'fas fa-minus-circle',
+            roi_earning:      'fas fa-chart-line',
+            referral_earning: 'fas fa-users',
+            plan_purchase:    'fas fa-layer-group',
+            manual:           'fas fa-user-shield',
+          };
+        %>
+        <tr>
+          <td>
+            <i class="<%= icons[tx.type]||'fas fa-circle' %>"
+               style="color:<%= isDebit?'var(--red)':'var(--green)' %>;margin-right:.4rem"></i>
+            <span style="font-size:.75rem;color:var(--text3)"><%= tx.type.replace(/_/g,' ') %></span>
+          </td>
+          <td style="color:var(--text2);font-size:.82rem"><%= tx.description||'' %></td>
+          <td style="font-weight:700" class="<%= isDebit?'text-red':'text-green' %>">
+            <%= isDebit?'-':'+' %>$<%= (tx.amount||0).toFixed(4) %>
+          </td>
+          <td style="color:var(--text3);font-size:.75rem"><%= fmtDate(tx.createdAt) %></td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table></div>
+    <% } %>
+  </div>
+</div>
+
+<script>
+/* ══ DASHBOARD CHART DATA FROM CUSTOMIZER ══ */
+var _dChart = (function(){
+  try {
+    return {
+      mix:         [<%- (_dsc.mix1Pct||37) %>,<%- (_dsc.mix2Pct||23) %>,<%- (_dsc.mix3Pct||20) %>,<%- (_dsc.mix4Pct||12) %>,<%- (_dsc.mix5Pct||8) %>],
+      colors:      ['#f5a623','#3d8ef0','#9b59b6','#00e676','#00d4ff'],
+      perfMonths:  '<%- (_dsc.perfMonths||"Feb,Mar,Apr,May,Jun,Jul") %>'.split(',').map(s=>s.trim()),
+      perfCrypto:  [<%- _dsc.perfCryptoPts||'0,14,22,32,40,46' %>],
+      perfStocks:  [<%- _dsc.perfStocksPts||'0,8,12,16,21,19' %>],
+      perfForex:   [<%- _dsc.perfForexPts||'0,3,5,7,8,8.7' %>],
+      perfRE:      [<%- _dsc.perfREPts||'0,5,9,12,14,16' %>],
+    };
+  } catch(e) {
+    return { mix:[37,23,20,12,8], colors:['#f5a623','#3d8ef0','#9b59b6','#00e676','#00d4ff'],
+      perfMonths:['Feb','Mar','Apr','May','Jun','Jul'],
+      perfCrypto:[0,14,22,32,40,46], perfStocks:[0,8,12,16,21,19],
+      perfForex:[0,3,5,7,8,8.7], perfRE:[0,5,9,12,14,16] };
+  }
+})();
+
+/* ── Shared canvas helper ── */
+function _getCtx(id, fallbackH) {
+  var c = document.getElementById(id); if (!c) return null;
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var W = c.offsetWidth || c.parentElement.offsetWidth || 200;
+  var H = c.offsetHeight || fallbackH || 140;
+  c.width = W * dpr; c.height = H * dpr;
+  var ctx = c.getContext('2d'); ctx.scale(dpr, dpr);
+  return { ctx:ctx, W:W, H:H };
+}
+
+/* ── Donut chart ── */
+function drawDashDonut() {
+  var c = document.getElementById('donutChart'); if (!c) return;
+  var wrap = c.parentElement;
+  var sz = wrap ? Math.min(wrap.offsetWidth || 110, wrap.offsetHeight || 110) : 110;
+  sz = Math.max(sz, 80);
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  c.width = c.height = sz * dpr;
+  c.style.width = sz + 'px'; c.style.height = sz + 'px';
+  var ctx = c.getContext('2d'); ctx.scale(dpr, dpr);
+  var cx = sz / 2, cy = sz / 2, r = sz * 0.43, inner = sz * 0.28;
+  var data = _dChart.mix, colors = _dChart.colors;
+  var total = data.reduce(function(a,b){return a+b;}, 0);
+  var gap = data.length > 1 ? 0.02 : 0;
+  var st = -Math.PI / 2;
+  data.forEach(function(v, i) {
+    var a = Math.max((v / total) * Math.PI * 2 - gap, 0.001);
+    var g = ctx.createLinearGradient(0, 0, sz, sz);
+    g.addColorStop(0, colors[i]); g.addColorStop(1, colors[i] + 'aa');
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, st, st + a); ctx.closePath();
+    ctx.fillStyle = g; ctx.fill();
+    st += a + gap;
+  });
+  /* hole — read card background from CSS variable */
+  var cardBg = getComputedStyle(document.documentElement).getPropertyValue('--card').trim() || '#1e2a3a';
+  ctx.beginPath(); ctx.arc(cx, cy, inner, 0, Math.PI * 2);
+  ctx.fillStyle = cardBg; ctx.fill();
+}
+
+/* ── Performance chart ── */
+function drawDashPerfChart() {
+  var r = _getCtx('perfChart', 140); if (!r) return;
+  var ctx = r.ctx, W = r.W, H = r.H;
+  var labels  = _dChart.perfMonths;
+  var crypto  = _dChart.perfCrypto;
+  var stocks  = _dChart.perfStocks;
+  var forex   = _dChart.perfForex;
+  var re      = _dChart.perfRE;
+  var allPts  = crypto.concat(stocks, forex, re);
+  var mx      = Math.max.apply(null, allPts) * 1.1 || 50;
+  var pad     = { l:6, r:6, t:10, b:22 };
+
+  /* grid lines */
+  ctx.strokeStyle = 'rgba(255,255,255,.05)'; ctx.lineWidth = 1;
+  [0.25, 0.5, 0.75, 1].forEach(function(f) {
+    var y = pad.t + (1 - f) * (H - pad.t - pad.b);
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
+  });
+
+  function mkPts(d) {
+    return d.map(function(v, i) {
+      return [pad.l + (i / (d.length - 1)) * (W - pad.l - pad.r),
+              pad.t + (1 - v / mx) * (H - pad.t - pad.b)];
+    });
+  }
+  function drawLine(pts, color, dash) {
+    ctx.beginPath();
+    ctx.setLineDash(dash || []);
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    for (var i = 1; i < pts.length; i++) {
+      var m = (pts[i-1][0] + pts[i][0]) / 2;
+      ctx.bezierCurveTo(m, pts[i-1][1], m, pts[i][1], pts[i][0], pts[i][1]);
+    }
+    ctx.setLineDash([]);
+    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke();
+  }
+  /* filled area for crypto (top performer) */
+  var cPts = mkPts(crypto);
+  var grad = ctx.createLinearGradient(0, pad.t, 0, H - pad.b);
+  grad.addColorStop(0, 'rgba(61,142,240,0.18)'); grad.addColorStop(1, 'rgba(61,142,240,0)');
+  ctx.beginPath(); ctx.moveTo(cPts[0][0], cPts[0][1]);
+  for (var i = 1; i < cPts.length; i++) {
+    var m = (cPts[i-1][0] + cPts[i][0]) / 2;
+    ctx.bezierCurveTo(m, cPts[i-1][1], m, cPts[i][1], cPts[i][0], cPts[i][1]);
+  }
+  ctx.lineTo(cPts[cPts.length-1][0], H - pad.b);
+  ctx.lineTo(cPts[0][0], H - pad.b); ctx.closePath();
+  ctx.fillStyle = grad; ctx.fill();
+
+  drawLine(mkPts(crypto), '#3d8ef0');
+  drawLine(mkPts(stocks), '#00e676');
+  drawLine(mkPts(forex),  '#f5a623', [5, 3]);
+  drawLine(mkPts(re),     '#9b59b6');
+
+  /* month labels */
+  ctx.fillStyle = 'rgba(148,163,184,0.7)';
+  ctx.font = '9px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  labels.forEach(function(l, i) {
+    ctx.fillText(l, pad.l + (i / (labels.length - 1)) * (W - pad.l - pad.r), H - 5);
+  });
+}
+
+/* ── Mini market sparklines ── */
+function drawMini(id, data, color) {
+  var c = document.getElementById(id); if (!c) return;
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var W = c.offsetWidth || 140, H = 48;
+  c.width = W * dpr; c.height = H * dpr; c.style.height = H + 'px';
+  var ctx = c.getContext('2d'); ctx.scale(dpr, dpr);
+  var mn = Math.min.apply(null, data), mx2 = Math.max.apply(null, data), rng = mx2 - mn || 1;
+  var pts = data.map(function(v, i) {
+    return [i / (data.length - 1) * W, H - 4 - (v - mn) / rng * (H - 10)];
+  });
+  /* fill */
+  var g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, color + '44'); g.addColorStop(1, color + '00');
+  ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
+  for (var i = 1; i < pts.length; i++) {
+    var m = (pts[i-1][0] + pts[i][0]) / 2;
+    ctx.bezierCurveTo(m, pts[i-1][1], m, pts[i][1], pts[i][0], pts[i][1]);
+  }
+  ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+  ctx.fillStyle = g; ctx.fill();
+  /* line */
+  ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
+  for (var j = 1; j < pts.length; j++) {
+    var n = (pts[j-1][0] + pts[j][0]) / 2;
+    ctx.bezierCurveTo(n, pts[j-1][1], n, pts[j][1], pts[j][0], pts[j][1]);
+  }
+  ctx.strokeStyle = color; ctx.lineWidth = 1.8; ctx.lineJoin = 'round'; ctx.stroke();
+}
+
+/* ── Live crypto state ── */
+var _p = {
+  btc:{ price:77525, chg:2.41,  hist:[58000,60500,64800,62000,66200,70400,77525], color:'#f7931a' },
+  eth:{ price:2116,  chg:1.82,  hist:[1800,1900,2000,2050,2080,2100,2116],        color:'#627eea' },
+  bnb:{ price:661,   chg:0.93,  hist:[500,550,580,620,640,655,661],                color:'#f3ba2f' },
+  sol:{ price:86,    chg:3.14,  hist:[60,68,75,80,82,84,86],                       color:'#9945ff' }
+};
+var _dashWsRetry = 1000;
+
+function fmtDashP(p) {
+  if (p >= 1000) return '$' + p.toLocaleString('en-US', {maximumFractionDigits:0});
+  if (p >= 1)    return '$' + p.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  return '$' + p.toFixed(4);
+}
+function updateDashCard(key) {
+  var d = _p[key];
+  var priceEl = document.getElementById('mc-' + key + '-price');
+  var chgEl   = document.getElementById('mc-' + key + '-chg');
+  if (priceEl) priceEl.textContent = fmtDashP(d.price);
+  if (chgEl) {
+    var up = d.chg >= 0;
+    chgEl.textContent = (up ? '▲' : '▼') + ' ' + Math.abs(d.chg).toFixed(2) + '% ' + key.toUpperCase();
+    chgEl.className = 'mc-change ' + (up ? 'up' : 'dn');
+  }
+  var hist = d.hist.slice(-7); hist[hist.length - 1] = d.price;
+  drawMini('dash-chart-' + key, hist, d.color);
+}
+function initDashWS() {
+  try {
+    var ws = new WebSocket('wss://stream.binance.com:9443/stream?streams=btcusdt@miniTicker/ethusdt@miniTicker/bnbusdt@miniTicker/solusdt@miniTicker');
+    ws.onmessage = function(e) {
+      try {
+        var msg = JSON.parse(e.data), d = msg.data || msg;
+        var price = parseFloat(d.c), open = parseFloat(d.o);
+        var chg   = (price - open) / open * 100;
+        var sym   = (d.s || '').toUpperCase();
+        var key   = sym === 'BTCUSDT' ? 'btc' : sym === 'ETHUSDT' ? 'eth' : sym === 'BNBUSDT' ? 'bnb' : sym === 'SOLUSDT' ? 'sol' : null;
+        if (!key) return;
+        _p[key].price = price; _p[key].chg = chg;
+        _p[key].hist[_p[key].hist.length - 1] = price;
+        updateDashCard(key);
+        _dashWsRetry = 1000;
+      } catch(_) {}
+    };
+    ws.onclose = function() {
+      _dashWsRetry = Math.min(_dashWsRetry * 1.5, 30000);
+      setTimeout(initDashWS, _dashWsRetry);
+    };
+    ws.onerror = function() { ws.close(); };
+  } catch(_) {}
+}
+
+/* ── Boot ── */
+document.addEventListener('DOMContentLoaded', function() {
+  drawDashDonut();
+  drawDashPerfChart();
+  ['btc','eth','bnb','sol'].forEach(updateDashCard);
+  initDashWS();
+  window.addEventListener('resize', function() {
+    drawDashDonut(); drawDashPerfChart();
+    ['btc','eth','bnb','sol'].forEach(updateDashCard);
+  });
+});
+</script>
+
+<%- include('partials/footer') %>

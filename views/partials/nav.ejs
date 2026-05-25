@@ -1,0 +1,71 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo"><%= siteCustomize.logoText %><span><%= siteCustomize.logoAccent %></span></a>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu"><i class="fas fa-bars"></i></button>
+    <ul class="nav-menu" id="navMenu">
+      <% if (user) { %>
+        <li><a href="/dashboard" class="<%= path==='/dashboard'?'active':'' %>"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+        <li><a href="/plans"     class="<%= path==='/plans'?'active':'' %>"><i class="fas fa-layer-group"></i> Plans</a></li>
+        <li><a href="/deposit"   class="<%= path==='/deposit'?'active':'' %>"><i class="fas fa-plus-circle"></i> Deposit</a></li>
+        <li><a href="/withdraw"  class="<%= path==='/withdraw'?'active':'' %>"><i class="fas fa-minus-circle"></i> Withdraw</a></li>
+        <li><a href="/referrals" class="<%= path==='/referrals'?'active':'' %>"><i class="fas fa-users"></i> Referrals</a></li>
+        <% if (user.isAdmin) { %><li><a href="/admin" style="color:var(--gold)"><i class="fas fa-shield-alt"></i> Admin</a></li><% } %>
+        <li><span class="nav-balance"><i class="fas fa-wallet"></i> <span data-balance>$<%= (user.balance||0).toFixed(4) %></span></span></li>
+        <li><a href="/logout" class="nav-logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+      <% } else { %>
+        <li><a href="/#about">About</a></li>
+        <li><a href="/#how">How It Works</a></li>
+        <li><a href="/markets" class="<%= path==='/markets'?'active':'' %>">Markets</a></li>
+        <li><a href="/plans" class="<%= path==='/plans'?'active':'' %>" style="color:var(--gold)">Plans</a></li>
+        <li><a href="mailto:support@apexinvest.com">Contact</a></li>
+        <li><a href="/login"    class="btn nav-btn-outline"><%= siteCustomize.navSignIn %></a></li>
+        <li><a href="/register" class="btn nav-btn"><%= siteCustomize.navInvestNow %></a></li>
+      <% } %>
+    </ul>
+  </div>
+</nav>
+
+<% if (!user) { %>
+<div class="ticker-bar">
+  <div class="ticker-track">
+    <span class="ticker-item"><span class="t-pair">BTC/USD</span><span class="t-price" id="t-btc">67,420</span><span class="t-change up" id="tc-btc">▲2.4%</span></span>
+    <span class="ticker-item"><span class="t-pair">ETH/USD</span><span class="t-price" id="t-eth">3,512</span><span class="t-change up" id="tc-eth">▲1.8%</span></span>
+    <span class="ticker-item"><span class="t-pair">EUR/USD</span><span class="t-price" id="t-eur">1.0842</span><span class="t-change dn" id="tc-eur">▼0.3%</span></span>
+    <span class="ticker-item"><span class="t-pair">GBP/USD</span><span class="t-price" id="t-gbp">1.2714</span><span class="t-change up" id="tc-gbp">▲0.2%</span></span>
+    <span class="ticker-item"><span class="t-pair">S&amp;P 500</span><span class="t-price" id="t-sp">5,842</span><span class="t-change up" id="tc-sp">▲0.9%</span></span>
+    <span class="ticker-item"><span class="t-pair">NASDAQ</span><span class="t-price" id="t-nas">18,412</span><span class="t-change up" id="tc-nas">▲1.2%</span></span>
+    <span class="ticker-item"><span class="t-pair">XAU/USD</span><span class="t-price" id="t-xau">2,318</span><span class="t-change up" id="tc-xau">▲0.6%</span></span>
+    <span class="ticker-item"><span class="t-pair">SOL/USD</span><span class="t-price" id="t-sol">142.6</span><span class="t-change up" id="tc-sol">▲3.1%</span></span>
+    <span class="ticker-item"><span class="t-pair">BTC/USD</span><span class="t-price">67,420</span><span class="t-change up">▲2.4%</span></span>
+    <span class="ticker-item"><span class="t-pair">ETH/USD</span><span class="t-price">3,512</span><span class="t-change up">▲1.8%</span></span>
+    <span class="ticker-item"><span class="t-pair">EUR/USD</span><span class="t-price">1.0842</span><span class="t-change dn">▼0.3%</span></span>
+    <span class="ticker-item"><span class="t-pair">GBP/USD</span><span class="t-price">1.2714</span><span class="t-change up">▲0.2%</span></span>
+    <span class="ticker-item"><span class="t-pair">S&amp;P 500</span><span class="t-price">5,842</span><span class="t-change up">▲0.9%</span></span>
+    <span class="ticker-item"><span class="t-pair">XAU/USD</span><span class="t-price">2,318</span><span class="t-change up">▲0.6%</span></span>
+    <span class="ticker-item"><span class="t-pair">SOL/USD</span><span class="t-price">142.6</span><span class="t-change up">▲3.1%</span></span>
+  </div>
+</div>
+<% } else { %>
+<div class="ticker-bar">
+  <div class="ticker-track">
+    <span class="ticker-item"><span class="t-pair">BTC/USD</span><span class="t-price" id="dt-btc">$67,420</span><span class="t-change up" id="dtc-btc">▲2.4%</span></span>
+    <span class="ticker-item"><span class="t-pair">ETH/USD</span><span class="t-price" id="dt-eth">$3,512</span><span class="t-change up" id="dtc-eth">▲1.8%</span></span>
+    <span class="ticker-item"><span class="t-pair">EUR/USD</span><span class="t-price" id="dt-eur">1.0842</span><span class="t-change dn" id="dtc-eur">▼0.3%</span></span>
+    <span class="ticker-item"><span class="t-pair">S&amp;P 500</span><span class="t-price" id="dt-sp">5,842</span><span class="t-change up" id="dtc-sp">▲0.9%</span></span>
+    <span class="ticker-item"><span class="t-pair">XAU/USD</span><span class="t-price" id="dt-xau">$2,318</span><span class="t-change up" id="dtc-xau">▲0.6%</span></span>
+    <span class="ticker-item"><span class="t-pair">SOL/USD</span><span class="t-price" id="dt-sol">$142.6</span><span class="t-change up" id="dtc-sol">▲3.1%</span></span>
+    <span class="ticker-item"><span class="t-pair">BTC/USD</span><span class="t-price">$67,420</span><span class="t-change up">▲2.4%</span></span>
+    <span class="ticker-item"><span class="t-pair">ETH/USD</span><span class="t-price">$3,512</span><span class="t-change up">▲1.8%</span></span>
+    <span class="ticker-item"><span class="t-pair">EUR/USD</span><span class="t-price">1.0842</span><span class="t-change dn">▼0.3%</span></span>
+    <span class="ticker-item"><span class="t-pair">S&amp;P 500</span><span class="t-price">5,842</span><span class="t-change up">▲0.9%</span></span>
+    <span class="ticker-item"><span class="t-pair">XAU/USD</span><span class="t-price">$2,318</span><span class="t-change up">▲0.6%</span></span>
+    <span class="ticker-item"><span class="t-pair">SOL/USD</span><span class="t-price">$142.6</span><span class="t-change up">▲3.1%</span></span>
+  </div>
+</div>
+<% } %>
+
+<% if (success && success.length) { %><div class="alert alert-success"><i class="fas fa-check-circle"></i> <%- success[0] %></div><% } %>
+<% if (error && error.length)   { %><div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> <%- error[0] %></div><% } %>
+<% if (info && info.length)     { %><div class="alert alert-info"><i class="fas fa-info-circle"></i> <%- info[0] %></div><% } %>
+
+<main class="main-content">

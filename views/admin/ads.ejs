@@ -1,0 +1,63 @@
+<% pageTitle = 'Admin — Ads' %>
+<%- include('../partials/head') %>
+<%- include('../partials/nav') %>
+<div class="admin-layout">
+  <nav class="admin-sidebar">
+    <div class="sidebar-title">Admin Panel</div>
+    <a href="/admin"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
+    <a href="/admin/plans"><i class="fas fa-layer-group"></i> Plans</a>
+    <a href="/admin/deposits"><i class="fas fa-plus-circle"></i> Deposits</a>
+    <a href="/admin/withdrawals"><i class="fas fa-minus-circle"></i> Withdrawals</a>
+    <a href="/admin/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+    <div class="sidebar-title">Site</div>
+    <a href="/admin/settings"><i class="fas fa-cog"></i> Settings</a>
+    <a href="/admin/customize"><i class="fas fa-paint-brush"></i> Customizer</a>
+    <a href="/dashboard"><i class="fas fa-home"></i> Front End</a>
+    <a href="/logout" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </nav>
+  <div class="admin-main">
+    <div class="page-header"><h1><i class="fas fa-ad"></i> Advertisements</h1></div>
+    <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:1.5rem;align-items:start;">
+      <div class="card">
+        <% if(error){%><div class="alert alert-danger"><%= error %></div><%}%>
+        <form method="POST" action="/admin/ads/save">
+          <% if(editAd){%><input type="hidden" name="ad_id" value="<%= editAd._id %>"><%}%>
+          <div class="form-group"><label class="form-label">Title</label><input type="text" name="title" class="form-control" required value="<%= editAd?editAd.title:'' %>"></div>
+          <div class="form-group"><label class="form-label">URL</label><input type="url" name="url" class="form-control" required value="<%= editAd?editAd.url:'' %>"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group"><label class="form-label">Credit ($)</label><input type="number" name="credit" class="form-control" min="0.000001" step="0.000001" required value="<%= editAd?editAd.credit:0.001 %>"></div>
+            <div class="form-group"><label class="form-label">Duration (sec)</label><input type="number" name="view_seconds" class="form-control" min="5" max="120" required value="<%= editAd?editAd.viewSeconds:30 %>"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group"><label class="form-label">Clicks Available</label><input type="number" name="clicks_available" class="form-control" min="1" required value="<%= editAd?editAd.clicksAvailable:500 %>"></div>
+            <div class="form-group"><label class="form-label">Min Plan</label><select name="min_plan_id" class="form-control"><% plans.forEach(p=>{%><option value="<%= p._id %>" <%= (editAd?editAd.minPlanId:'plan1')===p._id?'selected':''%>><%= p.name %></option><%})%></select></div>
+          </div>
+          <div class="form-group" style="display:flex;align-items:center;gap:.5rem;"><input type="checkbox" name="is_active" id="is_active" <%= (!editAd||editAd.active)?'checked':''%>><label for="is_active" class="form-label" style="margin:0;">Active</label></div>
+          <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-save"></i> Save</button>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title"><i class="fas fa-list"></i> All Ads (<%= ads.length %>)</span></div>
+        <div class="table-responsive"><table class="table">
+          <thead><tr><th>Title</th><th>Credit</th><th>Clicks</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <% ads.forEach(ad=>{%>
+            <tr>
+              <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= ad.title %></td>
+              <td class="text-success">$<%= (ad.credit||0).toFixed(6) %></td>
+              <td style="font-size:.82rem;"><%= (ad.clicksDone||0) %>/<%= (ad.clicksAvailable||0) %></td>
+              <td><%- ad.active?'<span class="badge badge-success">Active</span>':'<span class="badge badge-secondary">Off</span>'%></td>
+              <td>
+                <a href="/admin/ads/edit/<%= ad._id %>" class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></a>
+                <form method="POST" action="/admin/ads/delete" style="display:inline;" onsubmit="return confirm('Delete?')"><input type="hidden" name="ad_id" value="<%= ad._id %>"><button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button></form>
+              </td>
+            </tr>
+            <%})%>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

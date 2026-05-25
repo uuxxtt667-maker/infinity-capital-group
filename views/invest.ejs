@@ -1,0 +1,192 @@
+<% pageTitle = 'Activate Plan — ' + plan.name %>
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+<style>
+.inv-wrap  { max-width:640px; margin:2.5rem auto 4rem; padding:0 1.25rem; }
+.inv-card  { background:var(--card); border:1px solid var(--border); border-radius:18px; overflow:hidden; }
+.inv-hero  { padding:1.75rem 2rem 1.5rem; background:radial-gradient(ellipse at 50% 0%,rgba(245,166,35,.07) 0%,transparent 70%); border-bottom:1px solid var(--border); }
+.inv-body  { padding:1.75rem 2rem; }
+.inv-plan-badge { display:inline-flex; align-items:center; gap:.55rem; font-size:.72rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:.35rem 1rem; border-radius:20px; margin-bottom:.9rem; }
+.inv-plan-name  { font-size:1.5rem; font-weight:900; color:var(--text); margin-bottom:.25rem; display:flex; align-items:center; gap:.55rem; }
+.inv-plan-roi   { font-size:.9rem; color:var(--text2); }
+.inv-meta-grid  { display:grid; grid-template-columns:repeat(3,1fr); gap:.65rem; margin:1.25rem 0; }
+.inv-meta-box   { background:var(--bg2); border-radius:10px; padding:.65rem .9rem; text-align:center; }
+.inv-meta-lbl   { font-size:.63rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text3); margin-bottom:.2rem; }
+.inv-meta-val   { font-size:.95rem; font-weight:800; color:var(--text); }
+.inv-divider    { border:none; border-top:1px solid var(--border); margin:1.25rem 0; }
+.inv-bal-row    { display:flex; align-items:center; justify-content:space-between; background:var(--bg2); border-radius:10px; padding:.75rem 1rem; margin-bottom:1.1rem; }
+.inv-bal-lbl    { font-size:.78rem; color:var(--text2); display:flex; align-items:center; gap:.4rem; }
+.inv-bal-val    { font-size:1.05rem; font-weight:800; }
+.inv-form-lbl   { font-size:.75rem; font-weight:700; color:var(--text2); margin-bottom:.45rem; display:block; }
+.inv-input      { width:100%; padding:.72rem 1rem; border:1px solid var(--border); border-radius:10px; background:var(--bg2); color:var(--text); font-size:1rem; font-weight:700; outline:none; transition:border-color .2s; box-sizing:border-box; }
+.inv-input:focus { border-color:var(--gold); }
+.inv-range-hint { font-size:.72rem; color:var(--text3); margin-top:.35rem; }
+.inv-est-box    { background:rgba(0,230,118,.06); border:1px solid rgba(0,230,118,.12); border-radius:10px; padding:.8rem 1rem; margin:1.1rem 0; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.4rem; }
+.inv-est-lbl    { font-size:.75rem; color:var(--text3); }
+.inv-est-val    { font-size:.95rem; font-weight:800; color:#00e676; }
+.inv-pending-box { background:rgba(245,166,35,.07); border:1px solid rgba(245,166,35,.2); border-radius:12px; padding:1.1rem 1.2rem; text-align:center; }
+.inv-insufficient { background:rgba(244,63,94,.06); border:1px solid rgba(244,63,94,.15); border-radius:12px; padding:1.25rem; text-align:center; }
+</style>
+
+<div class="inv-wrap">
+
+  <% if (error) { %>
+  <div class="alert alert-danger mb-3"><i class="fas fa-exclamation-circle"></i> <%= error %></div>
+  <% } %>
+
+  <div style="margin-bottom:1.1rem">
+    <a href="/plans" style="color:var(--text2);font-size:.82rem;text-decoration:none;"><i class="fas fa-arrow-left" style="margin-right:.35rem"></i>Back to Plans</a>
+  </div>
+
+  <div class="inv-card">
+    <!-- Plan hero -->
+    <div class="inv-hero">
+      <div class="inv-plan-badge" style="background:<%= plan.color %>18;border:1px solid <%= plan.color %>44;color:<%= plan.color %>">
+        <i class="<%= plan.icon %>"></i> <%= plan.name.toUpperCase() %>
+      </div>
+      <div class="inv-plan-name" style="color:<%= plan.color %>"><i class="<%= plan.icon %>"></i> <%= plan.name %></div>
+      <div class="inv-plan-roi"><%= annRoi %>% Annual ROI &middot; <%= plan.durationDays %> Days &middot; <%= plan.withdrawalFreq || 'Monthly' %> Withdrawals</div>
+      <div class="inv-meta-grid">
+        <div class="inv-meta-box">
+          <div class="inv-meta-lbl">Annual ROI</div>
+          <div class="inv-meta-val" style="color:<%= plan.color %>"><%= annRoi %>%</div>
+        </div>
+        <div class="inv-meta-box">
+          <div class="inv-meta-lbl">Duration</div>
+          <div class="inv-meta-val"><%= plan.durationDays %> days</div>
+        </div>
+        <div class="inv-meta-box">
+          <div class="inv-meta-lbl">Min. Invest</div>
+          <div class="inv-meta-val">$<%= (minAmt||0).toLocaleString() %></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="inv-body">
+
+      <!-- User balance -->
+      <div class="inv-bal-row">
+        <span class="inv-bal-lbl"><i class="fas fa-wallet"></i> Available Balance</span>
+        <span class="inv-bal-val" style="color:<%= balance >= minAmt ? '#00e676' : '#f43f5e' %>">$<%= (balance||0).toFixed(2) %></span>
+      </div>
+
+      <% if (existingReq) { %>
+      <!-- Already has a pending request -->
+      <div class="inv-pending-box">
+        <i class="fas fa-clock" style="font-size:2rem;color:var(--gold);margin-bottom:.65rem;display:block"></i>
+        <div style="font-size:1rem;font-weight:800;color:var(--text);margin-bottom:.35rem">Request Pending Review</div>
+        <div style="font-size:.83rem;color:var(--text2)">
+          You have a pending activation request for <strong><%= existingReq.planName %></strong> ($<%= (existingReq.amountUsd||0).toFixed(2) %>).
+          Admin will review it shortly.
+        </div>
+        <a href="/dashboard" class="btn btn-gold" style="margin-top:1.1rem;display:inline-block">
+          <i class="fas fa-home"></i> Go to Dashboard
+        </a>
+      </div>
+
+      <% } else if (!hasEnough) { %>
+      <!-- Insufficient balance -->
+      <div class="inv-insufficient">
+        <i class="fas fa-exclamation-triangle" style="font-size:2rem;color:#f43f5e;margin-bottom:.65rem;display:block"></i>
+        <div style="font-size:1rem;font-weight:800;color:var(--text);margin-bottom:.35rem">Insufficient Balance</div>
+        <div style="font-size:.83rem;color:var(--text2);margin-bottom:1rem">
+          You need at least <strong>$<%= (minAmt||0).toLocaleString() %></strong> to activate this plan.<br>
+          Your balance: <strong style="color:#f43f5e">$<%= (balance||0).toFixed(2) %></strong> &mdash;
+          you need <strong>$<%= Math.max(0, minAmt - balance).toFixed(2) %></strong> more.
+        </div>
+        <a href="/deposit?plan=<%= plan._id %>" class="btn btn-gold">
+          <i class="fas fa-plus-circle"></i> Deposit Funds
+        </a>
+        <a href="/plans" class="btn btn-outline" style="margin-left:.5rem">View Other Plans</a>
+      </div>
+
+      <% } else { %>
+      <!-- Sufficient balance — show activation form -->
+      <hr class="inv-divider">
+      <form method="POST" action="/invest" id="investForm">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <input type="hidden" name="plan_id" value="<%= plan._id %>">
+
+        <label class="inv-form-lbl" for="invest_amount">Investment Amount (USD)</label>
+        <input type="number" id="invest_amount" name="invest_amount"
+          class="inv-input"
+          value="<%= minAmt %>"
+          min="<%= minAmt %>"
+          <% if (maxAmt) { %>max="<%= maxAmt %>"<% } %>
+          step="0.01"
+          oninput="recalc()"
+          required>
+        <div class="inv-range-hint">
+          Min: <strong>$<%= (minAmt||0).toLocaleString() %></strong>
+          <% if (maxAmt) { %>&nbsp;&middot;&nbsp; Max: <strong>$<%= maxAmt.toLocaleString() %></strong><% } else { %>&nbsp;&middot;&nbsp; No maximum<% } %>
+          &nbsp;&middot;&nbsp; Your balance: <strong>$<%= (balance||0).toFixed(2) %></strong>
+        </div>
+
+        <!-- Live earnings estimate -->
+        <div class="inv-est-box" id="estBox">
+          <div>
+            <div class="inv-est-lbl">Estimated Total Return</div>
+            <div class="inv-est-val" id="estTotal">—</div>
+          </div>
+          <div style="text-align:right">
+            <div class="inv-est-lbl">Est. Daily Earnings</div>
+            <div class="inv-est-val" id="estDaily">—</div>
+          </div>
+          <div style="text-align:right">
+            <div class="inv-est-lbl">After <%= plan.durationDays %> Days</div>
+            <div class="inv-est-val" id="estAfter" style="color:var(--gold)">—</div>
+          </div>
+        </div>
+
+        <div style="background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.15);border-radius:10px;padding:.75rem 1rem;font-size:.78rem;color:var(--text2);margin-bottom:1.25rem">
+          <i class="fas fa-info-circle" style="color:var(--gold);margin-right:.3rem"></i>
+          The investment amount will be <strong>held</strong> from your balance and activated once an admin approves your request (usually within 1 hour).
+        </div>
+
+        <button type="submit" class="btn btn-gold btn-block" style="font-size:1rem;padding:.85rem;">
+          <i class="<%= plan.icon %>"></i> Submit Plan Activation Request
+        </button>
+        <a href="/plans" class="btn btn-outline btn-block" style="margin-top:.6rem;text-align:center;display:block">
+          Cancel — Back to Plans
+        </a>
+      </form>
+      <% } %>
+
+    </div>
+  </div>
+</div>
+
+<script>
+var _annRoi  = <%= annRoi %>;
+var _days    = <%= plan.durationDays %>;
+var _minAmt  = <%= minAmt %>;
+var _maxAmt  = <%= maxAmt || 0 %>;
+var _balance = <%= balance %>;
+
+function recalc() {
+  var amt    = parseFloat(document.getElementById('invest_amount').value) || _minAmt;
+  var annual = amt * _annRoi / 100;
+  var total  = annual * _days / 365;
+  var daily  = annual / 365;
+  var after  = amt + total;
+  function fmt(n) { return '$' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+  document.getElementById('estTotal').textContent = fmt(total);
+  document.getElementById('estDaily').textContent = fmt(daily);
+  document.getElementById('estAfter').textContent = fmt(after);
+
+  /* Validate against balance */
+  var btn = document.querySelector('#investForm button[type=submit]');
+  if (amt > _balance) {
+    btn.disabled = true;
+    btn.style.opacity = '.5';
+    btn.textContent = 'Insufficient Balance';
+  } else {
+    btn.disabled = false;
+    btn.style.opacity = '';
+    btn.innerHTML = '<i class="<%= plan.icon %>"></i> Submit Plan Activation Request';
+  }
+}
+document.addEventListener('DOMContentLoaded', recalc);
+</script>
+
+<%- include('partials/footer') %>

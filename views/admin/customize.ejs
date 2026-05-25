@@ -1,0 +1,1112 @@
+<% pageTitle = 'Admin — Site Customizer' %>
+<%- include('../partials/head') %>
+<%- include('../partials/nav') %>
+<div class="admin-layout">
+  <nav class="admin-sidebar">
+    <div class="sidebar-title">Admin Panel</div>
+    <a href="/admin"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
+    <a href="/admin/plans"><i class="fas fa-layer-group"></i> Plans</a>
+    <a href="/admin/plan-requests"><i class="fas fa-tasks"></i> Plan Requests</a>
+    <a href="/admin/deposits"><i class="fas fa-plus-circle"></i> Deposits</a>
+    <a href="/admin/withdrawals"><i class="fas fa-minus-circle"></i> Withdrawals</a>
+    <a href="/admin/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+    <div class="sidebar-title">Site</div>
+    <a href="/admin/settings"><i class="fas fa-cog"></i> Settings</a>
+    <a href="/admin/customize" class="active"><i class="fas fa-paint-brush"></i> Customizer</a>
+    <a href="/dashboard"><i class="fas fa-home"></i> Front End</a>
+    <a href="/logout" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </nav>
+  <div class="admin-main">
+    <div class="page-header">
+      <h1><i class="fas fa-paint-brush"></i> Site Customizer</h1>
+      <div style="display:flex;gap:.5rem;">
+        <a href="/plans" target="_blank" class="btn btn-outline btn-sm"><i class="fas fa-eye"></i> Preview Site</a>
+      </div>
+    </div>
+
+    <!-- TAB NAV -->
+    <div class="tabs mb-3" style="flex-wrap:wrap;gap:.35rem;">
+      <% [['branding','fas fa-copyright','Branding'],['colors','fas fa-palette','Colors'],['fonts','fas fa-font','Fonts'],['backgrounds','fas fa-image','Backgrounds'],['content','fas fa-align-left','Texts']].forEach(function(t){ %>
+      <a href="/admin/customize?tab=<%= t[0] %>" class="tab-btn <%= tab===t[0]?'active':'' %>" style="text-decoration:none;">
+        <i class="<%= t[1] %>"></i> <%= t[2] %>
+      </a>
+      <% }); %>
+    </div>
+
+    <!-- ══════════════════════════════════ TAB: BRANDING ══ -->
+    <% if (tab === 'branding') { %>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><i class="fas fa-copyright"></i> Branding & Identity</span>
+        <form method="POST" action="/admin/customize/reset" style="display:inline">
+          <input type="hidden" name="section" value="branding">
+          <button class="btn btn-outline btn-sm" onclick="return confirm('Reset branding to defaults?')"><i class="fas fa-undo"></i> Reset</button>
+        </form>
+      </div>
+      <form method="POST" action="/admin/customize/branding">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+          <div class="form-group">
+            <label class="form-label">Logo Text <span style="color:var(--text-muted);font-weight:400">(first part)</span></label>
+            <input type="text" name="logoText" class="form-control" value="<%= customize.logoText %>" placeholder="APEX">
+            <p class="form-text">Displayed without color</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Logo Accent <span style="color:var(--text-muted);font-weight:400">(colored part)</span></label>
+            <input type="text" name="logoAccent" class="form-control" value="<%= customize.logoAccent %>" placeholder="INVEST">
+            <p class="form-text">Shown in gold/primary color</p>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Footer Tagline</label>
+          <textarea name="footerTagline" class="form-control" rows="2"><%= customize.footerTagline %></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Support Email</label>
+          <input type="email" name="supportEmail" class="form-control" value="<%= customize.supportEmail %>" placeholder="support@yoursite.com">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+          <div class="form-group">
+            <label class="form-label"><i class="fab fa-telegram" style="color:#0088cc"></i> Telegram Link</label>
+            <input type="url" name="telegramLink" class="form-control" value="<%= customize.telegramLink %>" placeholder="https://t.me/yourhandle">
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fab fa-whatsapp" style="color:#25d366"></i> WhatsApp Link</label>
+            <input type="url" name="whatsappLink" class="form-control" value="<%= customize.whatsappLink %>" placeholder="https://wa.me/1234567890">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Footer Disclaimer</label>
+          <textarea name="footerDisclaimer" class="form-control" rows="3"><%= customize.footerDisclaimer %></textarea>
+        </div>
+        <div style="display:flex;gap:.75rem;margin-top:.5rem;">
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Branding</button>
+          <a href="/" target="_blank" class="btn btn-outline"><i class="fas fa-eye"></i> Preview</a>
+        </div>
+      </form>
+    </div>
+    <% } %>
+
+    <!-- ══════════════════════════════════ TAB: COLORS ══ -->
+    <% if (tab === 'colors') { %>
+    <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;align-items:start;">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><i class="fas fa-palette"></i> Color Scheme</span>
+          <form method="POST" action="/admin/customize/reset" style="display:inline">
+            <input type="hidden" name="section" value="colors">
+            <button class="btn btn-outline btn-sm" onclick="return confirm('Reset colors to defaults?')"><i class="fas fa-undo"></i> Reset</button>
+          </form>
+        </div>
+        <form method="POST" action="/admin/customize/colors" id="colorsForm">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <% var colorFields = [
+              ['colorPrimary','Primary / Blue','Main accent, buttons, links'],
+              ['colorGold','Gold / Highlight','Earnings, highlights'],
+              ['colorGreen','Green / Success','Positive values, success'],
+              ['colorRed','Red / Danger','Warnings, negative values'],
+              ['colorPurple','Purple / Accent','Referrals, misc accent'],
+              ['colorBg','Background','Main page background'],
+              ['colorBg2','Background 2','Cards, secondary surfaces'],
+              ['colorCard','Card Background','Card components'],
+              ['colorBorder','Border Color','Lines, dividers'],
+              ['colorText','Text Primary','Main text color'],
+              ['colorText2','Text Secondary','Subtitles, labels'],
+              ['colorText3','Text Muted','Placeholder, hints'],
+            ]; %>
+            <% colorFields.forEach(function(cf) { %>
+            <div class="form-group" style="display:flex;align-items:center;gap:.75rem;background:var(--content-bg);border:1px solid var(--card-border);border-radius:8px;padding:.6rem .75rem;">
+              <input type="color" name="<%= cf[0] %>" value="<%= customize[cf[0]] %>"
+                oninput="updatePreview('<%= cf[0] %>',this.value)"
+                style="width:38px;height:38px;border:none;padding:0;background:none;cursor:pointer;flex-shrink:0;border-radius:6px;overflow:hidden;">
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:.82rem;font-weight:700;color:var(--text)"><%= cf[1] %></div>
+                <div style="font-size:.72rem;color:var(--text-muted)"><%= cf[2] %></div>
+                <input type="text" style="font-size:.75rem;font-family:monospace;border:none;background:none;color:var(--text-secondary);width:100%;outline:none;padding:0;margin-top:.1rem;"
+                  value="<%= customize[cf[0]] %>"
+                  oninput="document.querySelector('[name=<%= cf[0] %>]').value=this.value;updatePreview('<%= cf[0] %>',this.value)">
+              </div>
+            </div>
+            <% }); %>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top:1rem;"><i class="fas fa-save"></i> Save Colors</button>
+        </form>
+      </div>
+      <!-- Live Color Preview -->
+      <div class="card" style="position:sticky;top:80px;">
+        <div class="card-header"><span class="card-title"><i class="fas fa-eye"></i> Live Preview</span></div>
+        <div id="colorPreview" style="padding:.75rem;display:flex;flex-direction:column;gap:.75rem;">
+          <div id="prev-bg" style="border-radius:10px;padding:1rem;background:#ffffff;border:1px solid #e2e8f0;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;">
+              <span id="prev-logo" style="font-size:1.1rem;font-weight:900;color:#1e293b">APEX<span id="prev-accent" style="color:#f5a623">INVEST</span></span>
+              <div style="display:flex;gap:.4rem;">
+                <span id="prev-btn-primary" style="background:#3d8ef0;color:#fff;padding:.3rem .75rem;border-radius:6px;font-size:.75rem;font-weight:700">Button</span>
+                <span id="prev-btn-gold" style="background:#f5a623;color:#000;padding:.3rem .75rem;border-radius:6px;font-size:.75rem;font-weight:700">Gold</span>
+              </div>
+            </div>
+            <div id="prev-card" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:.75rem;">
+              <div id="prev-text" style="font-size:.9rem;font-weight:700;color:#1e293b;margin-bottom:.3rem;">Card Title</div>
+              <div id="prev-text2" style="font-size:.78rem;color:#64748b;margin-bottom:.5rem;">Secondary text for labels</div>
+              <div style="display:flex;gap:.5rem;">
+                <span id="prev-green" style="color:#059669;font-size:.8rem;font-weight:700">+$124.50</span>
+                <span id="prev-red" style="color:#dc2626;font-size:.8rem;font-weight:700">-$12.00</span>
+                <span id="prev-purple" style="color:#7c3aed;font-size:.8rem;font-weight:700">Referral</span>
+              </div>
+              <div id="prev-border" style="height:1px;background:#e2e8f0;margin:.6rem 0;"></div>
+              <div id="prev-text3" style="font-size:.72rem;color:#94a3b8">Muted hint text</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:.75rem 1rem;font-size:.75rem;color:var(--text-muted);border-top:1px solid var(--card-border);"><i class="fas fa-info-circle"></i> Colors update live as you pick them</div>
+      </div>
+    </div>
+    <% } %>
+
+    <!-- ══════════════════════════════════ TAB: FONTS ══ -->
+    <% if (tab === 'fonts') { %>
+    <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;align-items:start;">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><i class="fas fa-font"></i> Typography</span>
+          <form method="POST" action="/admin/customize/reset" style="display:inline">
+            <input type="hidden" name="section" value="fonts">
+            <button class="btn btn-outline btn-sm" onclick="return confirm('Reset fonts to defaults?')"><i class="fas fa-undo"></i> Reset</button>
+          </form>
+        </div>
+        <form method="POST" action="/admin/customize/fonts">
+          <div class="form-group">
+            <label class="form-label">Font Family</label>
+            <select name="fontPreset" class="form-control" onchange="handleFontSelect(this)">
+              <% var fonts = [
+                ["'Segoe UI', system-ui, sans-serif","Segoe UI (System Default)"],
+                ["'Inter', sans-serif","Inter (Clean Modern)"],
+                ["'Roboto', sans-serif","Roboto (Google)"],
+                ["'Poppins', sans-serif","Poppins (Friendly)"],
+                ["'Montserrat', sans-serif","Montserrat (Bold)"],
+                ["'Lato', sans-serif","Lato (Readable)"],
+                ["'Nunito', sans-serif","Nunito (Rounded)"],
+                ["'Open Sans', sans-serif","Open Sans (Neutral)"],
+                ["'Raleway', sans-serif","Raleway (Elegant)"],
+                ["'Space Grotesk', sans-serif","Space Grotesk (Techy)"],
+                ["'Playfair Display', serif","Playfair Display (Luxury Serif)"],
+                ["'DM Sans', sans-serif","DM Sans (Clean)"],
+                ["custom","— Custom Font —"],
+              ]; %>
+              <% fonts.forEach(function(f){ %>
+              <option value="<%= f[0] %>" <%= customize.fontFamily === f[0] ? 'selected' : '' %>><%= f[1] %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="form-group" id="customFontWrap" style="display:<%= ['Inter','Roboto','Poppins','Montserrat','Lato','Nunito','Open Sans','Raleway','Space Grotesk','Playfair Display','DM Sans',"'Segoe UI', system-ui, sans-serif"].some(function(f){return customize.fontFamily.includes(f.replace(/'/g,''))}) ? 'none' : 'block' %>">
+            <label class="form-label">Custom Font Family <span style="color:var(--text-muted);font-weight:400">(CSS value)</span></label>
+            <input type="text" name="fontCustom" class="form-control" value="<%= customize.fontFamily %>" placeholder="'YourFont', sans-serif">
+            <p class="form-text">Enter the CSS font-family value exactly</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Google Fonts URL <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+            <input type="url" name="fontUrl" class="form-control" value="<%= customize.fontUrl %>" placeholder="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+            <p class="form-text">Paste a Google Fonts embed URL to load a custom font. Leave blank for system fonts.</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Base Font Size</label>
+            <div style="display:flex;align-items:center;gap:.75rem;">
+              <input type="range" name="fontSizeBase" min="12" max="20" step="1"
+                value="<%= parseInt(customize.fontSizeBase)||15 %>"
+                oninput="document.getElementById('fontSizeVal').textContent=this.value+'px'"
+                style="flex:1">
+              <span id="fontSizeVal" style="font-size:.9rem;font-weight:700;min-width:36px"><%= customize.fontSizeBase %></span>
+            </div>
+          </div>
+
+          <!-- Font Quick-Links -->
+          <div style="background:var(--content-bg);border:1px solid var(--card-border);border-radius:8px;padding:.85rem;margin-bottom:1.25rem;">
+            <div style="font-size:.78rem;font-weight:700;margin-bottom:.5rem;"><i class="fab fa-google" style="color:#4285f4"></i> Popular Google Fonts Quick Links</div>
+            <div style="display:flex;flex-wrap:wrap;gap:.4rem;">
+              <% var gfLinks = [
+                ['Inter','https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap'],
+                ['Poppins','https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap'],
+                ['Roboto','https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap'],
+                ['Montserrat','https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap'],
+                ['Lato','https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap'],
+                ['Nunito','https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap'],
+                ['DM Sans','https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap'],
+                ['Space Grotesk','https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap'],
+              ]; %>
+              <% gfLinks.forEach(function(gl){ %>
+              <button type="button" class="btn btn-outline btn-sm" onclick="fillGF('<%= gl[0] %>','<%= gl[1] %>')" style="font-size:.72rem;padding:.25rem .6rem;"><%= gl[0] %></button>
+              <% }); %>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-save"></i> Save Font Settings</button>
+        </form>
+      </div>
+      <!-- Font Preview -->
+      <div class="card" style="position:sticky;top:80px;">
+        <div class="card-header"><span class="card-title"><i class="fas fa-eye"></i> Font Preview</span></div>
+        <div id="fontPreview" style="padding:1.25rem;display:flex;flex-direction:column;gap:.75rem;">
+          <div style="font-size:1.6rem;font-weight:900;color:var(--text)">Investment Platform</div>
+          <div style="font-size:1rem;font-weight:600;color:var(--text2)">Grow Your Wealth Daily</div>
+          <div style="font-size:.85rem;color:var(--text3);line-height:1.6;">Invest in Crypto · Forex · Stocks · Real Estate — we manage, you earn with guaranteed returns.</div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+            <span style="background:var(--blue);color:#fff;padding:.3rem .75rem;border-radius:6px;font-size:.8rem;font-weight:700">Get Started</span>
+            <span style="background:var(--gold);color:#000;padding:.3rem .75rem;border-radius:6px;font-size:.8rem;font-weight:700">$48M+</span>
+          </div>
+          <div style="font-size:.72rem;color:var(--text3);">Base size: <span id="prevFontSz"><%= customize.fontSizeBase %></span> · Family: <span id="prevFontFam" style="font-family:inherit"><%= customize.fontFamily %></span></div>
+        </div>
+      </div>
+    </div>
+    <% } %>
+
+    <!-- ══════════════════════════════════ TAB: BACKGROUNDS ══ -->
+    <% if (tab === 'backgrounds') { %>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><i class="fas fa-image"></i> Page Backgrounds</span>
+        <form method="POST" action="/admin/customize/reset" style="display:inline">
+          <input type="hidden" name="section" value="backgrounds">
+          <button class="btn btn-outline btn-sm" onclick="return confirm('Clear all backgrounds?')"><i class="fas fa-undo"></i> Clear All</button>
+        </form>
+      </div>
+
+      <!-- HOW TO GET A DIRECT IMAGE URL -->
+      <div style="background:rgba(61,142,240,.07);border:1px solid rgba(61,142,240,.25);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;">
+        <div style="font-size:.82rem;font-weight:700;color:var(--blue);margin-bottom:.5rem;"><i class="fas fa-lightbulb"></i> How to get a direct image URL</div>
+        <div style="font-size:.78rem;color:var(--text-secondary);line-height:1.7;">
+          You need a <strong>direct link to the image file</strong> (ending in <code>.jpg</code>, <code>.png</code>, <code>.webp</code>, etc.) — NOT a webpage link.<br>
+          <strong>Free sources:</strong>
+          <a href="https://unsplash.com" target="_blank" style="color:var(--blue)">Unsplash.com</a> — open image → right-click → <em>Copy image address</em>&nbsp;&nbsp;|&nbsp;&nbsp;
+          <a href="https://imgur.com/upload" target="_blank" style="color:var(--blue)">Imgur.com</a> — upload → use direct link&nbsp;&nbsp;|&nbsp;&nbsp;
+          <a href="https://postimages.org" target="_blank" style="color:var(--blue)">PostImages.org</a> — upload → copy Direct Link<br>
+          <strong style="color:var(--danger)">⚠ Do NOT paste a webpage URL</strong> (e.g. a .html link). The image must load directly in a browser tab as just the image.
+        </div>
+      </div>
+
+      <form method="POST" action="/admin/customize/backgrounds">
+
+        <!-- ══ SECTION SLIDESHOWS — inside form so inputs are submitted ══ -->
+        <%
+          var _heroImgs   = [];
+          var _bottomImgs = [];
+          try { _heroImgs   = JSON.parse(customize.bgHeroImages   || '[]'); } catch(e){}
+          try { _bottomImgs = JSON.parse(customize.bgBottomImages || '[]'); } catch(e){}
+        %>
+        <div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.25);border-radius:12px;padding:1.25rem;margin-bottom:1.75rem;">
+          <div style="font-size:.9rem;font-weight:800;color:var(--gold);margin-bottom:.25rem;"><i class="fas fa-images"></i> Landing Page — Section Slideshow Backgrounds</div>
+          <div style="font-size:.78rem;color:var(--text-secondary);margin-bottom:1.25rem;">Add multiple images to the <strong>Hero (top)</strong> and <strong>Bottom Banner</strong> sections. They auto-rotate with a smooth fade. Leave empty to use the single image / colour below.</div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+
+            <!-- ── Hero / Top ── -->
+            <div style="background:var(--content-bg);border:1px solid var(--card-border);border-radius:10px;padding:1rem;">
+              <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.85rem;">
+                <span style="background:rgba(61,142,240,.12);color:var(--blue);padding:.2rem .65rem;border-radius:20px;font-size:.72rem;font-weight:700;"><i class="fas fa-arrow-up"></i> HERO TOP</span>
+                <span style="font-size:.8rem;font-weight:700;color:var(--text);">Hero Section Slideshow</span>
+              </div>
+
+              <div id="heroImgList" style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:.75rem;">
+                <% if (_heroImgs.length === 0) { %>
+                <div class="slide-row" style="display:flex;gap:.4rem;align-items:center;">
+                  <input type="text" name="bgHeroImages[]" class="form-control slide-url" style="font-size:.79rem;font-family:monospace;" placeholder="https://…image.jpg">
+                  <button type="button" class="btn btn-danger btn-sm slide-del" title="Remove"><i class="fas fa-times"></i></button>
+                </div>
+                <% } else { _heroImgs.forEach(function(url) { %>
+                <div class="slide-row" style="display:flex;gap:.4rem;align-items:center;">
+                  <input type="text" name="bgHeroImages[]" class="form-control slide-url" style="font-size:.79rem;font-family:monospace;" value="<%= url %>" placeholder="https://…image.jpg">
+                  <button type="button" class="btn btn-danger btn-sm slide-del" title="Remove"><i class="fas fa-times"></i></button>
+                </div>
+                <% }); } %>
+              </div>
+              <button type="button" class="btn btn-outline btn-sm" onclick="addSlideRow('heroImgList','bgHeroImages[]')"><i class="fas fa-plus"></i> Add Image</button>
+
+              <div style="margin-top:.85rem;display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+                <div>
+                  <label class="form-label" style="font-size:.73rem;">Interval (seconds): <strong id="heroIntVal"><%= customize.bgHeroSlideInterval||5 %></strong></label>
+                  <input type="range" name="bgHeroSlideInterval" min="2" max="20" step="1"
+                    value="<%= customize.bgHeroSlideInterval||5 %>"
+                    oninput="document.getElementById('heroIntVal').textContent=this.value" style="width:100%">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size:.73rem;">Overlay Darkness: <strong id="heroOvVal"><%= customize.bgHeroSlideOverlay||0 %></strong></label>
+                  <input type="range" name="bgHeroSlideOverlay" min="0" max="0.95" step="0.05"
+                    value="<%= customize.bgHeroSlideOverlay||0 %>"
+                    oninput="document.getElementById('heroOvVal').textContent=parseFloat(this.value).toFixed(2)" style="width:100%">
+                </div>
+              </div>
+
+              <!-- thumbnail strip -->
+              <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.75rem;">
+                <% _heroImgs.forEach(function(url,i){ %>
+                <div style="width:60px;height:40px;border-radius:5px;background:url('<%= url %>') center/cover;border:2px solid var(--blue);position:relative;" title="Image <%= i+1 %>">
+                  <span style="position:absolute;bottom:1px;right:3px;font-size:.55rem;font-weight:800;color:#fff;text-shadow:0 1px 3px #000"><%= i+1 %></span>
+                </div>
+                <% }); %>
+                <% if(!_heroImgs.length){ %><span style="font-size:.72rem;color:var(--text-muted);line-height:40px;">No images yet</span><% } %>
+              </div>
+            </div>
+
+            <!-- ── Bottom Banner ── -->
+            <div style="background:var(--content-bg);border:1px solid var(--card-border);border-radius:10px;padding:1rem;">
+              <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.85rem;">
+                <span style="background:rgba(0,230,118,.12);color:var(--green);padding:.2rem .65rem;border-radius:20px;font-size:.72rem;font-weight:700;"><i class="fas fa-arrow-down"></i> BOTTOM</span>
+                <span style="font-size:.8rem;font-weight:700;color:var(--text);">Bottom Banner Slideshow</span>
+              </div>
+
+              <div id="bottomImgList" style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:.75rem;">
+                <% if (_bottomImgs.length === 0) { %>
+                <div class="slide-row" style="display:flex;gap:.4rem;align-items:center;">
+                  <input type="text" name="bgBottomImages[]" class="form-control slide-url" style="font-size:.79rem;font-family:monospace;" placeholder="https://…image.jpg">
+                  <button type="button" class="btn btn-danger btn-sm slide-del" title="Remove"><i class="fas fa-times"></i></button>
+                </div>
+                <% } else { _bottomImgs.forEach(function(url) { %>
+                <div class="slide-row" style="display:flex;gap:.4rem;align-items:center;">
+                  <input type="text" name="bgBottomImages[]" class="form-control slide-url" style="font-size:.79rem;font-family:monospace;" value="<%= url %>" placeholder="https://…image.jpg">
+                  <button type="button" class="btn btn-danger btn-sm slide-del" title="Remove"><i class="fas fa-times"></i></button>
+                </div>
+                <% }); } %>
+              </div>
+              <button type="button" class="btn btn-outline btn-sm" onclick="addSlideRow('bottomImgList','bgBottomImages[]')"><i class="fas fa-plus"></i> Add Image</button>
+
+              <div style="margin-top:.85rem;display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+                <div>
+                  <label class="form-label" style="font-size:.73rem;">Interval (seconds): <strong id="botIntVal"><%= customize.bgBottomSlideInterval||6 %></strong></label>
+                  <input type="range" name="bgBottomSlideInterval" min="2" max="20" step="1"
+                    value="<%= customize.bgBottomSlideInterval||6 %>"
+                    oninput="document.getElementById('botIntVal').textContent=this.value" style="width:100%">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size:.73rem;">Overlay Darkness: <strong id="botOvVal"><%= customize.bgBottomSlideOverlay||0.4 %></strong></label>
+                  <input type="range" name="bgBottomSlideOverlay" min="0" max="0.95" step="0.05"
+                    value="<%= customize.bgBottomSlideOverlay||0.4 %>"
+                    oninput="document.getElementById('botOvVal').textContent=parseFloat(this.value).toFixed(2)" style="width:100%">
+                </div>
+              </div>
+
+              <!-- thumbnail strip -->
+              <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.75rem;">
+                <% _bottomImgs.forEach(function(url,i){ %>
+                <div style="width:60px;height:40px;border-radius:5px;background:url('<%= url %>') center/cover;border:2px solid var(--green);position:relative;" title="Image <%= i+1 %>">
+                  <span style="position:absolute;bottom:1px;right:3px;font-size:.55rem;font-weight:800;color:#fff;text-shadow:0 1px 3px #000"><%= i+1 %></span>
+                </div>
+                <% }); %>
+                <% if(!_bottomImgs.length){ %><span style="font-size:.72rem;color:var(--text-muted);line-height:40px;">No images yet</span><% } %>
+              </div>
+            </div>
+
+          </div><!-- /2-col grid -->
+        </div><!-- /gold panel -->
+
+        <!-- ══ LANDING PAGE SECTION BACKGROUNDS ══ -->
+        <%
+          var _landingSections = [
+            ['bgAbout',     'bgOverlayAbout',     'fas fa-info-circle',  'About Us',     '#3d8ef0', '/#about'],
+            ['bgHow',       'bgOverlayHow',       'fas fa-list-ol',      'How It Works', '#f5a623', '/#how'],
+            ['bgAnalytics', 'bgOverlayAnalytics', 'fas fa-chart-bar',    'Analytics',    '#9b59b6', '/#analytics'],
+            ['bgPortfolio', 'bgOverlayPortfolio', 'fas fa-chart-pie',    'Portfolio',    '#00e676', '/#portfolio'],
+            ['bgContact',   'bgOverlayContact',   'fas fa-envelope',     'Contact',      '#00d4ff', '/#contact'],
+          ];
+        %>
+        <div style="background:rgba(61,142,240,.05);border:1px solid rgba(61,142,240,.2);border-radius:12px;padding:1.25rem;margin-bottom:1.75rem;">
+          <div style="font-size:.9rem;font-weight:800;color:var(--blue);margin-bottom:.25rem;"><i class="fas fa-layer-group"></i> Landing Page — Section Backgrounds</div>
+          <div style="font-size:.78rem;color:var(--text-secondary);margin-bottom:1.25rem;">Set a background image for each section block on the landing page (About Us, How It Works, Analytics, Portfolio).</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;">
+            <% _landingSections.forEach(function(sec){ %>
+            <div style="background:var(--content-bg);border:1px solid var(--card-border);border-radius:10px;padding:1rem;">
+              <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.8rem;">
+                <i class="<%= sec[2] %>" style="color:<%= sec[4] %>;font-size:1rem;"></i>
+                <strong style="font-size:.85rem;color:var(--text);"><%= sec[3] %></strong>
+                <a href="<%= sec[5] %>" target="_blank" style="margin-left:auto;font-size:.72rem;color:var(--blue)"><i class="fas fa-external-link-alt"></i> View</a>
+              </div>
+              <!-- URL input -->
+              <div style="display:flex;gap:.4rem;align-items:center;margin-bottom:.4rem;">
+                <input type="text" name="<%= sec[0] %>" id="inp-<%= sec[0] %>" class="form-control"
+                  style="font-size:.79rem;font-family:monospace;"
+                  value="<%= customize[sec[0]]||'' %>"
+                  placeholder="https://…image.jpg"
+                  oninput="liveTestImage('<%= sec[0] %>',this.value)">
+                <button type="button" class="btn btn-outline btn-sm" style="flex-shrink:0;" title="Clear"
+                  onclick="clearBg('<%= sec[0] %>')"><i class="fas fa-times"></i></button>
+              </div>
+              <div id="status-<%= sec[0] %>" style="font-size:.72rem;margin-bottom:.5rem;min-height:1rem;"></div>
+              <!-- Overlay -->
+              <label style="font-size:.72rem;color:var(--text-muted);">Overlay: <strong id="ov-<%= sec[0] %>"><%= customize[sec[1]]||'0' %></strong></label>
+              <input type="range" name="<%= sec[1] %>" min="0" max="0.95" step="0.05"
+                value="<%= customize[sec[1]]||'0' %>"
+                oninput="document.getElementById('ov-<%= sec[0] %>').textContent=parseFloat(this.value).toFixed(2);updateBgPreviewDiv('<%= sec[0] %>')"
+                style="width:100%;margin-bottom:.6rem;">
+              <!-- Preview box -->
+              <div id="prev-<%= sec[0] %>"
+                style="border-radius:7px;height:60px;border:2px dashed var(--card-border);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;transition:all .3s;<%= customize[sec[0]] ? 'background:url(\''+customize[sec[0]]+'\') center/cover no-repeat;border-style:solid;' : '' %>">
+                <% if(customize[sec[0]]){ %>
+                <div style="position:absolute;inset:0;background:rgba(0,0,0,<%= customize[sec[1]]||'0' %>)"></div>
+                <span style="position:relative;color:#fff;font-weight:700;font-size:.7rem;text-shadow:0 1px 4px rgba(0,0,0,.8)">Preview</span>
+                <% } else { %>
+                <span style="font-size:.7rem;color:var(--text-muted)">No image set</span>
+                <% } %>
+              </div>
+            </div>
+            <% }); %>
+          </div>
+        </div><!-- /section backgrounds panel -->
+
+        <!-- ══ PER-PAGE BACKGROUNDS ══ -->
+        <div style="font-size:.82rem;font-weight:700;color:var(--text-muted);margin-bottom:.85rem;padding-bottom:.4rem;border-bottom:1px solid var(--card-border);"><i class="fas fa-file"></i> Individual Page Backgrounds</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+          <%
+          var bgPages = [
+            ['bgHome','bgOverlayHome','colorBgHome','fas fa-home','Home / Landing Page','/'],
+            ['bgDashboard','bgOverlayDashboard','colorBgDashboard','fas fa-chart-line','User Dashboard','/dashboard'],
+            ['bgPlans','bgOverlayPlans','colorBgPlans','fas fa-layer-group','Investment Plans','/plans'],
+            ['bgDeposit','bgOverlayDeposit','','fas fa-plus-circle','Deposit Page','/deposit'],
+            ['bgWithdraw','bgOverlayWithdraw','','fas fa-minus-circle','Withdraw Page','/withdraw'],
+            ['bgLogin','bgOverlayLogin','','fas fa-sign-in-alt','Login Page','/login'],
+            ['bgRegister','bgOverlayRegister','','fas fa-user-plus','Register Page','/register'],
+            ['bgAdmin','bgOverlayAdmin','','fas fa-shield-alt','Admin Panel','/admin'],
+          ];
+          %>
+          <% bgPages.forEach(function(pg){ %>
+          <div style="background:var(--content-bg);border:1px solid var(--card-border);border-radius:10px;padding:1rem;">
+            <!-- page title row -->
+            <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.85rem;">
+              <i class="<%= pg[3] %>" style="color:var(--blue);width:16px;"></i>
+              <strong style="font-size:.85rem;"><%= pg[4] %></strong>
+              <a href="<%= pg[5] %>" target="_blank" style="margin-left:auto;font-size:.72rem;color:var(--blue)"><i class="fas fa-external-link-alt"></i> Open Page</a>
+            </div>
+
+            <!-- Background Color (only for pages that have it) -->
+            <% if (pg[2]) { %>
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem;background:var(--bg);border:1px solid var(--card-border);border-radius:7px;padding:.5rem .7rem;">
+              <input type="color" name="<%= pg[2] %>"
+                value="<%= customize[pg[2]] || '#ffffff' %>"
+                id="colorpick-<%= pg[2] %>"
+                oninput="updateBgColor('<%= pg[0] %>',this.value)"
+                style="width:34px;height:34px;border:none;padding:2px;background:none;cursor:pointer;border-radius:5px;flex-shrink:0;">
+              <div style="flex:1;">
+                <div style="font-size:.75rem;font-weight:700;color:var(--text)">Background Colour</div>
+                <div style="font-size:.68rem;color:var(--text-muted)">Shown when no image is set (or behind it)</div>
+              </div>
+              <input type="text" style="font-size:.72rem;font-family:monospace;border:1px solid var(--card-border);background:var(--content-bg);color:var(--text);width:74px;padding:.25rem .4rem;border-radius:5px;outline:none;"
+                value="<%= customize[pg[2]] || '#ffffff' %>"
+                oninput="document.getElementById('colorpick-<%= pg[2] %>').value=this.value;updateBgColor('<%= pg[0] %>',this.value)">
+            </div>
+            <% } %>
+
+            <!-- Image URL input -->
+            <div class="form-group" style="margin-bottom:.6rem;">
+              <label class="form-label" style="font-size:.75rem;"><i class="fas fa-image" style="color:var(--blue)"></i> Background Image URL <span style="color:var(--text-muted);font-weight:400;">(direct image link)</span></label>
+              <div style="display:flex;gap:.4rem;align-items:center;">
+                <input type="text" name="<%= pg[0] %>" id="inp-<%= pg[0] %>" class="form-control" style="font-size:.79rem;font-family:monospace;"
+                  value="<%= customize[pg[0]] %>" placeholder="https://images.unsplash.com/photo-…?w=1920"
+                  oninput="liveTestImage('<%= pg[0] %>', this.value)">
+                <button type="button" class="btn btn-outline btn-sm" style="flex-shrink:0;" title="Clear"
+                  onclick="clearBg('<%= pg[0] %>')"><i class="fas fa-times"></i></button>
+              </div>
+              <!-- status bar -->
+              <div id="status-<%= pg[0] %>" style="font-size:.72rem;margin-top:.3rem;min-height:1rem;"></div>
+            </div>
+
+            <!-- Overlay slider -->
+            <div class="form-group" style="margin-bottom:.5rem;">
+              <label class="form-label" style="font-size:.75rem;">Overlay Darkness: <strong id="ov-<%= pg[0] %>"><%= customize[pg[1]] || '0' %></strong></label>
+              <input type="range" name="<%= pg[1] %>" min="0" max="0.95" step="0.05"
+                value="<%= customize[pg[1]] || '0' %>"
+                oninput="document.getElementById('ov-<%= pg[0] %>').textContent=parseFloat(this.value).toFixed(2);updateBgPreviewDiv('<%= pg[0] %>')"
+                style="width:100%;margin-top:.3rem;">
+            </div>
+
+            <!-- live preview box -->
+            <div id="prev-<%= pg[0] %>"
+              style="border-radius:7px;height:72px;border:2px dashed var(--card-border);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--text-muted);overflow:hidden;position:relative;transition:all .3s;
+              <%= customize[pg[0]] ? 'background:url(\''+customize[pg[0]]+'\') center/cover no-repeat;border-style:solid;' : '' %>">
+              <% if (customize[pg[0]]) { %>
+              <div style="position:absolute;inset:0;background:rgba(0,0,0,<%= customize[pg[1]]||'0' %>)"></div>
+              <span style="position:relative;color:#fff;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.8)">Preview</span>
+              <% } else { %>
+              <span>No image set</span>
+              <% } %>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:1.25rem;"><i class="fas fa-save"></i> Save All Backgrounds</button>
+      </form>
+    </div>
+    <% } %>
+
+    <!-- ══════════════════════════════════ TAB: CONTENT / TEXTS ══ -->
+    <% if (tab === 'content') { %>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><i class="fas fa-align-left"></i> Content & Texts</span>
+        <form method="POST" action="/admin/customize/reset" style="display:inline">
+          <input type="hidden" name="section" value="content">
+          <button class="btn btn-outline btn-sm" onclick="return confirm('Reset all texts to defaults?')"><i class="fas fa-undo"></i> Reset</button>
+        </form>
+      </div>
+      <%
+        var _cp = (typeof contentPage !== 'undefined' && contentPage) ? contentPage : 'hero';
+        var _cpages = [
+          ['hero',      'fas fa-home',        'Hero & Nav'],
+          ['stats',     'fas fa-chart-bar',   'Stats Bar'],
+          ['about',     'fas fa-info-circle', 'About Us'],
+          ['how',       'fas fa-list-ol',     'How It Works'],
+          ['features',  'fas fa-star',        'Features'],
+          ['analytics', 'fas fa-brain',       'Analytics'],
+          ['portfolio', 'fas fa-chart-pie',   'Portfolio'],
+          ['contact',   'fas fa-envelope',    'Contact'],
+          ['plans',     'fas fa-layer-group', 'Plans Page'],
+          ['auth',      'fas fa-lock',        'Login & Register'],
+          ['charts',    'fas fa-chart-pie',   'Charts & Data'],
+        ];
+      %>
+      <!-- page selector pills -->
+      <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.25rem;">
+        <% _cpages.forEach(function(cp){ %>
+        <a href="/admin/customize?tab=content&page=<%= cp[0] %>"
+           style="display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .85rem;border-radius:20px;font-size:.78rem;font-weight:600;text-decoration:none;border:1.5px solid <%= _cp===cp[0]?'var(--blue)':'var(--card-border)' %>;background:<%= _cp===cp[0]?'var(--blue)':'var(--content-bg)' %>;color:<%= _cp===cp[0]?'#fff':'var(--text2)' %>;transition:all .2s;">
+          <i class="<%= cp[1] %>" style="font-size:.7rem;"></i> <%= cp[2] %>
+        </a>
+        <% }); %>
+      </div>
+
+      <!-- ── Formatting Toolbar ── -->
+      <div id="fmtToolbar" style="display:none;position:fixed;z-index:9999;background:#1e293b;border:1px solid #334155;border-radius:9px;padding:.3rem .45rem;box-shadow:0 6px 24px rgba(0,0,0,.35);gap:.2rem;align-items:center;flex-wrap:wrap;">
+        <span style="font-size:.65rem;color:#64748b;padding-right:.3rem;font-weight:700;">FORMAT:</span>
+        <button type="button" onclick="fmtWrap('<strong>','</strong>')" title="Bold" style="background:#334155;border:none;color:#fff;padding:.25rem .55rem;border-radius:5px;cursor:pointer;font-weight:900;font-size:.8rem;">B</button>
+        <button type="button" onclick="fmtWrap('<em>','</em>')" title="Italic" style="background:#334155;border:none;color:#fff;padding:.25rem .55rem;border-radius:5px;cursor:pointer;font-style:italic;font-size:.8rem;">I</button>
+        <button type="button" onclick="fmtWrap('<u>','</u>')" title="Underline" style="background:#334155;border:none;color:#fff;padding:.25rem .55rem;border-radius:5px;cursor:pointer;text-decoration:underline;font-size:.8rem;">U</button>
+        <button type="button" onclick="fmtGrad()" title="Gradient colour" style="background:linear-gradient(90deg,#3d8ef0,#7c3aed);border:none;color:#fff;padding:.25rem .65rem;border-radius:5px;cursor:pointer;font-size:.75rem;font-weight:700;">grad</button>
+        <span style="width:1px;height:18px;background:#334155;margin:0 .15rem;display:inline-block;"></span>
+        <label style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:#94a3b8;cursor:pointer;">
+          <span>Color</span>
+          <input type="color" id="fmtColorPicker" value="#3d8ef0" style="width:28px;height:22px;border:none;background:none;cursor:pointer;padding:0;" onchange="fmtColor(this.value)">
+        </label>
+        <button type="button" onclick="hideFmtBar()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:.9rem;padding:.15rem .3rem;margin-left:.2rem;">✕</button>
+      </div>
+
+      <form method="POST" action="/admin/customize/content">
+        <input type="hidden" name="_page" value="<%= _cp %>">
+
+        <!-- ── HERO & NAV ── -->
+        <% if (_cp === 'hero') { %>
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="card-header"><span class="card-title"><i class="fas fa-rocket"></i> Hero Section</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group"><label class="form-label">Badge Text</label>
+              <input type="text" name="heroBadge" class="form-control" value="<%= customize.heroBadge %>"></div>
+            <div class="form-group"><label class="form-label">CTA Button 1 (Primary)</label>
+              <input type="text" name="heroCta1" class="form-control" value="<%= customize.heroCta1 %>"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Hero Title <span style="color:var(--text-muted);font-size:.75rem;">(HTML allowed — wrap colored word in &lt;span class="grad"&gt;…&lt;/span&gt;, use &lt;br&gt; for line breaks)</span></label>
+            <textarea name="heroTitle" class="form-control" rows="3"><%= customize.heroTitle %></textarea></div>
+          <div class="form-group"><label class="form-label">Hero Subtitle</label>
+            <textarea name="heroSubtitle" class="form-control" rows="2"><%= customize.heroSubtitle %></textarea></div>
+          <div class="form-group"><label class="form-label">CTA Button 2 (Ghost)</label>
+            <input type="text" name="heroCta2" class="form-control" value="<%= customize.heroCta2 %>"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title"><i class="fas fa-bars"></i> Navigation</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group"><label class="form-label">Sign In Button</label>
+              <input type="text" name="navSignIn" class="form-control" value="<%= customize.navSignIn %>"></div>
+            <div class="form-group"><label class="form-label">Register Button</label>
+              <input type="text" name="navInvestNow" class="form-control" value="<%= customize.navInvestNow %>"></div>
+          </div>
+        </div>
+        <% } %>
+
+        <!-- ── STATS BAR ── -->
+        <% if (_cp === 'stats') { %>
+        <div class="card">
+          <div class="card-header"><span class="card-title"><i class="fas fa-chart-bar"></i> Stats Bar — 5 Numbers</span></div>
+          <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:1rem;">The 5 trust stats shown below the hero section (e.g. $48M+ Assets Managed).</p>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:.75rem;">
+            <% for(var si=1;si<=5;si++){ %>
+            <div style="background:var(--content-bg);border:1px solid var(--card-border);border-radius:8px;padding:.75rem;">
+              <div style="font-size:.7rem;font-weight:700;color:var(--text-muted);margin-bottom:.5rem;">STAT <%= si %></div>
+              <div class="form-group" style="margin-bottom:.5rem;"><label class="form-label" style="font-size:.72rem;">Value</label>
+                <input type="text" name="stat<%= si %>Val" class="form-control" style="font-size:.82rem;" value="<%= customize['stat'+si+'Val'] %>"></div>
+              <div class="form-group" style="margin-bottom:0;"><label class="form-label" style="font-size:.72rem;">Label</label>
+                <input type="text" name="stat<%= si %>Lbl" class="form-control" style="font-size:.82rem;" value="<%= customize['stat'+si+'Lbl'] %>"></div>
+            </div>
+            <% } %>
+          </div>
+        </div>
+        <% } %>
+
+        <!-- ── ABOUT ── -->
+        <% if (_cp === 'about') { %>
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="card-header"><span class="card-title"><i class="fas fa-info-circle"></i> About Section Header</span></div>
+          <div class="form-group"><label class="form-label">Section Title <span style="color:var(--text-muted);font-size:.75rem;">(HTML — wrap colored words in &lt;span class="grad"&gt;)</span></label>
+            <input type="text" name="aboutTitle" class="form-control" value="<%= customize.aboutTitle %>"></div>
+          <div class="form-group"><label class="form-label">Section Subtitle</label>
+            <textarea name="aboutSubtitle" class="form-control" rows="3"><%= customize.aboutSubtitle %></textarea></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title"><i class="fas fa-th-large"></i> About Cards (4)</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <% [['aboutCard1Title','aboutCard1Desc','Global Markets'],['aboutCard2Title','aboutCard2Desc','Secure & Trusted'],['aboutCard3Title','aboutCard3Desc','Real-Time Data'],['aboutCard4Title','aboutCard4Desc','24/7 Support']].forEach(function(ac,i){ %>
+            <div style="background:var(--content-bg);border:1px solid var(--card-border);border-radius:8px;padding:.85rem;">
+              <div style="font-size:.7rem;font-weight:700;color:var(--text-muted);margin-bottom:.5rem;">CARD <%= i+1 %></div>
+              <div class="form-group" style="margin-bottom:.5rem;"><label class="form-label" style="font-size:.72rem;">Title</label>
+                <input type="text" name="<%= ac[0] %>" class="form-control" value="<%= customize[ac[0]] %>"></div>
+              <div class="form-group" style="margin-bottom:0;"><label class="form-label" style="font-size:.72rem;">Description</label>
+                <textarea name="<%= ac[1] %>" class="form-control" rows="2"><%= customize[ac[1]] %></textarea></div>
+            </div>
+            <% }); %>
+          </div>
+        </div>
+        <% } %>
+
+        <!-- ── HOW IT WORKS ── -->
+        <% if (_cp === 'how') { %>
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="card-header"><span class="card-title"><i class="fas fa-list-ol"></i> How It Works Header</span></div>
+          <div class="form-group"><label class="form-label">Section Title</label>
+            <input type="text" name="howTitle" class="form-control" value="<%= customize.howTitle %>"></div>
+          <div class="form-group"><label class="form-label">Section Subtitle</label>
+            <input type="text" name="howSubtitle" class="form-control" value="<%= customize.howSubtitle %>"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title"><i class="fas fa-shoe-prints"></i> 4 Steps</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <% [['step1Title','step1Desc'],['step2Title','step2Desc'],['step3Title','step3Desc'],['step4Title','step4Desc']].forEach(function(st,i){ %>
+            <div style="background:var(--content-bg);border:1px solid var(--card-border);border-radius:8px;padding:.85rem;">
+              <div style="font-size:.7rem;font-weight:700;color:var(--blue);margin-bottom:.5rem;">STEP 0<%= i+1 %></div>
+              <div class="form-group" style="margin-bottom:.5rem;"><label class="form-label" style="font-size:.72rem;">Title</label>
+                <input type="text" name="<%= st[0] %>" class="form-control" value="<%= customize[st[0]] %>"></div>
+              <div class="form-group" style="margin-bottom:0;"><label class="form-label" style="font-size:.72rem;">Description</label>
+                <textarea name="<%= st[1] %>" class="form-control" rows="2"><%= customize[st[1]] %></textarea></div>
+            </div>
+            <% }); %>
+          </div>
+        </div>
+        <% } %>
+
+        <!-- ── FEATURES ── -->
+        <% if (_cp === 'features') { %>
+        <div class="card">
+          <div class="card-header"><span class="card-title"><i class="fas fa-star"></i> Feature Cards (5)</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <% [['feat1Title','feat1Desc'],['feat2Title','feat2Desc'],['feat3Title','feat3Desc'],['feat4Title','feat4Desc'],['feat5Title','feat5Desc']].forEach(function(ft,i){ %>
+            <div style="background:var(--content-bg);border:1px solid var(--card-border);border-radius:8px;padding:.85rem;">
+              <div style="font-size:.7rem;font-weight:700;color:var(--gold);margin-bottom:.5rem;">FEATURE <%= i+1 %></div>
+              <div class="form-group" style="margin-bottom:.5rem;"><label class="form-label" style="font-size:.72rem;">Title</label>
+                <input type="text" name="<%= ft[0] %>" class="form-control" value="<%= customize[ft[0]] %>"></div>
+              <div class="form-group" style="margin-bottom:0;"><label class="form-label" style="font-size:.72rem;">Description</label>
+                <textarea name="<%= ft[1] %>" class="form-control" rows="2"><%= customize[ft[1]] %></textarea></div>
+            </div>
+            <% }); %>
+          </div>
+        </div>
+        <% } %>
+
+        <!-- ── ANALYTICS ── -->
+        <% if (_cp === 'analytics') { %>
+        <div class="card">
+          <div class="card-header"><span class="card-title"><i class="fas fa-brain"></i> Analytics Section</span></div>
+          <div class="form-group"><label class="form-label">Section Title</label>
+            <input type="text" name="analyticsTitle" class="form-control" value="<%= customize.analyticsTitle %>"></div>
+          <div class="form-group"><label class="form-label">Section Subtitle</label>
+            <textarea name="analyticsSubtitle" class="form-control" rows="2"><%= customize.analyticsSubtitle %></textarea></div>
+        </div>
+        <% } %>
+
+        <!-- ── PORTFOLIO ── -->
+        <% if (_cp === 'portfolio') { %>
+        <div class="card">
+          <div class="card-header"><span class="card-title"><i class="fas fa-chart-pie"></i> Portfolio Section</span></div>
+          <div class="form-group"><label class="form-label">Section Title</label>
+            <input type="text" name="portfolioTitle" class="form-control" value="<%= customize.portfolioTitle %>"></div>
+          <div class="form-group"><label class="form-label">Section Subtitle</label>
+            <textarea name="portfolioSubtitle" class="form-control" rows="2"><%= customize.portfolioSubtitle %></textarea></div>
+        </div>
+        <% } %>
+
+        <!-- ── CONTACT ── -->
+        <% if (_cp === 'contact') { %>
+        <div class="card">
+          <div class="card-header"><span class="card-title"><i class="fas fa-envelope"></i> Contact Section</span></div>
+          <div class="form-group"><label class="form-label">Section Title</label>
+            <input type="text" name="contactTitle" class="form-control" value="<%= customize.contactTitle %>"></div>
+          <div class="form-group"><label class="form-label">Section Subtitle</label>
+            <textarea name="contactSubtitle" class="form-control" rows="2"><%= customize.contactSubtitle %></textarea></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group"><label class="form-label">Phone / Hours</label>
+              <input type="text" name="contactPhone" class="form-control" value="<%= customize.contactPhone %>"></div>
+            <div class="form-group"><label class="form-label">Contact Form Heading</label>
+              <input type="text" name="contactFormTitle" class="form-control" value="<%= customize.contactFormTitle %>"></div>
+          </div>
+          <p style="font-size:.78rem;color:var(--text-muted);margin-top:.25rem;"><i class="fas fa-info-circle"></i> Email &amp; Telegram links are set in the <a href="/admin/customize?tab=branding" style="color:var(--blue)">Branding tab</a>.</p>
+        </div>
+        <% } %>
+
+        <!-- ── PLANS PAGE ── -->
+        <% if (_cp === 'plans') { %>
+        <div class="card">
+          <div class="card-header"><span class="card-title"><i class="fas fa-layer-group"></i> Investment Plans Page</span></div>
+          <div class="form-group"><label class="form-label">Page Title</label>
+            <input type="text" name="plansTitle" class="form-control" value="<%= customize.plansTitle %>"></div>
+          <div class="form-group"><label class="form-label">Page Subtitle</label>
+            <input type="text" name="plansSubtitle" class="form-control" value="<%= customize.plansSubtitle %>"></div>
+          <a href="/plans" target="_blank" class="btn btn-outline btn-sm"><i class="fas fa-eye"></i> Preview Plans Page</a>
+        </div>
+        <% } %>
+
+        <!-- ── AUTH ── -->
+        <% if (_cp === 'auth') { %>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="card">
+            <div class="card-header"><span class="card-title"><i class="fas fa-sign-in-alt"></i> Login Page</span></div>
+            <div class="form-group"><label class="form-label">Page Title</label>
+              <input type="text" name="loginTitle" class="form-control" value="<%= customize.loginTitle %>"></div>
+            <div class="form-group"><label class="form-label">Page Subtitle</label>
+              <input type="text" name="loginSubtitle" class="form-control" value="<%= customize.loginSubtitle %>"></div>
+            <a href="/login" target="_blank" class="btn btn-outline btn-sm"><i class="fas fa-eye"></i> Preview</a>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title"><i class="fas fa-user-plus"></i> Register Page</span></div>
+            <div class="form-group"><label class="form-label">Page Title</label>
+              <input type="text" name="registerTitle" class="form-control" value="<%= customize.registerTitle %>"></div>
+            <div class="form-group"><label class="form-label">Page Subtitle</label>
+              <input type="text" name="registerSubtitle" class="form-control" value="<%= customize.registerSubtitle %>"></div>
+            <a href="/register" target="_blank" class="btn btn-outline btn-sm"><i class="fas fa-eye"></i> Preview</a>
+          </div>
+        </div>
+        <% } %>
+
+        <!-- ── CHARTS & DATA ── -->
+        <% if (_cp === 'charts') { %>
+
+        <!-- Portfolio Mix (bottom row donut) -->
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="card-header"><span class="card-title"><i class="fas fa-chart-donut" style="color:var(--gold)"></i><i class="fas fa-circle" style="color:var(--gold);margin-right:.4rem"></i> Portfolio Mix <span style="font-size:.72rem;color:var(--text-muted);font-weight:400">(bottom-row donut)</span></span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:.75rem;">
+            <div class="form-group"><label class="form-label">Center Total Value</label>
+              <input type="text" name="mixTotal" class="form-control" value="<%= customize.mixTotal %>"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:.6rem;">
+            <% [['mix1','#f5a623'],['mix2','#3d8ef0'],['mix3','#9b59b6'],['mix4','#00e676'],['mix5','#00d4ff']].forEach(function(m,i){ %>
+            <div style="background:var(--content-bg);border:1.5px solid <%=m[1]%>33;border-radius:8px;padding:.75rem;">
+              <div style="display:flex;align-items:center;gap:.35rem;margin-bottom:.5rem;"><span style="width:10px;height:10px;border-radius:50%;background:<%=m[1]%>;flex-shrink:0;display:inline-block;"></span><span style="font-size:.7rem;font-weight:700;color:var(--text-muted);">SEGMENT <%=i+1%></span></div>
+              <div class="form-group" style="margin-bottom:.4rem;"><label class="form-label" style="font-size:.7rem;">Label</label>
+                <input type="text" name="<%=m[0]%>Name" class="form-control" style="font-size:.8rem;" value="<%= customize[m[0]+'Name'] %>"></div>
+              <div class="form-group" style="margin-bottom:0;"><label class="form-label" style="font-size:.7rem;">% (number only)</label>
+                <input type="number" name="<%=m[0]%>Pct" class="form-control" style="font-size:.8rem;" value="<%= customize[m[0]+'Pct'] %>" min="0" max="100"></div>
+            </div>
+            <% }); %>
+          </div>
+          <p style="font-size:.75rem;color:var(--text-muted);margin-top:.6rem;"><i class="fas fa-info-circle"></i> Percentages don't need to total 100 — the donut sizes each slice proportionally.</p>
+        </div>
+
+        <!-- Portfolio Section (large donut + allocations) -->
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="card-header"><span class="card-title"><i class="fas fa-chart-pie" style="color:var(--blue)"></i> Portfolio Section <span style="font-size:.72rem;color:var(--text-muted);font-weight:400">(large donut + allocation bars)</span></span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:.75rem;">
+            <div class="form-group"><label class="form-label">Total Portfolio Value</label>
+              <input type="text" name="portTotal" class="form-control" value="<%= customize.portTotal %>"></div>
+            <div class="form-group"><label class="form-label">Growth % Badge</label>
+              <input type="text" name="portGrowthPct" class="form-control" value="<%= customize.portGrowthPct %>"></div>
+            <div class="form-group"><label class="form-label">Growth Label</label>
+              <input type="text" name="portGrowthLabel" class="form-control" value="<%= customize.portGrowthLabel %>"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:.6rem;">
+            <% [['port1','#f5a623'],['port2','#3d8ef0'],['port3','#9b59b6'],['port4','#00e676'],['port5','#00d4ff']].forEach(function(p,i){ %>
+            <div style="background:var(--content-bg);border:1.5px solid <%=p[1]%>33;border-radius:8px;padding:.75rem;">
+              <div style="display:flex;align-items:center;gap:.35rem;margin-bottom:.5rem;"><span style="width:10px;height:10px;border-radius:50%;background:<%=p[1]%>;flex-shrink:0;display:inline-block;"></span><span style="font-size:.7rem;font-weight:700;color:var(--text-muted);">ASSET <%=i+1%></span></div>
+              <div class="form-group" style="margin-bottom:.4rem;"><label class="form-label" style="font-size:.7rem;">Name</label>
+                <input type="text" name="<%=p[0]%>Name" class="form-control" style="font-size:.78rem;" value="<%= customize[p[0]+'Name'] %>"></div>
+              <div class="form-group" style="margin-bottom:.4rem;"><label class="form-label" style="font-size:.7rem;">% Share</label>
+                <input type="number" name="<%=p[0]%>Pct" class="form-control" style="font-size:.8rem;" value="<%= customize[p[0]+'Pct'] %>" min="0" max="100"></div>
+              <div class="form-group" style="margin-bottom:0;"><label class="form-label" style="font-size:.7rem;">USD Value</label>
+                <input type="text" name="<%=p[0]%>USD" class="form-control" style="font-size:.78rem;" value="<%= customize[p[0]+'USD'] %>"></div>
+            </div>
+            <% }); %>
+          </div>
+        </div>
+
+        <!-- Holdings Table -->
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="card-header"><span class="card-title"><i class="fas fa-list-ul" style="color:var(--green)"></i> Top Holdings Table</span></div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:.6rem;">
+            <% var _hColors=['#f7931a','#627eea','#f5a623','#555','#3d8ef0']; %>
+            <% for(var hi=1;hi<=5;hi++){ %>
+            <div style="background:var(--content-bg);border:1px solid var(--card-border);border-radius:8px;padding:.75rem;">
+              <div style="display:flex;align-items:center;gap:.35rem;margin-bottom:.5rem;"><span style="width:10px;height:10px;border-radius:50%;background:<%=_hColors[hi-1]%>;flex-shrink:0;display:inline-block;"></span><span style="font-size:.7rem;font-weight:700;color:var(--text-muted);">HOLDING <%=hi%></span></div>
+              <div class="form-group" style="margin-bottom:.4rem;"><label class="form-label" style="font-size:.7rem;">Asset Name</label>
+                <input type="text" name="hold<%=hi%>Name" class="form-control" style="font-size:.78rem;" value="<%= customize['hold'+hi+'Name'] %>"></div>
+              <div class="form-group" style="margin-bottom:.4rem;"><label class="form-label" style="font-size:.7rem;">Share %</label>
+                <input type="text" name="hold<%=hi%>Pct" class="form-control" style="font-size:.8rem;" value="<%= customize['hold'+hi+'Pct'] %>"></div>
+              <div class="form-group" style="margin-bottom:0;"><label class="form-label" style="font-size:.7rem;">Change (e.g. +12.4%)</label>
+                <input type="text" name="hold<%=hi%>Chg" class="form-control" style="font-size:.8rem;" value="<%= customize['hold'+hi+'Chg'] %>"></div>
+            </div>
+            <% } %>
+          </div>
+          <p style="font-size:.75rem;color:var(--text-muted);margin-top:.6rem;"><i class="fas fa-info-circle"></i> Positive changes show green, negative (starts with <code>-</code>) show red automatically.</p>
+        </div>
+
+        <!-- Performance Chart -->
+        <div class="card">
+          <div class="card-header"><span class="card-title"><i class="fas fa-chart-line" style="color:var(--blue)"></i> Performance Chart <span style="font-size:.72rem;color:var(--text-muted);font-weight:400">(6-month line chart)</span></span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+            <div class="form-group"><label class="form-label">Badge Text (e.g. +24.8%)</label>
+              <input type="text" name="perfBadge" class="form-control" value="<%= customize.perfBadge %>"></div>
+            <div class="form-group"><label class="form-label">Month Labels <span style="color:var(--text-muted);font-weight:400">(6 comma-separated)</span></label>
+              <input type="text" name="perfMonths" class="form-control" value="<%= customize.perfMonths %>" placeholder="Feb,Mar,Apr,May,Jun,Jul"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <% [
+              ['perfCrypto','#3d8ef0','Crypto','perfCryptoPts','perfCryptoReturn'],
+              ['perfStocks','#00e676','Stocks','perfStocksPts','perfStocksReturn'],
+              ['perfForex', '#f5a623','Forex (dashed)','perfForexPts','perfForexReturn'],
+              ['perfRE',    '#9b59b6','Real Estate','perfREPts','perfREReturn'],
+            ].forEach(function(s){ %>
+            <div style="background:var(--content-bg);border:2px solid <%=s[1]%>44;border-radius:8px;padding:.85rem;">
+              <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.65rem;">
+                <span style="width:24px;height:3px;background:<%=s[1]%>;border-radius:2px;display:inline-block;"></span>
+                <span style="font-size:.78rem;font-weight:700;color:<%=s[1]%>;"><%=s[2]%></span>
+              </div>
+              <div class="form-group" style="margin-bottom:.5rem;">
+                <label class="form-label" style="font-size:.72rem;">Data Points <span style="color:var(--text-muted);font-weight:400">(6 comma-separated numbers)</span></label>
+                <input type="text" name="<%=s[3]%>" class="form-control" style="font-family:monospace;font-size:.8rem;" value="<%= customize[s[3]] %>" placeholder="0,10,20,30,40,50">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" style="font-size:.72rem;">Return Label (shown in summary)</label>
+                <input type="text" name="<%=s[4]%>" class="form-control" style="font-size:.82rem;" value="<%= customize[s[4]] %>" placeholder="+46%">
+              </div>
+            </div>
+            <% }); %>
+          </div>
+          <p style="font-size:.75rem;color:var(--text-muted);margin-top:.75rem;"><i class="fas fa-info-circle"></i> Data points are relative % values starting from 0 — e.g. <code>0,14,22,32,40,46</code> means the asset grew 46% over 6 months.</p>
+        </div>
+
+        <% } %>
+
+        <div style="margin-top:1.25rem;display:flex;gap:.75rem;align-items:center;">
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+          <a href="/" target="_blank" class="btn btn-outline"><i class="fas fa-eye"></i> Preview Site</a>
+          <span style="font-size:.75rem;color:var(--text-muted);margin-left:.5rem;"><i class="fas fa-info-circle"></i> HTML is supported in title fields — use <code>&lt;span class="grad"&gt;word&lt;/span&gt;</code> for gradient colour effect.</span>
+        </div>
+      </form>
+    </div>
+    <% } %>
+
+  </div><!-- /admin-main -->
+</div><!-- /admin-layout -->
+
+<script>
+/* ── Text Formatting Toolbar ───────────────────────────────── */
+var _fmtEl = null; // currently focused input/textarea
+var _fmtBar = document.getElementById('fmtToolbar');
+
+function showFmtBar(el, e) {
+  _fmtEl = el;
+  _fmtBar.style.display = 'flex';
+  // Position near the element
+  var rect = el.getBoundingClientRect();
+  var top = rect.top + window.scrollY - 46;
+  var left = Math.min(rect.left, window.innerWidth - 340);
+  _fmtBar.style.top  = Math.max(top, 8) + 'px';
+  _fmtBar.style.left = Math.max(left, 8) + 'px';
+}
+function hideFmtBar() {
+  _fmtBar.style.display = 'none';
+  _fmtEl = null;
+}
+function fmtWrap(open, close) {
+  if (!_fmtEl) return;
+  var s = _fmtEl.selectionStart, e = _fmtEl.selectionEnd;
+  var val = _fmtEl.value;
+  var sel = val.substring(s, e) || 'text';
+  var inserted = open + sel + close;
+  _fmtEl.value = val.substring(0, s) + inserted + val.substring(e);
+  _fmtEl.selectionStart = s + open.length;
+  _fmtEl.selectionEnd   = s + open.length + sel.length;
+  _fmtEl.focus();
+}
+function fmtGrad() { fmtWrap('<span class="grad">', '</span>'); }
+function fmtColor(hex) {
+  fmtWrap('<span style="color:' + hex + '">', '</span>');
+  document.getElementById('fmtColorPicker').value = hex;
+}
+
+// Attach toolbar to all content form text/textarea inputs
+document.addEventListener('DOMContentLoaded', function() {
+  function attachFmt() {
+    var form = document.querySelector('form[action="/admin/customize/content"]');
+    if (!form) return;
+    form.querySelectorAll('input[type=text], textarea').forEach(function(el) {
+      el.addEventListener('focus', function(e) { showFmtBar(el, e); });
+      el.addEventListener('mouseup', function(e) { if (_fmtEl === el) showFmtBar(el, e); });
+      el.addEventListener('keyup', function(e) { if (_fmtEl === el) showFmtBar(el, e); });
+    });
+  }
+  attachFmt();
+  // Hide toolbar when clicking outside
+  document.addEventListener('mousedown', function(e) {
+    if (_fmtBar && !_fmtBar.contains(e.target) && e.target !== _fmtEl) {
+      hideFmtBar();
+    }
+  });
+});
+
+/* ── Slideshow multi-image rows ────────────────────────────── */
+function addSlideRow(listId, inputName) {
+  var list = document.getElementById(listId);
+  if (!list) return;
+  var row = document.createElement('div');
+  row.className = 'slide-row';
+  row.style.cssText = 'display:flex;gap:.4rem;align-items:center;';
+  row.innerHTML = '<input type="text" name="' + inputName + '" class="form-control slide-url" style="font-size:.79rem;font-family:monospace;" placeholder="https://…image.jpg">' +
+    '<button type="button" class="btn btn-danger btn-sm slide-del" title="Remove"><i class="fas fa-times"></i></button>';
+  list.appendChild(row);
+  row.querySelector('.slide-del').addEventListener('click', function(){ removeSlideRow(this); });
+  row.querySelector('.slide-url').focus();
+}
+function removeSlideRow(btn) {
+  var list = btn.closest('[id$="ImgList"]');
+  var row  = btn.closest('.slide-row');
+  if (list && list.querySelectorAll('.slide-row').length <= 1) {
+    row.querySelector('.slide-url').value = '';
+  } else {
+    row.remove();
+  }
+}
+/* Wire up existing delete buttons */
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.slide-del').forEach(function(btn) {
+    btn.addEventListener('click', function(){ removeSlideRow(this); });
+  });
+});
+
+/* ── Color picker live preview ─────────────────────────────── */
+var previewMap = {
+  colorPrimary: ['prev-btn-primary','background'],
+  colorGold:    [['prev-btn-gold','background'],['prev-accent','color']],
+  colorGreen:   ['prev-green','color'],
+  colorRed:     ['prev-red','color'],
+  colorPurple:  ['prev-purple','color'],
+  colorBg:      ['prev-bg','background'],
+  colorBg2:     ['prev-card','background'],
+  colorCard:    ['prev-card','background'],
+  colorBorder:  ['prev-border','background'],
+  colorText:    ['prev-text','color'],
+  colorText2:   ['prev-text2','color'],
+  colorText3:   ['prev-text3','color'],
+};
+function updatePreview(name, val) {
+  var map = previewMap[name];
+  if (!map) return;
+  /* support array of [id,prop] pairs */
+  if (Array.isArray(map[0])) {
+    map.forEach(function(m){ var el=document.getElementById(m[0]); if(el) el.style[m[1]]=val; });
+  } else {
+    var el = document.getElementById(map[0]);
+    if (el) el.style[map[1]] = val;
+  }
+  /* sync hex text inputs */
+  var hexEl = document.querySelector('[name=' + name + '] + div input[type=text]');
+}
+
+/* ── Fonts ─────────────────────────────────────────────────── */
+function handleFontSelect(sel) {
+  var wrap = document.getElementById('customFontWrap');
+  if (wrap) wrap.style.display = sel.value === 'custom' ? 'block' : 'none';
+  var prev = document.getElementById('fontPreview');
+  if (prev) prev.style.fontFamily = sel.value === 'custom' ? '' : sel.value;
+  var fam = document.getElementById('prevFontFam');
+  if (fam) fam.textContent = sel.value;
+}
+function fillGF(name, url) {
+  var urlInput = document.querySelector('[name=fontUrl]');
+  var selInput = document.querySelector('[name=fontPreset]');
+  if (urlInput) urlInput.value = url;
+  if (selInput) {
+    for (var i=0;i<selInput.options.length;i++) {
+      if (selInput.options[i].text.includes(name)) { selInput.value = selInput.options[i].value; break; }
+    }
+  }
+  document.getElementById('customFontWrap').style.display = 'none';
+}
+var fontRangeEl = document.querySelector('[name=fontSizeBase]');
+if (fontRangeEl) fontRangeEl.addEventListener('input', function(){
+  var prev = document.getElementById('fontPreview');
+  var sz = document.getElementById('prevFontSz');
+  if (prev) prev.style.fontSize = this.value + 'px';
+  if (sz) sz.textContent = this.value + 'px';
+});
+
+/* ── Background live image test ──────────────────────────────── */
+var _bgTimers = {};
+function liveTestImage(fieldName, url) {
+  clearTimeout(_bgTimers[fieldName]);
+  var statusEl = document.getElementById('status-' + fieldName);
+  if (!statusEl) return;
+  url = url.trim();
+  if (!url) {
+    statusEl.innerHTML = '';
+    updateBgPreviewDiv(fieldName, '');
+    return;
+  }
+  /* quick sanity check – must look like a direct image */
+  var looksLikeImage = /\.(jpg|jpeg|png|webp|gif|avif|svg)(\?|$)/i.test(url) ||
+    url.includes('images.unsplash.com') || url.includes('imgur.com') ||
+    url.includes('postimages.org') || url.includes('ibb.co') || url.includes('cloudinary.com') ||
+    url.includes('githubusercontent.com') || url.includes('i.imgur.com');
+  var looksLikePage = /\.html?(\?|$)/i.test(url) || /\/(wallpaper|photo|image|post)\//i.test(url) && !/\.(jpg|jpeg|png|webp)/i.test(url);
+  if (looksLikePage) {
+    statusEl.innerHTML = '<span style="color:#dc2626"><i class="fas fa-exclamation-triangle"></i> This looks like a <strong>webpage URL</strong>, not an image. Right-click the image on that page → Copy image address.</span>';
+    return;
+  }
+  statusEl.innerHTML = '<span style="color:#94a3b8"><i class="fas fa-spinner fa-spin"></i> Testing image…</span>';
+  _bgTimers[fieldName] = setTimeout(function() {
+    var img = new Image();
+    img.onload = function() {
+      statusEl.innerHTML = '<span style="color:#059669"><i class="fas fa-check-circle"></i> Image loaded ✓ (' + img.naturalWidth + '×' + img.naturalHeight + ')</span>';
+      updateBgPreviewDiv(fieldName, url);
+    };
+    img.onerror = function() {
+      statusEl.innerHTML = '<span style="color:#dc2626"><i class="fas fa-times-circle"></i> Cannot load image. Check the URL — it must be a <strong>direct image link</strong>.</span>';
+      updateBgPreviewDiv(fieldName, '');
+    };
+    img.src = url;
+  }, 600);
+}
+function updateBgPreviewDiv(fieldName, url) {
+  var prevEl = document.getElementById('prev-' + fieldName);
+  if (!prevEl) return;
+  var ovEl = document.getElementById('ov-' + fieldName);
+  var ov = ovEl ? parseFloat(ovEl.textContent) || 0 : 0;
+  if (url === undefined) {
+    var inp = document.getElementById('inp-' + fieldName);
+    url = inp ? inp.value.trim() : '';
+  }
+  if (url) {
+    prevEl.style.backgroundImage = "url('" + url + "')";
+    prevEl.style.backgroundSize = 'cover';
+    prevEl.style.backgroundPosition = 'center';
+    prevEl.style.borderStyle = 'solid';
+    prevEl.innerHTML = '<div style="position:absolute;inset:0;background:rgba(0,0,0,'+ov+')"></div><span style="position:relative;color:#fff;font-weight:700;font-size:.7rem;text-shadow:0 1px 4px rgba(0,0,0,.8)">Preview</span>';
+  } else {
+    prevEl.style.backgroundImage = '';
+    prevEl.style.borderStyle = 'dashed';
+    prevEl.innerHTML = '<span style="color:var(--text-muted);font-size:.7rem;">No image set</span>';
+  }
+}
+function clearBg(fieldName) {
+  var inp = document.getElementById('inp-' + fieldName);
+  if (inp) inp.value = '';
+  var statusEl = document.getElementById('status-' + fieldName);
+  if (statusEl) statusEl.innerHTML = '';
+  updateBgPreviewDiv(fieldName, '');
+}
+function updateBgColor(fieldName, color) {
+  var prevEl = document.getElementById('prev-' + fieldName);
+  if (prevEl && !document.getElementById('inp-' + fieldName).value.trim()) {
+    prevEl.style.background = color;
+    prevEl.style.borderStyle = 'solid';
+    prevEl.innerHTML = '<span style="font-size:.7rem;font-weight:700;color:rgba(0,0,0,.5)">Colour preview</span>';
+  }
+}
+</script>
+<%- include('../partials/footer') %>

@@ -1,0 +1,180 @@
+<% pageTitle = 'Investor Login' %>
+<%- include('partials/head') %>
+
+<style>
+/* ══ LOGIN PAGE — full-page background image ══ */
+
+/* stretch the grid to the full viewport so no gap shows */
+.login-page {
+  min-height: calc(100vh - 108px); /* nav + ticker */
+  position: relative;
+}
+
+/* LEFT panel — remove solid gradient, use dark semi-transparent overlay */
+.login-left {
+  background: rgba(8, 15, 35, 0.72) !important;
+  border-right: 1px solid rgba(255,255,255,.12) !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.login-left::before { display: none !important; } /* remove inner radial glow */
+
+/* RIGHT panel — frosted-glass card so form stays readable */
+.login-right {
+  background: rgba(255,255,255,0.10) !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-left: 1px solid rgba(255,255,255,.14);
+}
+
+/* form elements need to remain readable on the dark/blurred bg */
+.login-right h3,
+.login-logo                          { color: #ffffff !important; }
+.login-right .sub                    { color: rgba(255,255,255,.72) !important; }
+.form-label                          { color: rgba(255,255,255,.82) !important; }
+.login-right .form-control {
+  background: rgba(255,255,255,.12) !important;
+  border-color: rgba(255,255,255,.22) !important;
+  color: #ffffff !important;
+}
+.login-right .form-control::placeholder { color: rgba(255,255,255,.4) !important; }
+.login-right .form-control:focus {
+  background: rgba(255,255,255,.18) !important;
+  border-color: rgba(255,255,255,.5) !important;
+}
+.remember-row,
+.remember-row label                  { color: rgba(255,255,255,.65) !important; }
+.remember-row a                      { color: rgba(255,255,255,.7) !important; }
+.login-divider                       { color: rgba(255,255,255,.45) !important; }
+.login-divider::before,
+.login-divider::after                { background: rgba(255,255,255,.2) !important; }
+.social-btn {
+  background: rgba(255,255,255,.1) !important;
+  border-color: rgba(255,255,255,.2) !important;
+  color: #ffffff !important;
+}
+.social-btn:hover                    { background: rgba(255,255,255,.2) !important; }
+.login-footer-txt                    { color: rgba(255,255,255,.6) !important; }
+.login-footer-txt a                  { color: #ffffff !important; }
+.login-security .sec-item            { color: rgba(255,255,255,.5) !important; }
+.login-logo span                     { color: var(--gold) !important; }
+
+/* ticker bars — ensure they sit above the bg */
+.ticker-bar { position: relative; z-index: 2; }
+</style>
+
+<!-- Minimal nav for auth -->
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo"><%= siteCustomize.logoText %><span><%= siteCustomize.logoAccent %></span></a>
+    <ul class="nav-menu" style="margin-left:auto">
+      <li><a href="/#about">About</a></li>
+      <li><a href="/#plans">Plans</a></li>
+      <li><a href="/#markets">Markets</a></li>
+      <li><a href="/register" class="btn nav-btn">View Plans</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="ticker-bar">
+  <div class="ticker-track">
+    <span class="ticker-item"><span class="t-pair">BTC/USD</span><span class="t-price" id="t-btc">$67,420</span><span class="t-change up" id="tc-btc">▲2.4%</span></span>
+    <span class="ticker-item"><span class="t-pair">ETH/USD</span><span class="t-price" id="t-eth">$3,512</span><span class="t-change up" id="tc-eth">▲1.8%</span></span>
+    <span class="ticker-item"><span class="t-pair">EUR/USD</span><span class="t-price" id="t-eur">1.0842</span><span class="t-change dn" id="tc-eur">▼0.3%</span></span>
+    <span class="ticker-item"><span class="t-pair">GBP/USD</span><span class="t-price" id="t-gbp">1.2714</span><span class="t-change up" id="tc-gbp">▲0.2%</span></span>
+    <span class="ticker-item"><span class="t-pair">S&amp;P 500</span><span class="t-price" id="t-sp">5,842</span><span class="t-change up" id="tc-sp">▲0.9%</span></span>
+    <span class="ticker-item"><span class="t-pair">XAU/USD</span><span class="t-price" id="t-xau">$2,318</span><span class="t-change up" id="tc-xau">▲0.6%</span></span>
+    <span class="ticker-item"><span class="t-pair">SOL/USD</span><span class="t-price" id="t-sol">$142.6</span><span class="t-change up" id="tc-sol">▲3.1%</span></span>
+    <span class="ticker-item"><span class="t-pair">BTC/USD</span><span class="t-price">$67,420</span><span class="t-change up">▲2.4%</span></span>
+    <span class="ticker-item"><span class="t-pair">ETH/USD</span><span class="t-price">$3,512</span><span class="t-change up">▲1.8%</span></span>
+    <span class="ticker-item"><span class="t-pair">EUR/USD</span><span class="t-price">1.0842</span><span class="t-change dn">▼0.3%</span></span>
+    <span class="ticker-item"><span class="t-pair">GBP/USD</span><span class="t-price">1.2714</span><span class="t-change up">▲0.2%</span></span>
+    <span class="ticker-item"><span class="t-pair">S&amp;P 500</span><span class="t-price">5,842</span><span class="t-change up">▲0.9%</span></span>
+    <span class="ticker-item"><span class="t-pair">XAU/USD</span><span class="t-price">$2,318</span><span class="t-change up">▲0.6%</span></span>
+    <span class="ticker-item"><span class="t-pair">SOL/USD</span><span class="t-price">$142.6</span><span class="t-change up">▲3.1%</span></span>
+  </div>
+</div>
+
+<% if (error && error.length) { %><div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> <%- error[0] %></div><% } %>
+<% if (success && success.length) { %><div class="alert alert-success"><i class="fas fa-check-circle"></i> <%- success[0] %></div><% } %>
+
+<div class="login-page">
+  <!-- LEFT PANEL -->
+  <div class="login-left">
+    <div style="position:relative;z-index:1">
+      <div style="width:52px;height:52px;background:rgba(245,166,35,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1.5rem">&#128100;</div>
+      <div style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem">Investor Portal</div>
+      <h2>Welcome back to your<br>wealth dashboard</h2>
+      <p>Sign in to track your returns, manage deposits, and monitor live market performance across all your active investment plans.</p>
+      <div class="login-plan-chips">
+        <span class="plan-chip chip-silver">Silver 30%</span>
+        <span class="plan-chip chip-gold">Gold 35%</span>
+        <span class="plan-chip chip-platinum">Platinum 40%</span>
+        <span class="plan-chip chip-diamond">Diamond 45%</span>
+        <span class="plan-chip chip-elite">Elite 50%</span>
+      </div>
+      <div class="login-mini-stats">
+        <div class="lms-item"><div class="lms-val">$48M+</div><div class="lms-lbl">Managed</div></div>
+        <div class="lms-item"><div class="lms-val">12.4K+</div><div class="lms-lbl">Investors</div></div>
+        <div class="lms-item"><div class="lms-val">50%</div><div class="lms-lbl">Max Return</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT FORM -->
+  <div class="login-right">
+    <div class="login-logo"><%= siteCustomize.logoText %><span><%= siteCustomize.logoAccent %></span></div>
+    <h3><%= siteCustomize.loginTitle %></h3>
+    <p class="sub"><%= siteCustomize.loginSubtitle %></p>
+
+    <form method="POST" action="/login">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input type="text" name="login" class="form-control" placeholder="investor@example.com" required autofocus>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
+      </div>
+      <div class="remember-row">
+        <label><input type="checkbox" name="remember"> Keep me signed in for 30 days</label>
+        <a href="#">Forgot password?</a>
+      </div>
+      <button type="submit" class="btn btn-gold btn-block btn-lg">Sign in to Dashboard</button>
+    </form>
+
+    <div class="login-divider">or continue with</div>
+    <div class="social-btns">
+      <button class="social-btn" onclick="alert('OAuth setup required')"><i class="fab fa-google" style="color:#ea4335"></i> Google</button>
+      <button class="social-btn" onclick="alert('OAuth setup required')"><i class="fab fa-apple"></i> Apple</button>
+      <button class="social-btn" onclick="alert('OAuth setup required')"><i class="fab fa-facebook" style="color:#1877f2"></i> Facebook</button>
+    </div>
+    <div class="login-footer-txt">New investor? <a href="/register">Create an account</a></div>
+    <div class="login-security">
+      <span class="sec-item"><i class="fas fa-lock"></i> 256-bit SSL</span>
+      <span class="sec-item"><i class="fas fa-mobile-alt"></i> 2FA ready</span>
+      <span class="sec-item"><i class="fas fa-shield-alt"></i> Private</span>
+    </div>
+  </div>
+</div>
+
+<div class="ticker-bar" style="border-top:1px solid var(--border)">
+  <div class="ticker-track" style="animation-direction:reverse;animation-duration:35s">
+    <span class="ticker-item"><span class="t-pair">BTC/USD</span><span class="t-price">$67,420</span><span class="t-change up">▲2.4% today</span></span>
+    <span class="ticker-item"><span class="t-pair">ETH/USD</span><span class="t-price">$3,512</span><span class="t-change up">▲1.8% today</span></span>
+    <span class="ticker-item"><span class="t-pair">EUR/USD</span><span class="t-price">1.0842</span><span class="t-change dn">▼0.3%</span></span>
+    <span class="ticker-item"><span class="t-pair">GBP/USD</span><span class="t-price">1.2714</span><span class="t-change up">▲0.2%</span></span>
+    <span class="ticker-item"><span class="t-pair">S&amp;P 500</span><span class="t-price">5,842</span><span class="t-change up">▲0.9%</span></span>
+    <span class="ticker-item"><span class="t-pair">NASDAQ</span><span class="t-price">18,412</span><span class="t-change up">▲1.2%</span></span>
+    <span class="ticker-item"><span class="t-pair">XAU/USD</span><span class="t-price">$2,318</span><span class="t-change up">▲0.6%</span></span>
+    <span class="ticker-item"><span class="t-pair">SOL/USD</span><span class="t-price">$142.6</span><span class="t-change up">▲3.1%</span></span>
+    <span class="ticker-item"><span class="t-pair">BTC/USD</span><span class="t-price">$67,420</span><span class="t-change up">▲2.4% today</span></span>
+    <span class="ticker-item"><span class="t-pair">ETH/USD</span><span class="t-price">$3,512</span><span class="t-change up">▲1.8% today</span></span>
+    <span class="ticker-item"><span class="t-pair">EUR/USD</span><span class="t-price">1.0842</span><span class="t-change dn">▼0.3%</span></span>
+    <span class="ticker-item"><span class="t-pair">S&amp;P 500</span><span class="t-price">5,842</span><span class="t-change up">▲0.9%</span></span>
+  </div>
+</div>
+
+<script src="/js/main.js"></script>
+</body></html>

@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Invest Smarter Across Every Market | <%= siteName %></title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#ffffff;color:#1e293b;overflow-x:hidden;line-height:1.6}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#f1f5f9}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+
+/* glow blobs removed — use bg images instead */
+
+/* ── NAV ── */
+.ap-nav{position:sticky;top:0;z-index:1000;background:rgba(255,255,255,.97);border-bottom:1px solid #e2e8f0;backdrop-filter:blur(18px);box-shadow:0 1px 12px rgba(0,0,0,.06)}
+.ap-nav-inner{max-width:1320px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;height:66px;gap:1rem}
+.ap-logo{display:flex;align-items:center;gap:.5rem;font-size:1.3rem;font-weight:900;color:#1e293b;letter-spacing:-.5px;margin-right:1rem;white-space:nowrap}
+.ap-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#3d8ef0,#7c3aed);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem}
+.ap-logo span{color:#3d8ef0}
+.ap-links{display:flex;gap:.1rem;list-style:none;flex:1;flex-wrap:nowrap}
+.ap-links a{color:#64748b;padding:.4rem .85rem;border-radius:7px;font-size:.85rem;font-weight:500;transition:all .2s;white-space:nowrap}
+.ap-links a:hover{color:#1e293b;background:rgba(0,0,0,.05)}
+.ap-nav-right{display:flex;align-items:center;gap:.7rem;flex-shrink:0}
+.ap-btn-in{color:#64748b;padding:.4rem .9rem;font-size:.85rem;font-weight:600;transition:color .2s;white-space:nowrap}
+.ap-btn-in:hover{color:#1e293b}
+.ap-btn-reg{background:linear-gradient(135deg,#3d8ef0,#2563eb);color:#fff;padding:.5rem 1.35rem;border-radius:8px;font-size:.85rem;font-weight:700;transition:all .2s;white-space:nowrap;display:inline-flex;align-items:center;gap:.4rem;box-shadow:0 4px 12px rgba(61,142,240,.3)}
+.ap-btn-reg:hover{background:linear-gradient(135deg,#2a6fd6,#1d4fb8);transform:translateY(-1px);box-shadow:0 8px 24px rgba(61,142,240,.4)}
+.ap-ham{display:none;background:none;border:none;color:#64748b;font-size:1.3rem;cursor:pointer;padding:.4rem;margin-left:auto}
+
+/* ── HERO ── */
+.ap-hero{position:relative;min-height:88vh;display:flex;align-items:center;overflow:hidden;padding:3rem 1.5rem 2rem;background:linear-gradient(145deg,#eef6ff 0%,#f0f7ff 35%,#f5f9ff 65%,#ffffff 100%)}
+.ap-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 68% 45%,rgba(61,142,240,.1) 0%,transparent 65%),radial-gradient(ellipse 40% 50% at 20% 70%,rgba(124,58,237,.05) 0%,transparent 60%);pointer-events:none;z-index:1}
+.ap-hero-inner{max-width:1320px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:center;position:relative;z-index:2}
+.ap-hero-badges{display:flex;gap:.6rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.ap-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(61,142,240,.08);border:1px solid rgba(61,142,240,.2);color:#3d8ef0;font-size:.72rem;font-weight:700;padding:.3rem .85rem;border-radius:20px;letter-spacing:.05em}
+.ap-badge .dot{width:6px;height:6px;border-radius:50%;background:#00c853;box-shadow:0 0 6px #00c853;animation:pulse-dot 2s infinite}
+.ap-hero h1{font-size:clamp(2.4rem,5vw,3.8rem);font-weight:900;line-height:1.08;letter-spacing:-.03em;margin-bottom:1rem;color:#0f172a}
+.ap-hero h1 .grad{background:linear-gradient(90deg,#3d8ef0,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ap-hero-sub{font-size:1rem;color:#64748b;margin-bottom:2rem;line-height:1.7}
+.ap-hero-ctas{display:flex;gap:.9rem;flex-wrap:wrap;margin-bottom:2.5rem}
+.ap-btn-primary{background:linear-gradient(135deg,#3d8ef0,#2563eb);color:#fff;padding:.75rem 2rem;border-radius:10px;font-size:.95rem;font-weight:700;display:inline-flex;align-items:center;gap:.5rem;transition:all .25s;box-shadow:0 6px 20px rgba(61,142,240,.35)}
+.ap-btn-primary:hover{background:linear-gradient(135deg,#2a6fd6,#1d4fb8);transform:translateY(-2px);box-shadow:0 12px 32px rgba(61,142,240,.45);color:#fff}
+.ap-btn-ghost{background:rgba(255,255,255,.8);border:1.5px solid #e2e8f0;color:#475569;padding:.75rem 2rem;border-radius:10px;font-size:.95rem;font-weight:600;display:inline-flex;align-items:center;gap:.5rem;transition:all .25s;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.ap-btn-ghost:hover{background:#fff;border-color:#3d8ef0;color:#3d8ef0;box-shadow:0 4px 16px rgba(61,142,240,.15)}
+
+/* ── HERO GLOBE VISUAL ── */
+.ap-hero-visual{position:relative;height:520px;display:flex;align-items:center;justify-content:center;overflow:visible}
+.ap-globe-wrap{position:relative;width:440px;height:440px}
+.ap-globe-glow{position:absolute;inset:-50px;background:radial-gradient(circle,rgba(61,142,240,.2) 0%,rgba(124,58,237,.1) 50%,transparent 70%);border-radius:50%;animation:globe-pulse 4s ease-in-out infinite}
+#globeCanvas{position:relative;z-index:2;border-radius:50%;box-shadow:0 20px 60px rgba(61,142,240,.3)}
+.ap-coin{position:absolute;z-index:3;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:1.6rem;font-weight:900;box-shadow:0 8px 28px rgba(0,0,0,.2);animation:float-coin 6s ease-in-out infinite}
+.ap-coin-btc{width:60px;height:60px;background:linear-gradient(135deg,#f7931a,#e07d10);top:4%;right:14%;animation-delay:0s}
+.ap-coin-eth{width:52px;height:52px;background:linear-gradient(135deg,#627eea,#8e6de0);top:20%;right:2%;animation-delay:-2s}
+.ap-coin-sol{width:44px;height:44px;background:linear-gradient(135deg,#9945ff,#14f195);bottom:20%;right:6%;animation-delay:-4s;font-size:.85rem}
+.ap-coin-bnb{width:40px;height:40px;background:linear-gradient(135deg,#f3ba2f,#d4a017);bottom:6%;left:10%;animation-delay:-1s;font-size:.8rem}
+.ap-coin-ada{width:36px;height:36px;background:linear-gradient(135deg,#0033ad,#0066ff);top:8%;left:14%;animation-delay:-3s;font-size:.75rem}
+@keyframes float-coin{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-16px) rotate(6deg)}}
+@keyframes globe-pulse{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── ASSET CATEGORY ICONS ── */
+.ap-asset-cats{display:flex;gap:1.25rem;margin-top:2rem;flex-wrap:wrap;align-items:flex-start}
+.ap-asset-cat{display:flex;flex-direction:column;align-items:center;gap:.4rem;cursor:pointer;transition:transform .2s;text-decoration:none}
+.ap-asset-cat:hover{transform:translateY(-3px)}
+.ap-acat-icon{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.35rem;border:1.5px solid #e2e8f0;background:#ffffff;box-shadow:0 2px 10px rgba(0,0,0,.08);transition:all .2s}
+.ap-asset-cat:hover .ap-acat-icon{box-shadow:0 6px 20px rgba(0,0,0,.12);transform:none;border-color:transparent}
+.ap-acat-lbl{font-size:.57rem;font-weight:800;letter-spacing:.1em;color:#94a3b8;text-transform:uppercase;white-space:nowrap}
+
+/* ── TICKER ── */
+.ap-ticker{background:#080d1c;border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);overflow:hidden;height:38px;display:flex;align-items:center;position:relative;z-index:2}
+.ap-ticker-track{display:flex;align-items:center;gap:2.5rem;animation:ticker 50s linear infinite;white-space:nowrap;padding:0 1rem}
+.ap-ticker-track:hover{animation-play-state:paused}
+.ap-tick-item{display:flex;align-items:center;gap:.5rem;font-size:.78rem}
+.ap-tick-pair{color:rgba(255,255,255,.4);font-weight:600}
+.ap-tick-price{color:#e2e8f0;font-weight:800;font-variant-numeric:tabular-nums}
+.ap-tick-chg{font-weight:700;font-size:.75rem}
+.ap-tick-chg.up{color:#00e676}.ap-tick-chg.dn{color:#ff4757}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* ── MARKET CARDS ── */
+.ap-cards-row{max-width:1320px;margin:2.5rem auto;padding:0 1.5rem;display:grid;grid-template-columns:repeat(5,1fr);gap:1.1rem}
+.ap-mcard{background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:1.35rem;transition:all .25s;overflow:hidden;position:relative;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.ap-mcard::after{content:'';position:absolute;inset:0;border-radius:16px;opacity:0;transition:opacity .25s;pointer-events:none}
+.ap-mcard:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.1)}
+.ap-mcard:hover::after{opacity:1}
+.ap-mcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.ap-mcard-lbl{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8}
+.ap-mcard-badge{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.25rem}
+.ap-mcard-price{font-size:1.7rem;font-weight:900;color:#1e293b;margin-bottom:.25rem;font-variant-numeric:tabular-nums;line-height:1}
+.ap-mcard-chg{font-size:.78rem;font-weight:700;margin-bottom:.5rem;display:flex;align-items:center;gap:.3rem}
+.ap-mcard-chg.up{color:#059669}.ap-mcard-chg.dn{color:#dc2626}
+.ap-mcard-sub{font-size:.65rem;color:#94a3b8;margin-bottom:.75rem}
+.ap-mcard-chart{width:100%;height:70px;display:block}
+
+/* invite card */
+.ap-invite-card{background:linear-gradient(135deg,#0d1f4a,#0f2868);border:1px solid rgba(61,142,240,.22);display:flex;flex-direction:column;justify-content:center;gap:.6rem}
+.ap-invite-card:hover{border-color:rgba(61,142,240,.45);box-shadow:0 20px 50px rgba(61,142,240,.2)}
+.ap-invite-icon{font-size:2rem;margin-bottom:.25rem}
+.ap-invite-card h4{font-size:.95rem;font-weight:800;color:#fff}
+.ap-invite-card p{font-size:.75rem;color:#8a94b8;line-height:1.5}
+.ap-invite-card p strong{color:#00e676;font-size:1.1rem}
+.ap-invite-btn{background:#3d8ef0;color:#fff;border:none;padding:.55rem 1.2rem;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;margin-top:.25rem;width:fit-content}
+.ap-invite-btn:hover{background:#2a6fd6}
+
+/* ── STATS BAR ── */
+.ap-stats-bar{max-width:1320px;margin:0 auto 2.5rem;padding:0 1.5rem;display:grid;grid-template-columns:repeat(5,1fr);gap:1.1rem}
+.ap-stat-pill{background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;padding:1.1rem 1.3rem;display:flex;align-items:center;gap:.9rem;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.ap-stat-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.ap-stat-val{font-size:1.35rem;font-weight:900;color:#1e293b;line-height:1.1;font-variant-numeric:tabular-nums}
+.ap-stat-lbl{font-size:.67rem;color:#94a3b8;font-weight:600;margin-top:.1rem}
+
+/* ── BOTTOM ROW ── */
+.ap-bottom{max-width:1320px;margin:0 auto 2.5rem;padding:0 1.5rem;display:grid;grid-template-columns:1.1fr 2fr 1fr;gap:1.1rem;align-items:stretch}
+.ap-panel{background:#ffffff;border:1px solid #e2e8f0;border-radius:18px;padding:1.5rem;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.ap-panel h4{font-size:.9rem;font-weight:800;color:#1e293b;margin-bottom:1.1rem}
+
+/* donut */
+.ap-donut-wrap{position:relative;width:150px;height:150px;flex-shrink:0}
+.ap-donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.ap-donut-center .dlbl{font-size:.65rem;color:#94a3b8}
+.ap-donut-center .dval{font-size:1.2rem;font-weight:900;color:#1e293b}
+.ap-legend{display:flex;flex-direction:column;gap:.5rem;flex:1}
+.ap-leg-item{display:flex;align-items:center;justify-content:space-between;font-size:.75rem;color:#64748b}
+.ap-leg-left{display:flex;align-items:center;gap:.5rem}
+.ap-leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.ap-leg-pct{font-weight:700;color:#1e293b}
+.ap-portfolio-inner{display:flex;align-items:center;gap:1.25rem;margin-bottom:1rem}
+
+/* performance */
+.ap-perf-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.4rem}
+.ap-perf-badge{background:rgba(0,230,118,.12);color:#00e676;font-size:.7rem;font-weight:700;padding:.2rem .65rem;border-radius:20px}
+.ap-perf-chart{width:100%;flex:1;min-height:200px;display:block}
+.ap-perf-legend{display:flex;gap:1rem;margin-top:.75rem;flex-wrap:wrap}
+.ap-perf-leg{display:flex;align-items:center;gap:.35rem;font-size:.7rem;color:#5a6380}
+.ap-perf-line{width:20px;height:2px;border-radius:1px}
+.ap-perf-returns{display:flex;gap:1.1rem;margin-top:.5rem}
+.ap-ret-val{font-size:.82rem;font-weight:800}
+.ap-ret-lbl{font-size:.64rem;color:#5a6380}
+
+/* cta col */
+.ap-cta-col{display:flex;flex-direction:column;gap:1.1rem}
+.ap-cta-card{border-radius:16px;padding:1.5rem;flex:1;transition:all .25s;display:flex;flex-direction:column}
+.ap-cta-inv{background:linear-gradient(145deg,#0d1f4a,#0f2868);border:1px solid rgba(61,142,240,.2)}
+.ap-cta-inv:hover{border-color:rgba(61,142,240,.45);box-shadow:0 14px 40px rgba(61,142,240,.2);transform:translateY(-2px)}
+.ap-cta-earn{background:linear-gradient(145deg,#0a2918,#0e3d22);border:1px solid rgba(0,230,118,.18)}
+.ap-cta-earn:hover{border-color:rgba(0,230,118,.4);box-shadow:0 14px 40px rgba(0,230,118,.15);transform:translateY(-2px)}
+.ap-cta-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:.85rem}
+.ap-cta-inv .ap-cta-ico{background:rgba(61,142,240,.15);color:#6bb3ff}
+.ap-cta-earn .ap-cta-ico{background:rgba(0,230,118,.12);color:#00e676}
+.ap-cta-card h5{font-size:1rem;font-weight:800;margin-bottom:.3rem}
+.ap-cta-inv h5{color:#fff}.ap-cta-earn h5{color:#00e676}
+.ap-cta-card p{font-size:.75rem;color:#8a94b8;flex:1;line-height:1.6;margin-bottom:.85rem}
+.ap-cta-link{font-size:.8rem;font-weight:700;padding:.5rem .9rem;border-radius:8px;display:inline-flex;align-items:center;gap:.35rem;transition:all .2s}
+.ap-cta-inv .ap-cta-link{color:#6bb3ff;background:rgba(61,142,240,.12)}
+.ap-cta-inv .ap-cta-link:hover{background:rgba(61,142,240,.22)}
+.ap-cta-earn .ap-cta-link{color:#00e676;background:rgba(0,230,118,.1)}
+.ap-cta-earn .ap-cta-link:hover{background:rgba(0,230,118,.18)}
+
+/* ── FEATURES ── */
+.ap-features{max-width:1320px;margin:0 auto 1.5rem;padding:0 1.5rem}
+.ap-feat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1.1rem}
+.ap-feat-card{background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:1.35rem;transition:all .25s;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.ap-feat-card:hover{border-color:#bfdbfe;transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.ap-feat-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:.9rem}
+.ap-feat-card h5{font-size:.85rem;font-weight:800;color:#1e293b;margin-bottom:.3rem}
+.ap-feat-card p{font-size:.72rem;color:#64748b;line-height:1.6;margin-bottom:.65rem}
+.ap-feat-link{font-size:.72rem;font-weight:700;display:flex;align-items:center;gap:.25rem}
+
+/* ── SECTION SHARED ── */
+.ap-section{padding:5.5rem 1.5rem;position:relative;overflow:hidden}
+.ap-section-inner{max-width:1320px;margin:0 auto;text-align:center;position:relative;z-index:2}
+.ap-eyebrow{display:inline-flex;align-items:center;gap:.5rem;background:rgba(61,142,240,.08);border:1px solid rgba(61,142,240,.2);color:#3d8ef0;font-size:.68rem;font-weight:700;letter-spacing:.1em;padding:.3rem .9rem;border-radius:20px;margin-bottom:1.1rem;text-transform:uppercase}
+.ap-eyebrow::before{content:'◆';font-size:.5rem;color:#3d8ef0}
+.ap-section-inner h2{font-size:clamp(1.9rem,3.5vw,2.8rem);font-weight:900;color:#1e293b;margin-bottom:.85rem;line-height:1.1}
+.ap-section-inner h2 .grad{background:linear-gradient(90deg,#3d8ef0,#9b59b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ap-section-inner > p{font-size:.95rem;color:#64748b;margin:0 auto 3rem;max-width:580px}
+
+/* ── ABOUT ── */
+.ap-about-wrap{display:grid;grid-template-columns:1fr 3fr 1fr;gap:2rem;align-items:center;margin-bottom:3rem}
+.ap-about-art{display:flex;align-items:center;justify-content:center}
+.ap-eth-art{width:160px;height:160px;position:relative;animation:float-coin 5s ease-in-out infinite}
+.ap-btc-art{width:160px;height:160px;position:relative;animation:float-coin 5s ease-in-out infinite;animation-delay:-2.5s}
+.ap-eth-gem{width:130px;height:130px;background:linear-gradient(135deg,#627eea,#8e6de0,#00d4ff);clip-path:polygon(50% 0%,100% 38%,82% 100%,18% 100%,0% 38%);filter:drop-shadow(0 0 20px rgba(98,126,234,.4));margin:auto}
+.ap-btc-coin{width:130px;height:130px;background:linear-gradient(135deg,#f7931a,#ffc107,#e07d10);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:3.5rem;filter:drop-shadow(0 0 20px rgba(247,147,26,.35));margin:auto}
+.ap-about-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem}
+.ap-about-card{background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:1.5rem;text-align:left;transition:all .25s;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.ap-about-card:hover{border-color:#bfdbfe;transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.ap-about-card i{font-size:1.6rem;margin-bottom:.85rem;display:block}
+.ap-about-card h4{font-size:.9rem;font-weight:800;color:#1e293b;margin-bottom:.4rem}
+.ap-about-card p{font-size:.75rem;color:#64748b;line-height:1.6}
+
+/* ── HOW IT WORKS ── */
+.ap-how-dark{background:#f8fafc}
+.ap-steps-row{display:flex;align-items:flex-start;justify-content:center;gap:.75rem;flex-wrap:wrap}
+.ap-step{background:#ffffff;border:1px solid #e2e8f0;border-radius:18px;padding:1.75rem 1.25rem;width:200px;text-align:center;transition:all .25s;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.ap-step:hover{border-color:#bfdbfe;transform:translateY(-4px);box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.ap-step-num{font-size:.65rem;font-weight:800;letter-spacing:.15em;color:#3d8ef0;margin-bottom:.65rem}
+.ap-step-icon{width:58px;height:58px;border-radius:18px;background:rgba(61,142,240,.1);border:1px solid rgba(61,142,240,.18);display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#3d8ef0;margin:0 auto .85rem}
+.ap-step h4{font-size:.88rem;font-weight:800;color:#1e293b;margin-bottom:.4rem}
+.ap-step p{font-size:.72rem;color:#64748b;line-height:1.6}
+.ap-step-arrow{color:#cbd5e1;font-size:1.2rem;padding-top:3rem}
+
+/* ── ANALYTICS ── */
+.ap-ana-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1.1rem;text-align:left}
+.ap-ana-card{background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:1.25rem;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.ap-ana-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
+.ap-ana-head span:first-child{font-size:.8rem;font-weight:700;color:#1e293b}
+.bx-green{background:rgba(0,230,118,.12);color:#00e676;font-size:.66rem;font-weight:700;padding:.18rem .6rem;border-radius:20px}
+.bx-blue{background:rgba(61,142,240,.12);color:#6bb3ff;font-size:.66rem;font-weight:700;padding:.18rem .6rem;border-radius:20px}
+.bx-gold{background:rgba(245,166,35,.12);color:#f5a623;font-size:.66rem;font-weight:700;padding:.18rem .6rem;border-radius:20px}
+.ap-ana-chart{height:60px;margin-bottom:.75rem}
+.ap-ana-chart canvas{width:100%!important;height:60px;display:block}
+.ap-ana-stats div{display:flex;justify-content:space-between;font-size:.72rem;color:#94a3b8;margin-bottom:.2rem}
+.ap-ana-stats strong{font-size:.72rem}
+/* upgrade card */
+.ap-upgrade-card{background:linear-gradient(145deg,#fffbeb,#fef3c7);border:1px solid rgba(245,166,35,.35);display:flex;flex-direction:column;justify-content:space-between}
+.ap-upgrade-card .ap-ana-head span:first-child{color:#92400e}
+.up-icon{font-size:2rem;margin-bottom:.5rem}
+.up-title{font-size:.9rem;font-weight:800;color:#92400e;margin-bottom:.35rem}
+.up-desc{font-size:.72rem;color:#b45309;line-height:1.6;margin-bottom:1rem;flex:1}
+.up-btn{background:linear-gradient(90deg,#f5a623,#e09418);color:#000;border:none;padding:.55rem 1rem;border-radius:8px;font-size:.78rem;font-weight:800;cursor:pointer;font-family:inherit;transition:all .2s;width:100%}
+.up-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(245,166,35,.3)}
+
+/* ── PORTFOLIO ── */
+.ap-port-grid{display:grid;grid-template-columns:auto 1fr auto;gap:2.5rem;align-items:start;max-width:1100px;margin:0 auto;text-align:left}
+.ap-port-donut-wrap{position:relative;width:220px;height:220px;flex-shrink:0}
+.ap-port-donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ap-port-allocs{display:flex;flex-direction:column;gap:.9rem;min-width:220px}
+.ap-port-row{display:flex;align-items:center;gap:.65rem}
+.ap-port-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.ap-port-name{font-size:.78rem;color:#8a94b8;width:110px;flex-shrink:0}
+.ap-port-bar-bg{flex:1;height:6px;background:rgba(0,0,0,.1);border-radius:3px;overflow:hidden}
+.ap-port-bar{height:100%;border-radius:3px}
+.ap-port-pct{font-size:.75rem;font-weight:700;width:30px;text-align:right}
+.ap-port-usd{font-size:.7rem;color:#5a6380;width:44px;text-align:right}
+.ap-port-right{display:flex;flex-direction:column;gap:1.1rem}
+.ap-holdings-card,.ap-growth-card{background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;padding:1.25rem;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.ap-holdings-card h5,.ap-growth-card h5{font-size:.8rem;font-weight:800;color:#1e293b;margin-bottom:.85rem}
+.ap-holding-row{display:flex;align-items:center;justify-content:space-between;font-size:.75rem;padding:.35rem 0;border-bottom:1px solid #f1f5f9}
+.ap-holding-row:last-child{border:none}
+.ap-holding-left{display:flex;align-items:center;gap:.5rem;color:#1e293b}
+.ap-holding-dot{width:8px;height:8px;border-radius:50%}
+.ap-holding-pct{color:#94a3b8}
+.ap-holding-chg{font-weight:700}
+.ap-growth-num{font-size:1.8rem;font-weight:900;color:#00e676}
+.ap-growth-lbl{font-size:.7rem;color:#5a6380;margin-top:.1rem}
+.ap-growth-chart{width:100%;height:70px;margin-top:.85rem}
+.ap-port-ctas{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin-top:2rem}
+
+/* ── CONTACT ── */
+.ap-contact-grid{display:grid;grid-template-columns:1fr 1.5fr 1fr;gap:2rem;align-items:start;text-align:left;max-width:1100px;margin:0 auto}
+.ap-contact-list{display:flex;flex-direction:column;gap:1.1rem}
+.ap-ci{display:flex;gap:.9rem;align-items:flex-start}
+.ap-ci-icon{width:42px;height:42px;border-radius:12px;background:rgba(61,142,240,.1);border:1px solid rgba(61,142,240,.18);color:#6bb3ff;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.ap-ci h5{font-size:.82rem;font-weight:800;color:#1e293b;margin-bottom:.1rem}
+.ap-ci p{font-size:.75rem;color:#6bb3ff;margin:0}
+.ap-ci span{font-size:.68rem;color:#5a6380}
+.ap-contact-form-wrap{background:#ffffff;border:1px solid #e2e8f0;border-radius:18px;padding:1.75rem;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.ap-contact-form-wrap h4{font-size:1rem;font-weight:800;color:#1e293b;margin-bottom:1.25rem}
+.cf-group{margin-bottom:.85rem}
+.cf-group label{display:block;font-size:.72rem;font-weight:700;color:#64748b;margin-bottom:.3rem}
+.cf-group input,.cf-group select,.cf-group textarea{width:100%;background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:.6rem .85rem;color:#1e293b;font-size:.84rem;outline:none;transition:border-color .2s;font-family:inherit;box-sizing:border-box}
+.cf-group input:focus,.cf-group select:focus,.cf-group textarea:focus{border-color:#3d8ef0;background:#fff}
+.cf-group textarea{resize:vertical}
+.cf-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.cf-btn{width:100%;background:#3d8ef0;color:#fff;border:none;padding:.75rem;border-radius:9px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.5rem}
+.cf-btn:hover{background:#2a6fd6;transform:translateY(-1px)}
+.ap-contact-art{display:flex;align-items:center;justify-content:center}
+.ap-headphones-art{width:200px;height:200px;background:radial-gradient(circle,rgba(61,142,240,.15),transparent 70%);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7rem;animation:float-coin 5s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(61,142,240,.3))}
+
+/* ── FOOTER ── */
+.ap-footer{background:#1e293b;border-top:1px solid #334155;padding:2.5rem 1.5rem 1.5rem}
+.ap-footer-inner{max-width:1320px;margin:0 auto}
+.ap-footer-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;margin-bottom:1.75rem}
+.ap-footer-logo{font-size:1.3rem;font-weight:900;color:#fff}
+.ap-footer-logo span{color:#3d8ef0}
+.ap-footer-links{display:flex;gap:1.5rem;flex-wrap:wrap}
+.ap-footer-links a{font-size:.8rem;color:#5a6380;transition:color .2s}
+.ap-footer-links a:hover{color:#8a94b8}
+.ap-footer-socials{display:flex;gap:.6rem}
+.ap-social-btn{width:36px;height:36px;border-radius:9px;background:#0c0e1a;border:1px solid #1a1e30;display:flex;align-items:center;justify-content:center;color:#5a6380;font-size:.85rem;transition:all .2s}
+.ap-social-btn:hover{color:#fff;border-color:#263050;background:#111420}
+.ap-footer-bottom{border-top:1px solid #1a1e30;padding-top:1.25rem;text-align:center;font-size:.75rem;color:#3d4560}
+
+/* ── TRUST STRIP ── */
+.ap-trust{display:flex;align-items:center;justify-content:center;gap:3rem;padding:1.4rem 1.5rem;background:#f8fafc;border-top:1px solid #e2e8f0;flex-wrap:wrap}
+.ap-trust-item{display:flex;align-items:center;gap:.55rem;font-size:.8rem;color:#94a3b8}
+
+/* ── ANIMATIONS ── */
+@keyframes fade-up{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+@keyframes slide-right{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
+.anim-up{animation:fade-up .7s ease both}
+.anim-in{animation:fade-in .8s ease both}
+[data-aos]{opacity:0;transition:opacity .6s ease,transform .6s ease}
+[data-aos="fade-up"]{transform:translateY(40px)}
+[data-aos="fade-right"]{transform:translateX(-40px)}
+[data-aos="fade-left"]{transform:translateX(40px)}
+[data-aos].aos-animate{opacity:1;transform:none}
+
+/* ── SECTION SLIDESHOWS ── */
+.slide-bg-wrap{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.slide-bg-layer{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;transition:opacity 1.6s ease;opacity:0}
+.slide-bg-layer.active{opacity:1}
+/* bottom banner */
+.ap-bottom-banner{position:relative;overflow:hidden;min-height:340px;display:flex;align-items:center;justify-content:center;text-align:center}
+.ap-bottom-banner-content{position:relative;z-index:2;max-width:700px;padding:3rem 2rem}
+.ap-bottom-banner h2{font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:900;color:#fff;margin-bottom:.85rem;line-height:1.15;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+.ap-bottom-banner p{font-size:1rem;color:rgba(255,255,255,.85);margin-bottom:2rem;line-height:1.7;text-shadow:0 1px 6px rgba(0,0,0,.4)}
+.ap-bottom-banner-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.ap-bb-btn-primary{background:linear-gradient(135deg,#3d8ef0,#2563eb);color:#fff;padding:.75rem 2rem;border-radius:10px;font-size:.95rem;font-weight:700;display:inline-flex;align-items:center;gap:.5rem;transition:all .25s;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.ap-bb-btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.4);color:#fff}
+.ap-bb-btn-ghost{background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.5);color:#fff;padding:.75rem 2rem;border-radius:10px;font-size:.95rem;font-weight:700;display:inline-flex;align-items:center;gap:.5rem;transition:all .25s;backdrop-filter:blur(4px)}
+.ap-bb-btn-ghost:hover{background:rgba(255,255,255,.25);border-color:#fff;color:#fff}
+/* slide indicators */
+.slide-dots{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:.4rem;z-index:3}
+.slide-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.4);cursor:pointer;transition:all .3s}
+.slide-dot.active{background:#fff;transform:scale(1.25)}
+
+/* ── RE BUILDINGS ── */
+.re-buildings{display:flex;align-items:flex-end;gap:5px;height:70px;padding-top:6px}
+.re-building{border-radius:3px 3px 0 0;display:flex;flex-direction:column}
+.re-windows{display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:4px 3px;flex:1}
+.re-win{background:rgba(255,255,255,.3);border-radius:1px;width:5px;height:4px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1200px){
+  .ap-cards-row{grid-template-columns:repeat(3,1fr)}.ap-stats-bar{grid-template-columns:repeat(3,1fr)}
+  .ap-ana-grid{grid-template-columns:repeat(3,1fr)}.ap-feat-grid{grid-template-columns:repeat(3,1fr)}
+  .ap-about-wrap{grid-template-columns:1fr}.ap-about-art{display:none}
+  .ap-port-grid{grid-template-columns:auto 1fr}.ap-port-right{grid-column:1/-1}
+  .ap-contact-grid{grid-template-columns:1fr 1.5fr}.ap-contact-art{display:none}
+}
+@media(max-width:900px){
+  .ap-hero-inner{grid-template-columns:1fr}.ap-hero-visual{display:none}
+  .ap-bottom{grid-template-columns:1fr}.ap-feat-grid{grid-template-columns:repeat(2,1fr)}
+  .ap-ana-grid{grid-template-columns:repeat(2,1fr)}.ap-about-grid{grid-template-columns:repeat(2,1fr)}
+  .ap-ham{display:block}.ap-links{display:none;flex-direction:column;position:fixed;top:66px;left:0;right:0;background:rgba(255,255,255,.98);border-bottom:1px solid #e2e8f0;padding:1rem;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.1)}
+  .ap-links.open{display:flex}.ap-nav-right{display:none}.ap-nav-right.open{display:flex!important;flex-direction:column;gap:.5rem;padding:0 1rem 1rem;position:fixed;top:auto;left:0;right:0;background:rgba(255,255,255,.98);z-index:998;border-bottom:1px solid #e2e8f0}
+  .ap-port-grid{grid-template-columns:1fr;text-align:center}
+  .ap-port-allocs{align-items:center}.ap-port-row{width:100%;max-width:300px}
+}
+@media(max-width:600px){
+  .ap-cards-row{grid-template-columns:1fr 1fr}.ap-stats-bar{grid-template-columns:1fr 1fr}
+  .ap-feat-grid{grid-template-columns:1fr 1fr}.ap-about-grid{grid-template-columns:1fr}
+  .ap-ana-grid{grid-template-columns:1fr}.ap-contact-grid{grid-template-columns:1fr}
+  .ap-steps-row{flex-direction:column;align-items:center}.ap-step-arrow{display:none}
+}
+@media(max-width:400px){.ap-cards-row{grid-template-columns:1fr}.ap-stats-bar{grid-template-columns:1fr}.ap-feat-grid{grid-template-columns:1fr}}
+
+/* ── HERO PARTNERS BAND ── */
+.ap-hpartners{position:relative;z-index:2;background:rgba(6,10,25,.7);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07);padding:.95rem 1.5rem}
+.ap-hpartners-in{max-width:1320px;margin:0 auto;display:flex;align-items:center;gap:2.5rem;flex-wrap:wrap;justify-content:center}
+.ap-hpartners-lbl{font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.32);white-space:nowrap;flex-shrink:0;padding-right:2rem;border-right:1px solid rgba(255,255,255,.1)}
+.ap-hpartner{display:flex;align-items:center;gap:.55rem;opacity:.6;transition:opacity .25s,transform .2s;text-decoration:none}
+.ap-hpartner:hover{opacity:1;transform:translateY(-2px)}
+.ap-hpartner-name{font-weight:900;font-size:.9rem;letter-spacing:.03em;white-space:nowrap}
+@media(max-width:900px){.ap-hpartners-in{gap:1.75rem}.ap-hpartners-lbl{border-right:none;padding-right:0;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:.65rem;width:100%;text-align:center}}
+@media(max-width:500px){.ap-hpartner-name{display:none}}
+</style>
+<% if (typeof siteCustomize !== 'undefined') { var sc = siteCustomize; var _pageBg = sc.colorBgHome || sc.colorBg; %>
+<% if (sc.fontUrl) { %><link rel="stylesheet" href="<%- sc.fontUrl %>"><% } %>
+<style>
+  /* ══ ADMIN CUSTOMIZER OVERRIDES ══ */
+
+  /* ── Typography ── */
+  body {
+    font-family: <%- sc.fontFamily %>;
+    font-size: <%- sc.fontSizeBase %>;
+    background: <%- _pageBg %>;
+    color: <%- sc.colorText %>;
+  }
+
+  /* ── Background image (home page) ── */
+  <% if (sc.bgHome) { %>
+  body {
+    background-image: url('<%- sc.bgHome %>') !important;
+    background-size: cover !important;
+    background-position: center top !important;
+    background-attachment: fixed !important;
+  }
+  <% if (parseFloat(sc.bgOverlayHome) > 0) { %>
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,<%- sc.bgOverlayHome %>);
+    z-index: 0;
+    pointer-events: none;
+  }
+  .ap-nav, .ap-ticker, .ap-footer { position: relative; z-index: 1; }
+  <% } %>
+  <% } %>
+
+  /* ── Page-level section backgrounds ── */
+  .ap-hero {
+    background: linear-gradient(145deg,
+      <%- _pageBg %> 0%,
+      <%- sc.colorBg2 %> 35%,
+      <%- sc.colorBg2 %> 65%,
+      <%- _pageBg %> 100%) !important;
+  }
+  .ap-hero::before {
+    background: radial-gradient(ellipse 70% 60% at 68% 45%, <%- sc.colorPrimary %>19 0%, transparent 65%),
+                radial-gradient(ellipse 40% 50% at 20% 70%, <%- sc.colorPurple %>0c 0%, transparent 60%) !important;
+  }
+  /* alternating section backgrounds */
+  .ap-how-dark,
+  .ap-section[style*="background:#f8fafc"],
+  .ap-section[style*="background: #f8fafc"] {
+    background: <%- sc.colorBg2 %> !important;
+  }
+  .ap-trust { background: <%- sc.colorBg2 %> !important; border-color: <%- sc.colorBorder %>; }
+  /* ticker & footer */
+  .ap-ticker { background: <%- sc.colorText %>; }
+  .ap-footer { background: <%- sc.colorText %>; border-color: <%- sc.colorText2 %>66; }
+  .ap-footer-bottom { color: <%- sc.colorText3 %>; border-color: <%- sc.colorText2 %>33; }
+  .ap-footer-links a { color: <%- sc.colorText3 %>; }
+  .ap-social-btn { background: <%- sc.colorBg %>22; border-color: <%- sc.colorBg %>33; color: <%- sc.colorText3 %>; }
+  /* nav */
+  .ap-nav { background: <%- sc.colorBg %>f7 !important; border-color: <%- sc.colorBorder %>; }
+  .ap-logo { color: <%- sc.colorText %>; }
+  .ap-links a { color: <%- sc.colorText2 %>; }
+  .ap-links a:hover { color: <%- sc.colorText %>; background: <%- sc.colorBg2 %>; }
+
+  /* ── Logo & Branding ── */
+  .ap-logo span, .ap-footer-logo span { color: <%- sc.colorPrimary %>; }
+  .ap-logo-icon { background: linear-gradient(135deg,<%- sc.colorPrimary %>,<%- sc.colorPurple %>); }
+
+  /* ── Buttons ── */
+  .ap-btn-reg, .ap-btn-in { color: <%- sc.colorText2 %>; }
+  .ap-btn-reg {
+    background: linear-gradient(135deg,<%- sc.colorPrimary %>,<%- sc.colorPrimary %>cc) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 12px <%- sc.colorPrimary %>4d;
+  }
+  .ap-btn-reg:hover {
+    background: linear-gradient(135deg,<%- sc.colorPrimary %>cc,<%- sc.colorPrimary %>99) !important;
+    box-shadow: 0 8px 24px <%- sc.colorPrimary %>66;
+  }
+  .ap-btn-primary {
+    background: linear-gradient(135deg,<%- sc.colorPrimary %>,<%- sc.colorPrimary %>cc) !important;
+    box-shadow: 0 6px 20px <%- sc.colorPrimary %>59;
+  }
+  .ap-btn-primary:hover {
+    background: linear-gradient(135deg,<%- sc.colorPrimary %>cc,<%- sc.colorPrimary %>99) !important;
+    box-shadow: 0 12px 32px <%- sc.colorPrimary %>73;
+    color: #fff;
+  }
+  .ap-btn-ghost:hover { border-color: <%- sc.colorPrimary %>; color: <%- sc.colorPrimary %>; }
+  .cf-btn { background: <%- sc.colorPrimary %>; }
+  .cf-btn:hover { background: <%- sc.colorPrimary %>cc; }
+  .ap-invite-btn { background: <%- sc.colorPrimary %>; }
+  .ap-invite-btn:hover { background: <%- sc.colorPrimary %>cc; }
+  .up-btn { background: linear-gradient(90deg,<%- sc.colorGold %>,<%- sc.colorGold %>cc); }
+
+  /* ── Badges / chips ── */
+  .ap-eyebrow { background: <%- sc.colorPrimary %>14; color: <%- sc.colorPrimary %>; border-color: <%- sc.colorPrimary %>33; }
+  .ap-eyebrow::before { color: <%- sc.colorPrimary %>; }
+  .ap-badge { background: <%- sc.colorPrimary %>14; border-color: <%- sc.colorPrimary %>33; color: <%- sc.colorPrimary %>; }
+  .ap-step-icon { background: <%- sc.colorPrimary %>1a; border-color: <%- sc.colorPrimary %>2e; color: <%- sc.colorPrimary %>; }
+  .ap-step-num { color: <%- sc.colorPrimary %>; }
+
+  /* ── Gradient text ── */
+  .ap-hero h1 .grad,
+  .ap-section-inner h2 .grad {
+    background: linear-gradient(90deg,<%- sc.colorPrimary %>,<%- sc.colorPurple %>) !important;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── Cards / surfaces ── */
+  .ap-mcard, .ap-stat-pill, .ap-panel, .ap-about-card, .ap-feat-card,
+  .ap-step, .ap-holdings-card, .ap-growth-card, .ap-contact-form-wrap, .ap-ana-card {
+    background: <%- sc.colorCard %>;
+    border-color: <%- sc.colorBorder %>;
+  }
+  .ap-feat-card:hover { border-color: <%- sc.colorPrimary %>40; }
+  .ap-ci-icon { background: <%- sc.colorPrimary %>1a; color: <%- sc.colorPrimary %>cc; border-color: <%- sc.colorPrimary %>2e; }
+  .ap-perf-badge { background: <%- sc.colorGreen %>1f; color: <%- sc.colorGreen %>; }
+
+  /* ── Text — full override with !important so customizer always wins ── */
+  /* headings */
+  .ap-hero h1                               { color: <%- sc.colorText %> !important; }
+  .ap-section-inner h2                      { color: <%- sc.colorText %> !important; }
+  .ap-about-card h4, .ap-feat-card h5,
+  .ap-step h4, .ap-panel h4,
+  .ap-holdings-card h5, .ap-growth-card h5,
+  .ap-ana-head span:first-child,
+  .ap-mcard-price, .ap-stat-val,
+  .ap-contact-form-wrap h4                  { color: <%- sc.colorText %> !important; }
+  /* body / secondary text */
+  .ap-hero-sub                              { color: <%- sc.colorText2 %> !important; }
+  .ap-about-card p, .ap-feat-card p,
+  .ap-step p, .ap-section-inner > p,
+  .ap-mcard-sub, .ap-stat-lbl,
+  .ap-trust-item                            { color: <%- sc.colorText2 %> !important; }
+  /* card & eyebrow labels */
+  .ap-mcard-lbl, .ap-acat-lbl              { color: <%- sc.colorText3 %> !important; }
+  .ap-mcard-chg.up { color: <%- sc.colorGreen %> !important; }
+  .ap-mcard-chg.dn { color: <%- sc.colorRed %>  !important; }
+
+  /* ── Form inputs ── */
+  .cf-group input, .cf-group select, .cf-group textarea {
+    background: <%- sc.colorBg2 %>;
+    border-color: <%- sc.colorBorder %>;
+    color: <%- sc.colorText %>;
+  }
+  .cf-group input:focus, .cf-group select:focus, .cf-group textarea:focus {
+    border-color: <%- sc.colorPrimary %>;
+    background: <%- sc.colorCard %>;
+  }
+  .cf-group label { color: <%- sc.colorText2 %>; }
+
+  /* ── Extra elements — text & color visibility ── */
+  .ap-ci h5                  { color: <%- sc.colorText %> !important; }
+  .ap-ci span                { color: <%- sc.colorText3 %>; }
+  .ap-port-bar-bg            { background: <%- sc.colorBorder %>; }
+  .ap-port-name              { color: <%- sc.colorText2 %>; }
+  .ap-port-usd               { color: <%- sc.colorText3 %>; }
+  .ap-perf-leg               { color: <%- sc.colorText2 %>; }
+  .ap-ret-lbl                { color: <%- sc.colorText3 %>; }
+  .ap-holding-left           { color: <%- sc.colorText %>; }
+  .ap-holding-pct            { color: <%- sc.colorText3 %>; }
+  .ap-leg-left               { color: <%- sc.colorText2 %>; }
+  .ap-leg-pct                { color: <%- sc.colorText %>; }
+  .ap-donut-center .dlbl     { color: <%- sc.colorText3 %>; }
+  .ap-donut-center .dval     { color: <%- sc.colorText %>; }
+  .ap-panel h4               { color: <%- sc.colorText %>; }
+
+  /* ── Partners band (hero) ── */
+  .ap-hpartners { background: rgba(6,10,25,.7); }
+</style>
+<% } %>
+<%
+  /* compute once here so we can use it in head and body */
+  var _heroHasImg = false;
+  try { _heroHasImg = JSON.parse((typeof siteCustomize!=='undefined' && siteCustomize.bgHeroImages)||'[]').filter(Boolean).length > 0; } catch(e) {}
+  /* which sections have dark bg images */
+  var _bgSections = (typeof siteCustomize !== 'undefined') ? {
+    about:     !!siteCustomize.bgAbout,
+    how:       !!siteCustomize.bgHow,
+    analytics: !!siteCustomize.bgAnalytics,
+    portfolio: !!siteCustomize.bgPortfolio,
+    contact:   !!siteCustomize.bgContact
+  } : {};
+  var _anyBgSection = Object.values(_bgSections).some(Boolean);
+%>
+<% if (_heroHasImg) { %>
+<style>
+/* ══ HERO WITH BACKGROUND IMAGE — auto-white text for readability ══ */
+#apHeroSection h1,
+#apHeroSection h1 .grad                 { color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; text-shadow: 0 2px 18px rgba(0,0,0,.65); }
+#apHeroSection .ap-hero-sub             { color: rgba(255,255,255,.92) !important; text-shadow: 0 1px 10px rgba(0,0,0,.5); }
+#apHeroSection .ap-badge                { color: #ffffff !important; background: rgba(255,255,255,.14) !important; border-color: rgba(255,255,255,.28) !important; }
+#apHeroSection .ap-badge .dot           { background: #00e676; box-shadow: 0 0 6px #00e676; }
+#apHeroSection .ap-btn-ghost            { color: #ffffff !important; border-color: rgba(255,255,255,.55) !important; background: rgba(255,255,255,.08) !important; }
+#apHeroSection .ap-btn-ghost:hover      { background: rgba(255,255,255,.18) !important; }
+#apHeroSection .ap-acat-lbl             { color: rgba(255,255,255,.78) !important; }
+#apHeroSection .ap-acat-icon            { background: rgba(255,255,255,.12) !important; border-color: rgba(255,255,255,.22) !important; }
+#apHeroSection .ap-acat-icon i,
+#apHeroSection .ap-acat-icon            { color: #ffffff !important; }
+</style>
+<% } %>
+
+<% if (_anyBgSection) { %>
+<style>
+/* ══ SECTIONS WITH DARK BACKGROUND IMAGES — white text override ══
+   The .grad span gets background:none so the dark gradient rectangle
+   doesn't paint over the heading. Text becomes white with shadow.    */
+
+/* shared mixin — applied per-section below */
+<% ['about','how','analytics','portfolio','contact'].forEach(function(sec){ if(_bgSections[sec]){ %>
+#<%= sec %> .ap-eyebrow {
+  color: #ffffff !important;
+  background: rgba(255,255,255,.12) !important;
+  border-color: rgba(255,255,255,.28) !important;
+}
+#<%= sec %> .ap-eyebrow::before { color: #ffffff !important; }
+#<%= sec %> .ap-section-inner h2 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 14px rgba(0,0,0,.6);
+}
+/* remove the dark gradient rectangle from .grad span */
+#<%= sec %> .ap-section-inner h2 .grad {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  color: #ffffff !important;
+  text-shadow: 0 2px 14px rgba(0,0,0,.6);
+}
+#<%= sec %> .ap-section-inner > p {
+  color: rgba(255,255,255,.88) !important;
+  text-shadow: 0 1px 8px rgba(0,0,0,.45);
+}
+<% } }); %>
+
+/* About — cards on dark section need semi-transparent background */
+<% if(_bgSections.about){ %>
+#about .ap-about-card {
+  background: rgba(255,255,255,.10) !important;
+  border-color: rgba(255,255,255,.18) !important;
+  backdrop-filter: blur(8px);
+}
+#about .ap-about-card h4 { color: #ffffff !important; }
+#about .ap-about-card p  { color: rgba(255,255,255,.82) !important; }
+<% } %>
+
+/* How It Works — step cards */
+<% if(_bgSections.how){ %>
+#how .ap-step {
+  background: rgba(255,255,255,.10) !important;
+  border-color: rgba(255,255,255,.18) !important;
+  backdrop-filter: blur(8px);
+}
+#how .ap-step h4        { color: #ffffff !important; }
+#how .ap-step p         { color: rgba(255,255,255,.82) !important; }
+#how .ap-step-num       { color: rgba(255,255,255,.6) !important; }
+#how .ap-step-arrow     { color: rgba(255,255,255,.4) !important; }
+<% } %>
+
+/* Analytics — ana-cards */
+<% if(_bgSections.analytics){ %>
+#analytics .ap-ana-card {
+  background: rgba(255,255,255,.10) !important;
+  border-color: rgba(255,255,255,.15) !important;
+  backdrop-filter: blur(8px);
+}
+#analytics .ap-ana-head span:first-child { color: #ffffff !important; }
+#analytics .ap-ana-stats div span        { color: rgba(255,255,255,.65) !important; }
+#analytics .ap-upgrade-card {
+  background: rgba(245,166,35,.15) !important;
+  border-color: rgba(245,166,35,.4) !important;
+}
+#analytics .up-title { color: #fde68a !important; }
+#analytics .up-desc  { color: rgba(253,230,138,.8) !important; }
+<% } %>
+
+/* Portfolio — allocations text */
+<% if(_bgSections.portfolio){ %>
+#portfolio .ap-section-inner > p { color: rgba(255,255,255,.88) !important; }
+#portfolio .ap-port-allocs > div:first-child { color: #ffffff !important; }
+#portfolio .ap-port-name  { color: rgba(255,255,255,.75) !important; }
+#portfolio .ap-port-usd   { color: rgba(255,255,255,.55) !important; }
+#portfolio .ap-port-bar-bg { background: rgba(255,255,255,.15) !important; }
+#portfolio .ap-holdings-card,
+#portfolio .ap-growth-card {
+  background: rgba(255,255,255,.10) !important;
+  border-color: rgba(255,255,255,.15) !important;
+  backdrop-filter: blur(8px);
+}
+#portfolio .ap-holdings-card h5,
+#portfolio .ap-growth-card h5 { color: #ffffff !important; }
+#portfolio .ap-holding-left    { color: rgba(255,255,255,.9) !important; }
+#portfolio .ap-holding-pct     { color: rgba(255,255,255,.6) !important; }
+#portfolio .ap-holding-row     { border-bottom-color: rgba(255,255,255,.08) !important; }
+#portfolio .ap-growth-lbl      { color: rgba(255,255,255,.6) !important; }
+<% } %>
+
+/* Contact */
+<% if(_bgSections.contact){ %>
+#contact .ap-ci h5     { color: #ffffff !important; }
+#contact .ap-ci p      { color: rgba(255,255,255,.82) !important; }
+#contact .ap-ci span   { color: rgba(255,255,255,.55) !important; }
+#contact .ap-contact-form-wrap {
+  background: rgba(255,255,255,.10) !important;
+  border-color: rgba(255,255,255,.18) !important;
+  backdrop-filter: blur(10px);
+}
+#contact .ap-contact-form-wrap h4 { color: #ffffff !important; }
+#contact .cf-group label           { color: rgba(255,255,255,.78) !important; }
+#contact .cf-group input,
+#contact .cf-group select,
+#contact .cf-group textarea {
+  background: rgba(255,255,255,.08) !important;
+  border-color: rgba(255,255,255,.2) !important;
+  color: #ffffff !important;
+}
+#contact .cf-group input::placeholder,
+#contact .cf-group textarea::placeholder { color: rgba(255,255,255,.4) !important; }
+<% } %>
+</style>
+<% } %>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="ap-nav">
+  <div class="ap-nav-inner">
+    <a href="/" class="ap-logo">
+      <div class="ap-logo-icon"><i class="fas fa-chart-line" style="color:#fff;font-size:.75rem"></i></div>
+      <%= siteCustomize.logoText %><span><%= siteCustomize.logoAccent %></span>
+    </a>
+    <ul class="ap-links" id="apLinks">
+      <li><a href="#about">About</a></li>
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="/markets"><i class="fas fa-chart-line" style="font-size:.7rem;margin-right:.2rem"></i> Markets</a></li>
+      <li><a href="/plans"><i class="fas fa-layer-group" style="font-size:.7rem;margin-right:.2rem"></i> Plans</a></li>
+      <li><a href="#analytics">Analytics</a></li>
+      <li><a href="#portfolio">Portfolio</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="ap-nav-right" id="apNavRight">
+      <a href="/login" class="ap-btn-in"><%- siteCustomize.navSignIn %></a>
+      <a href="/register" class="ap-btn-reg"><i class="fas fa-rocket"></i> <%- siteCustomize.navInvestNow %></a>
+    </div>
+    <button class="ap-ham" id="apHam"><i class="fas fa-bars"></i></button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="ap-hero" id="apHeroSection">
+  <%
+    var _heroSlideImgs = [];
+    try { _heroSlideImgs = JSON.parse((typeof siteCustomize!=='undefined' && siteCustomize.bgHeroImages) || '[]'); } catch(e){}
+    _heroSlideImgs = _heroSlideImgs.filter(Boolean);
+    /* add section ID for hero-image CSS hook */
+  %>
+  <% if (_heroSlideImgs.length > 0) { %>
+  <div class="slide-bg-wrap" id="heroSlideBgWrap">
+    <% _heroSlideImgs.forEach(function(url, i) { %>
+    <div class="slide-bg-layer <%= i===0?'active':'' %>" style="background-image:url('<%= url %>')"></div>
+    <% }); %>
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,<%= parseFloat((typeof siteCustomize!=='undefined'&&siteCustomize.bgHeroSlideOverlay)||0)||0 %>);z-index:1"></div>
+  </div>
+  <div class="slide-dots" id="heroSlideDots">
+    <% _heroSlideImgs.forEach(function(url,i){ %><div class="slide-dot <%= i===0?'active':'' %>" data-idx="<%= i %>"></div><% }); %>
+  </div>
+  <% } %>
+  <div class="ap-hero-inner">
+    <div class="anim-up" style="position:relative;z-index:3">
+      <div class="ap-hero-badges">
+        <span class="ap-badge"><span class="dot"></span> <%= siteName %></span>
+        <span class="ap-badge"><i class="fas fa-bolt" style="font-size:.6rem;color:#f5a623"></i> <%- siteCustomize.heroBadge %></span>
+      </div>
+      <h1><%- siteCustomize.heroTitle %></h1>
+      <p class="ap-hero-sub"><%- siteCustomize.heroSubtitle %></p>
+      <div class="ap-hero-ctas">
+        <a href="/register" class="ap-btn-primary"><i class="fas fa-rocket"></i> <%- siteCustomize.heroCta1 %></a>
+        <a href="/login"    class="ap-btn-ghost"><i class="fas fa-sign-in-alt"></i> <%- siteCustomize.heroCta2 %></a>
+      </div>
+      <div class="ap-asset-cats">
+        <a href="/markets" class="ap-asset-cat">
+          <div class="ap-acat-icon" style="background:rgba(247,147,26,.1);border-color:rgba(247,147,26,.25);color:#f7931a;font-size:1.5rem;font-weight:900">&#8383;</div>
+          <span class="ap-acat-lbl">Crypto</span>
+        </a>
+        <a href="/markets" class="ap-asset-cat">
+          <div class="ap-acat-icon" style="background:rgba(61,142,240,.1);border-color:rgba(61,142,240,.25);color:#3d8ef0"><i class="fas fa-dollar-sign"></i></div>
+          <span class="ap-acat-lbl">Forex</span>
+        </a>
+        <a href="/markets" class="ap-asset-cat">
+          <div class="ap-acat-icon" style="background:rgba(124,58,237,.1);border-color:rgba(124,58,237,.25);color:#7c3aed"><i class="fas fa-chart-bar"></i></div>
+          <span class="ap-acat-lbl">Stocks</span>
+        </a>
+        <a href="/markets" class="ap-asset-cat">
+          <div class="ap-acat-icon" style="background:rgba(5,150,105,.1);border-color:rgba(5,150,105,.25);color:#059669"><i class="fas fa-building"></i></div>
+          <span class="ap-acat-lbl">Real Estate</span>
+        </a>
+        <a href="/markets" class="ap-asset-cat">
+          <div class="ap-acat-icon" style="background:rgba(245,166,35,.1);border-color:rgba(245,166,35,.25);color:#f5a623"><i class="fas fa-layer-group"></i></div>
+          <span class="ap-acat-lbl">Commodities</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Globe Visual -->
+    <div class="ap-hero-visual" style="z-index:3">
+      <div class="ap-globe-wrap">
+        <div class="ap-globe-glow"></div>
+        <canvas id="globeCanvas" width="400" height="400"></canvas>
+        <div class="ap-coin ap-coin-btc">&#8383;</div>
+        <div class="ap-coin ap-coin-eth"><i class="fab fa-ethereum" style="font-size:1.3rem"></i></div>
+        <div class="ap-coin ap-coin-sol">SOL</div>
+        <div class="ap-coin ap-coin-bnb">BNB</div>
+        <div class="ap-coin ap-coin-ada">ADA</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARTNERS BAND — between hero and ticker -->
+<div class="ap-hpartners">
+  <div class="ap-hpartners-in">
+    <span class="ap-hpartners-lbl">Trusted Exchange Partners</span>
+
+    <!-- ── MEXC ── rounded blue M logo -->
+    <a href="https://www.mexc.com" target="_blank" rel="noopener" class="ap-hpartner" title="MEXC">
+      <svg viewBox="-3 1 66 54" width="30" height="24" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="4" width="24" height="48" rx="12" fill="#2B6EFE" transform="rotate(20 18 28)"/>
+        <rect x="30" y="4" width="24" height="48" rx="12" fill="#2B6EFE" transform="rotate(-20 42 28)"/>
+      </svg>
+      <span class="ap-hpartner-name" style="color:#fff">MEXC</span>
+    </a>
+
+    <!-- ── Binance ── actual diamond mark from official SVG -->
+    <a href="https://www.binance.com" target="_blank" rel="noopener" class="ap-hpartner" title="Binance">
+      <svg viewBox="128 0 128 130" width="26" height="26" xmlns="http://www.w3.org/2000/svg">
+        <g transform="translate(-64 -64.45)" fill="#F0B90B">
+          <path d="M220.9 128.45l-14.45 14.46L192 128.45 206.45 114z"/>
+          <path d="M256 93.36l24.77 24.77 14.46-14.45L256 64.45l-39.23 39.23 14.46 14.45z"/>
+          <path d="M305.55 114l-14.45 14.45 14.45 14.46L320 128.45z"/>
+          <path d="M256 163.55l-24.77-24.77-14.46 14.45L256 192.45l39.23-39.22-14.46-14.45z"/>
+          <path d="M256 142.91l14.45-14.46L256 114l-14.45 14.45z"/>
+        </g>
+      </svg>
+      <span class="ap-hpartner-name" style="color:#F0B90B">BINANCE</span>
+    </a>
+
+    <!-- ── Bybit ── BYB + orange vertical bar + IT -->
+    <a href="https://www.bybit.com" target="_blank" rel="noopener" class="ap-hpartner" title="Bybit">
+      <span style="display:flex;align-items:center;gap:0;font-weight:900;font-size:.95rem;letter-spacing:.04em;line-height:1">
+        <span style="color:#fff">BYB</span>
+        <span style="display:inline-block;width:4px;height:20px;background:#F7A528;border-radius:2px;margin:0 3px;flex-shrink:0"></span>
+        <span style="color:#fff">T</span>
+      </span>
+    </a>
+
+    <!-- ── Gate.io ── blue arc-G with teal square -->
+    <a href="https://www.gate.io" target="_blank" rel="noopener" class="ap-hpartner" title="Gate.io">
+      <svg viewBox="0 0 48 48" width="26" height="26" xmlns="http://www.w3.org/2000/svg">
+        <!-- Blue open-circle (the G arc) -->
+        <path d="M 42 24 A 18 18 0 1 0 24 42" stroke="#4C86F9" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <!-- Teal square at the gap -->
+        <rect x="27" y="6" width="12" height="12" rx="3" fill="#00B897"/>
+      </svg>
+      <span class="ap-hpartner-name" style="color:#fff">Gate.io</span>
+    </a>
+
+    <!-- ── KuCoin ── teal K+C combined mark -->
+    <a href="https://www.kucoin.com" target="_blank" rel="noopener" class="ap-hpartner" title="KuCoin">
+      <svg viewBox="0 0 52 48" width="28" height="26" xmlns="http://www.w3.org/2000/svg">
+        <!-- K vertical bar -->
+        <rect x="4" y="5" width="8" height="38" rx="4" fill="#2AAD7B"/>
+        <!-- K upper-right diagonal arm -->
+        <rect x="4" y="5" width="26" height="8" rx="4" fill="#2AAD7B" transform="rotate(38 8 9)"/>
+        <!-- K lower-right diagonal arm -->
+        <rect x="4" y="35" width="26" height="8" rx="4" fill="#2AAD7B" transform="rotate(-38 8 39)"/>
+        <!-- C arc on the right -->
+        <path d="M 44 15 A 11 11 0 0 0 33 37" stroke="#2AAD7B" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <!-- Center dot -->
+        <circle cx="26" cy="24" r="4.5" fill="#2AAD7B"/>
+      </svg>
+      <span class="ap-hpartner-name" style="color:#2AAD7B">KUCOIN</span>
+    </a>
+
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ap-ticker">
+  <div class="ap-ticker-track">
+    <span class="ap-tick-item"><span class="ap-tick-pair">BTC/USDT</span><span class="ap-tick-price" id="tk-btc">77,525</span><span class="ap-tick-chg up" id="tkc-btc">+2.41%</span></span>
+    <span class="ap-tick-item"><span class="ap-tick-pair">ETH/USDT</span><span class="ap-tick-price" id="tk-eth">2,116</span><span class="ap-tick-chg up" id="tkc-eth">+1.82%</span></span>
+    <span class="ap-tick-item"><span class="ap-tick-pair">BNB/USDT</span><span class="ap-tick-price" id="tk-bnb">661</span><span class="ap-tick-chg up" id="tkc-bnb">+0.93%</span></span>
+    <span class="ap-tick-item"><span class="ap-tick-pair">SOL/USDT</span><span class="ap-tick-price" id="tk-sol">86.00</span><span class="ap-tick-chg up" id="tkc-sol">+3.14%</span></span>
+    <span class="ap-tick-item"><span class="ap-tick-pair">XRP/USDT</span><span class="ap-tick-price" id="tk-xrp">1.3600</span><span class="ap-tick-chg dn" id="tkc-xrp">-0.67%</span></span>
+    <span class="ap-tick-item"><span class="ap-tick-pair">DOGE/USDT</span><span class="ap-tick-price" id="tk-doge">0.1029</span><span class="ap-tick-chg dn" id="tkc-doge">-1.04%</span></span>
+    <span class="ap-tick-item"><span class="ap-tick-pair">ADA/USDT</span><span class="ap-tick-price" id="tk-ada">0.2458</span><span class="ap-tick-chg up" id="tkc-ada">+1.22%</span></span>
+    <span class="ap-tick-item"><span class="ap-tick-pair">TRX/USDT</span><span class="ap-tick-price" id="tk-trx">0.3666</span><span class="ap-tick-chg up" id="tkc-trx">+0.55%</span></span>
+    <span class="ap-tick-item"><span class="ap-tick-pair">AVAX/USDT</span><span class="ap-tick-price" id="tk-avax">9.42</span><span class="ap-tick-chg dn" id="tkc-avax">-1.23%</span></span>
+    <span class="ap-tick-item"><span class="ap-tick-pair">TON/USDT</span><span class="ap-tick-price" id="tk-ton">1.81</span><span class="ap-tick-chg up" id="tkc-ton">+2.10%</span></span>
+    <!-- duplicate for seamless loop -->
+    <span class="ap-tick-item"><span class="ap-tick-pair">BTC/USDT</span><span class="ap-tick-price">77,525</span><span class="ap-tick-chg up">+2.41%</span></span>
+    <span class="ap-tick-item"><span class="ap-tick-pair">ETH/USDT</span><span class="ap-tick-price">2,116</span><span class="ap-tick-chg up">+1.82%</span></span>
+    <span class="ap-tick-item"><span class="ap-tick-pair">BNB/USDT</span><span class="ap-tick-price">661</span><span class="ap-tick-chg up">+0.93%</span></span>
+    <span class="ap-tick-item"><span class="ap-tick-pair">SOL/USDT</span><span class="ap-tick-price">86.00</span><span class="ap-tick-chg up">+3.14%</span></span>
+    <span class="ap-tick-item"><span class="ap-tick-pair">XRP/USDT</span><span class="ap-tick-price">1.3600</span><span class="ap-tick-chg dn">-0.67%</span></span>
+    <span class="ap-tick-item"><span class="ap-tick-pair">DOGE/USDT</span><span class="ap-tick-price">0.1029</span><span class="ap-tick-chg dn">-1.04%</span></span>
+    <span class="ap-tick-item"><span class="ap-tick-pair">ADA/USDT</span><span class="ap-tick-price">0.2458</span><span class="ap-tick-chg up">+1.22%</span></span>
+    <span class="ap-tick-item"><span class="ap-tick-pair">TRX/USDT</span><span class="ap-tick-price">0.3666</span><span class="ap-tick-chg up">+0.55%</span></span>
+    <span class="ap-tick-item"><span class="ap-tick-pair">AVAX/USDT</span><span class="ap-tick-price">9.42</span><span class="ap-tick-chg dn">-1.23%</span></span>
+    <span class="ap-tick-item"><span class="ap-tick-pair">TON/USDT</span><span class="ap-tick-price">1.81</span><span class="ap-tick-chg up">+2.10%</span></span>
+  </div>
+</div>
+
+<!-- MARKET CARDS -->
+<div class="ap-cards-row" data-aos="fade-up">
+  <div class="ap-mcard">
+    <div class="ap-mcard-top"><span class="ap-mcard-lbl">Crypto</span><span class="ap-mcard-badge" style="background:rgba(247,147,26,.12);color:#f7931a">&#8383;</span></div>
+    <div class="ap-mcard-price" id="c-btc">$76,532</div>
+    <div class="ap-mcard-chg dn" id="cc-btc"><i class="fas fa-caret-down"></i> 1.05% Today</div>
+    <div class="ap-mcard-sub">BTC/USD &middot; 7-day</div>
+    <canvas class="ap-mcard-chart" id="mc-crypto"></canvas>
+  </div>
+  <div class="ap-mcard">
+    <div class="ap-mcard-top"><span class="ap-mcard-lbl">Ethereum</span><span class="ap-mcard-badge" style="background:rgba(98,126,234,.12);color:#627eea;font-size:1.1rem;font-weight:900">Ξ</span></div>
+    <div class="ap-mcard-price" id="c-eth">$2,116</div>
+    <div class="ap-mcard-chg up" id="cc-eth"><i class="fas fa-caret-up"></i> 1.82% ETH</div>
+    <div class="ap-mcard-sub">ETH/USDT &middot; 7-day</div>
+    <canvas class="ap-mcard-chart" id="mc-eth"></canvas>
+  </div>
+  <div class="ap-mcard">
+    <div class="ap-mcard-top"><span class="ap-mcard-lbl">BNB</span><span class="ap-mcard-badge" style="background:rgba(243,186,47,.12);color:#f3ba2f;font-size:1rem;font-weight:900">B</span></div>
+    <div class="ap-mcard-price" id="c-bnb">$661</div>
+    <div class="ap-mcard-chg up" id="cc-bnb"><i class="fas fa-caret-up"></i> 0.93% BNB</div>
+    <div class="ap-mcard-sub">BNB/USDT &middot; 7-day</div>
+    <canvas class="ap-mcard-chart" id="mc-bnb"></canvas>
+  </div>
+  <div class="ap-mcard">
+    <div class="ap-mcard-top"><span class="ap-mcard-lbl">Solana</span><span class="ap-mcard-badge" style="background:rgba(153,69,255,.12);color:#9945ff;font-size:1rem;font-weight:900">◎</span></div>
+    <div class="ap-mcard-price" id="c-sol">$86.00</div>
+    <div class="ap-mcard-chg up" id="cc-sol"><i class="fas fa-caret-up"></i> 3.14% SOL</div>
+    <div class="ap-mcard-sub">SOL/USDT &middot; 7-day</div>
+    <canvas class="ap-mcard-chart" id="mc-sol"></canvas>
+  </div>
+  <div class="ap-mcard ap-invite-card">
+    <div class="ap-invite-icon">🎁</div>
+    <h4>Invite &amp; Earn</h4>
+    <p>Get up to <strong>$100</strong> for every friend you invite.</p>
+    <button class="ap-invite-btn" onclick="window.location='/referrals'"><i class="fas fa-users"></i> Invite Now</button>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="ap-stats-bar" data-aos="fade-up">
+  <div class="ap-stat-pill"><div class="ap-stat-icon" style="background:rgba(245,166,35,.12);color:#f5a623"><i class="fas fa-wallet"></i></div><div><div class="ap-stat-val"><%- siteCustomize.stat1Val %></div><div class="ap-stat-lbl"><%- siteCustomize.stat1Lbl %></div></div></div>
+  <div class="ap-stat-pill"><div class="ap-stat-icon" style="background:rgba(61,142,240,.12);color:#3d8ef0"><i class="fas fa-users"></i></div><div><div class="ap-stat-val"><%- siteCustomize.stat2Val %></div><div class="ap-stat-lbl"><%- siteCustomize.stat2Lbl %></div></div></div>
+  <div class="ap-stat-pill"><div class="ap-stat-icon" style="background:rgba(0,230,118,.12);color:#00e676"><i class="fas fa-globe"></i></div><div><div class="ap-stat-val"><%- siteCustomize.stat3Val %></div><div class="ap-stat-lbl"><%- siteCustomize.stat3Lbl %></div></div></div>
+  <div class="ap-stat-pill"><div class="ap-stat-icon" style="background:rgba(155,89,182,.12);color:#9b59b6"><i class="fas fa-percentage"></i></div><div><div class="ap-stat-val"><%- siteCustomize.stat4Val %></div><div class="ap-stat-lbl"><%- siteCustomize.stat4Lbl %></div></div></div>
+  <div class="ap-stat-pill"><div class="ap-stat-icon" style="background:rgba(0,212,255,.1);color:#00d4ff"><i class="fas fa-server"></i></div><div><div class="ap-stat-val"><%- siteCustomize.stat5Val %></div><div class="ap-stat-lbl"><%- siteCustomize.stat5Lbl %></div></div></div>
+</div>
+
+<!-- BOTTOM ROW -->
+<% var sc2 = (typeof siteCustomize!=='undefined') ? siteCustomize : {}; %>
+<div class="ap-bottom" data-aos="fade-up">
+  <!-- Portfolio Mix -->
+  <div class="ap-panel">
+    <h4>Portfolio Mix</h4>
+    <div class="ap-portfolio-inner">
+      <div class="ap-donut-wrap">
+        <canvas id="ap-donut"></canvas>
+        <div class="ap-donut-center"><span class="dlbl">Total</span><span class="dval"><%- sc2.mixTotal||'$124K' %></span></div>
+      </div>
+      <div class="ap-legend">
+        <div class="ap-leg-item"><div class="ap-leg-left"><span class="ap-leg-dot" style="background:#f5a623"></span><%- sc2.mix1Name||'Crypto' %></div><span class="ap-leg-pct"><%- sc2.mix1Pct||'37' %>%</span></div>
+        <div class="ap-leg-item"><div class="ap-leg-left"><span class="ap-leg-dot" style="background:#3d8ef0"></span><%- sc2.mix2Name||'Forex' %></div><span class="ap-leg-pct"><%- sc2.mix2Pct||'23' %>%</span></div>
+        <div class="ap-leg-item"><div class="ap-leg-left"><span class="ap-leg-dot" style="background:#9b59b6"></span><%- sc2.mix3Name||'Stocks' %></div><span class="ap-leg-pct"><%- sc2.mix3Pct||'20' %>%</span></div>
+        <div class="ap-leg-item"><div class="ap-leg-left"><span class="ap-leg-dot" style="background:#00e676"></span><%- sc2.mix4Name||'Real Est.' %></div><span class="ap-leg-pct"><%- sc2.mix4Pct||'12' %>%</span></div>
+        <div class="ap-leg-item"><div class="ap-leg-left"><span class="ap-leg-dot" style="background:#00d4ff"></span><%- sc2.mix5Name||'Commod.' %></div><span class="ap-leg-pct"><%- sc2.mix5Pct||'8' %>%</span></div>
+      </div>
+    </div>
+  </div>
+  <!-- Performance -->
+  <div class="ap-panel" style="display:flex;flex-direction:column">
+    <div class="ap-perf-top">
+      <div><h4 style="margin-bottom:.2rem">Performance &mdash; 6 months</h4><div style="font-size:.72rem;color:<%- sc2.colorText3||'#94a3b8' %>">All assets &middot; 6 months</div></div>
+      <div style="display:flex;gap:.5rem;align-items:center"><span class="ap-perf-badge"><%- sc2.perfBadge||'+24.8%' %></span><span style="background:rgba(61,142,240,.1);color:#6bb3ff;font-size:.7rem;font-weight:700;padding:.2rem .65rem;border-radius:20px">6M</span></div>
+    </div>
+    <canvas class="ap-perf-chart" id="ap-perf-chart"></canvas>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.75rem;flex-wrap:wrap;gap:.5rem">
+      <div class="ap-perf-legend">
+        <div class="ap-perf-leg"><div class="ap-perf-line" style="background:#3d8ef0"></div>Crypto</div>
+        <div class="ap-perf-leg"><div class="ap-perf-line" style="background:#00e676"></div>Stocks</div>
+        <div class="ap-perf-leg"><div class="ap-perf-line" style="background:#f5a623;border-top:2px dashed #f5a623;background:none"></div>Forex</div>
+        <div class="ap-perf-leg"><div class="ap-perf-line" style="background:#9b59b6"></div>Real Est.</div>
+      </div>
+      <div class="ap-perf-returns">
+        <div><div class="ap-ret-val" style="color:#3d8ef0"><%- sc2.perfCryptoReturn||'+46%' %></div><div class="ap-ret-lbl">Crypto</div></div>
+        <div><div class="ap-ret-val" style="color:#00e676"><%- sc2.perfStocksReturn||'+19%' %></div><div class="ap-ret-lbl">Stocks</div></div>
+        <div><div class="ap-ret-val" style="color:#f5a623"><%- sc2.perfForexReturn||'+8.7%' %></div><div class="ap-ret-lbl">Forex</div></div>
+        <div><div class="ap-ret-val" style="color:#9b59b6"><%- sc2.perfREReturn||'+16%' %></div><div class="ap-ret-lbl">RE</div></div>
+      </div>
+    </div>
+  </div>
+  <!-- CTAs -->
+  <div class="ap-cta-col">
+    <div class="ap-cta-card ap-cta-inv">
+      <div class="ap-cta-ico"><i class="fas fa-rocket"></i></div>
+      <h5>Open Free Account</h5>
+      <p>Join 12,400+ investors and start your investment journey in minutes.</p>
+      <a href="/register" class="ap-cta-link">Get Started Free &rarr;</a>
+    </div>
+    <div class="ap-cta-card ap-cta-earn">
+      <div class="ap-cta-ico"><i class="fas fa-chart-bar"></i></div>
+      <h5>Earn Daily</h5>
+      <p>Get daily returns on your investments. Withdraw anytime with zero fees.</p>
+      <a href="/login" class="ap-cta-link">Start Earning &rarr;</a>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="ap-features" data-aos="fade-up">
+  <div class="ap-feat-grid">
+    <div class="ap-feat-card">
+      <div class="ap-feat-icon" style="background:rgba(61,142,240,.1);color:#3d8ef0"><i class="fas fa-chart-line"></i></div>
+      <h5><%- siteCustomize.feat1Title %></h5>
+      <p><%- siteCustomize.feat1Desc %></p>
+      <a href="/markets" class="ap-feat-link" style="color:#3d8ef0">See Live Data <i class="fas fa-arrow-right" style="font-size:.65rem"></i></a>
+    </div>
+    <div class="ap-feat-card">
+      <div class="ap-feat-icon" style="background:rgba(245,166,35,.1);color:#f5a623"><i class="fas fa-brain"></i></div>
+      <h5><%- siteCustomize.feat2Title %></h5>
+      <p><%- siteCustomize.feat2Desc %></p>
+      <a href="#analytics" class="ap-feat-link" style="color:#f5a623">Explore Analytics <i class="fas fa-arrow-right" style="font-size:.65rem"></i></a>
+    </div>
+    <div class="ap-feat-card">
+      <div class="ap-feat-icon" style="background:rgba(0,230,118,.1);color:#00e676"><i class="fas fa-shield-alt"></i></div>
+      <h5><%- siteCustomize.feat3Title %></h5>
+      <p><%- siteCustomize.feat3Desc %></p>
+      <a href="#about" class="ap-feat-link" style="color:#00e676">Learn More <i class="fas fa-arrow-right" style="font-size:.65rem"></i></a>
+    </div>
+    <div class="ap-feat-card">
+      <div class="ap-feat-icon" style="background:rgba(155,89,182,.1);color:#9b59b6"><i class="fas fa-headset"></i></div>
+      <h5><%- siteCustomize.feat4Title %></h5>
+      <p><%- siteCustomize.feat4Desc %></p>
+      <a href="#contact" class="ap-feat-link" style="color:#9b59b6">Contact Support <i class="fas fa-arrow-right" style="font-size:.65rem"></i></a>
+    </div>
+    <div class="ap-feat-card">
+      <div class="ap-feat-icon" style="background:rgba(0,212,255,.08);color:#00d4ff"><i class="fas fa-bolt"></i></div>
+      <h5><%- siteCustomize.feat5Title %></h5>
+      <p><%- siteCustomize.feat5Desc %></p>
+      <a href="/withdraw" class="ap-feat-link" style="color:#00d4ff">Learn More <i class="fas fa-arrow-right" style="font-size:.65rem"></i></a>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about" class="ap-section" style="background:<% if(typeof siteCustomize!=='undefined'&&siteCustomize.bgAbout){%>transparent<%}else{%>#f8fafc<%}%>">
+  <% if(typeof siteCustomize!=='undefined'&&siteCustomize.bgAbout){%>
+  <div style="position:absolute;inset:0;background:url('<%- siteCustomize.bgAbout %>') center/cover no-repeat;z-index:0;"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,<%- parseFloat(siteCustomize.bgOverlayAbout)||0 %>);z-index:0;"></div>
+  <%}%>
+  <div class="ap-section-inner">
+    <div class="ap-eyebrow">About Us</div>
+    <h2><%- siteCustomize.aboutTitle %></h2>
+    <p><%- siteCustomize.aboutSubtitle %></p>
+    <div class="ap-about-wrap" data-aos="fade-up">
+      <div class="ap-about-art"><div class="ap-eth-gem"></div></div>
+      <div class="ap-about-grid">
+        <div class="ap-about-card" data-aos="fade-up"><i class="fas fa-globe" style="color:#3d8ef0"></i><h4><%- siteCustomize.aboutCard1Title %></h4><p><%- siteCustomize.aboutCard1Desc %></p></div>
+        <div class="ap-about-card" data-aos="fade-up"><i class="fas fa-shield-alt" style="color:#00e676"></i><h4><%- siteCustomize.aboutCard2Title %></h4><p><%- siteCustomize.aboutCard2Desc %></p></div>
+        <div class="ap-about-card" data-aos="fade-up"><i class="fas fa-bolt" style="color:#f5a623"></i><h4><%- siteCustomize.aboutCard3Title %></h4><p><%- siteCustomize.aboutCard3Desc %></p></div>
+        <div class="ap-about-card" data-aos="fade-up"><i class="fas fa-headset" style="color:#9b59b6"></i><h4><%- siteCustomize.aboutCard4Title %></h4><p><%- siteCustomize.aboutCard4Desc %></p></div>
+      </div>
+      <div class="ap-about-art"><div class="ap-btc-coin">&#8383;</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="ap-section ap-how-dark" style="<% if(typeof siteCustomize!=='undefined'&&siteCustomize.bgHow){%>background:transparent<%}%>">
+  <% if(typeof siteCustomize!=='undefined'&&siteCustomize.bgHow){%>
+  <div style="position:absolute;inset:0;background:url('<%- siteCustomize.bgHow %>') center/cover no-repeat;z-index:0;"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,<%- parseFloat(siteCustomize.bgOverlayHow)||0 %>);z-index:0;"></div>
+  <%}%>
+  <div class="ap-section-inner">
+    <div class="ap-eyebrow">How It Works</div>
+    <h2><%- siteCustomize.howTitle %></h2>
+    <p><%- siteCustomize.howSubtitle %></p>
+    <div class="ap-steps-row" data-aos="fade-up">
+      <div class="ap-step"><div class="ap-step-num">STEP 01</div><div class="ap-step-icon"><i class="fas fa-user-plus"></i></div><h4><%- siteCustomize.step1Title %></h4><p><%- siteCustomize.step1Desc %></p></div>
+      <div class="ap-step-arrow"><i class="fas fa-chevron-right"></i></div>
+      <div class="ap-step"><div class="ap-step-num">STEP 02</div><div class="ap-step-icon"><i class="fas fa-layer-group"></i></div><h4><%- siteCustomize.step2Title %></h4><p><%- siteCustomize.step2Desc %></p></div>
+      <div class="ap-step-arrow"><i class="fas fa-chevron-right"></i></div>
+      <div class="ap-step"><div class="ap-step-num">STEP 03</div><div class="ap-step-icon"><i class="fas fa-coins"></i></div><h4><%- siteCustomize.step3Title %></h4><p><%- siteCustomize.step3Desc %></p></div>
+      <div class="ap-step-arrow"><i class="fas fa-chevron-right"></i></div>
+      <div class="ap-step"><div class="ap-step-num">STEP 04</div><div class="ap-step-icon"><i class="fas fa-wallet"></i></div><h4><%- siteCustomize.step4Title %></h4><p><%- siteCustomize.step4Desc %></p></div>
+    </div>
+    <div style="text-align:center;margin-top:2.5rem;display:flex;justify-content:center;gap:1rem;flex-wrap:wrap">
+      <a href="/register" class="ap-btn-primary"><i class="fas fa-rocket"></i> Get Started Free</a>
+      <a href="/plans" class="ap-btn-ghost"><i class="fas fa-layer-group"></i> View Plans</a>
+    </div>
+  </div>
+</section>
+
+<!-- ANALYTICS -->
+<section id="analytics" class="ap-section" style="background:<% if(typeof siteCustomize!=='undefined'&&siteCustomize.bgAnalytics){%>transparent<%}else{%>#f8fafc<%}%>">
+  <% if(typeof siteCustomize!=='undefined'&&siteCustomize.bgAnalytics){%>
+  <div style="position:absolute;inset:0;background:url('<%- siteCustomize.bgAnalytics %>') center/cover no-repeat;z-index:0;"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,<%- parseFloat(siteCustomize.bgOverlayAnalytics)||0 %>);z-index:0;"></div>
+  <%}%>
+  <div class="ap-section-inner">
+    <div class="ap-eyebrow">Analytics</div>
+    <h2><%- siteCustomize.analyticsTitle %></h2>
+    <p><%- siteCustomize.analyticsSubtitle %></p>
+    <div class="ap-ana-grid" data-aos="fade-up">
+      <div class="ap-ana-card">
+        <div class="ap-ana-head"><span>Crypto Sentiment</span><span class="bx-green">Bullish</span></div>
+        <div class="ap-ana-chart"><canvas id="ana-btc"></canvas></div>
+        <div class="ap-ana-stats">
+          <div><span>Fear &amp; Greed</span><strong style="color:#00e676">78 — Greed</strong></div>
+          <div><span>7D Trend</span><strong id="ana-btc-chg" style="color:#00e676">+4.2%</strong></div>
+        </div>
+      </div>
+      <div class="ap-ana-card">
+        <div class="ap-ana-head"><span>ETH Signals</span><span class="bx-blue">Bullish</span></div>
+        <div class="ap-ana-chart"><canvas id="ana-eth"></canvas></div>
+        <div class="ap-ana-stats">
+          <div><span>ETH/USDT</span><strong id="ana-eth-price" style="color:#627eea">$2,116</strong></div>
+          <div><span>24H Trend</span><strong id="ana-eth-chg" style="color:#627eea">+1.82%</strong></div>
+        </div>
+      </div>
+      <div class="ap-ana-card">
+        <div class="ap-ana-head"><span>BNB Signals</span><span class="bx-gold">Neutral</span></div>
+        <div class="ap-ana-chart"><canvas id="ana-bnb"></canvas></div>
+        <div class="ap-ana-stats">
+          <div><span>BNB/USDT</span><strong id="ana-bnb-price" style="color:#f3ba2f">$661</strong></div>
+          <div><span>24H Trend</span><strong id="ana-bnb-chg" style="color:#f3ba2f">+0.93%</strong></div>
+        </div>
+      </div>
+      <div class="ap-ana-card">
+        <div class="ap-ana-head"><span>SOL / DeFi</span><span class="bx-green">Bullish</span></div>
+        <div class="ap-ana-chart"><canvas id="ana-sol"></canvas></div>
+        <div class="ap-ana-stats">
+          <div><span>SOL/USDT</span><strong id="ana-sol-price" style="color:#9945ff">$86</strong></div>
+          <div><span>24H Trend</span><strong id="ana-sol-chg" style="color:#9945ff">+3.14%</strong></div>
+        </div>
+      </div>
+      <div class="ap-ana-card ap-upgrade-card">
+        <div><div class="up-icon">⭐</div><div class="up-title">Upgrade to Pro</div><div class="up-desc">Get advanced insights, exclusive signals &amp; higher returns.</div></div>
+        <button class="up-btn" onclick="window.location='/plans'"><i class="fas fa-arrow-up"></i> Upgrade Now</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio" class="ap-section ap-how-dark" style="<% if(typeof siteCustomize!=='undefined'&&siteCustomize.bgPortfolio){%>background:transparent<%}%>">
+  <% if(typeof siteCustomize!=='undefined'&&siteCustomize.bgPortfolio){%>
+  <div style="position:absolute;inset:0;background:url('<%- siteCustomize.bgPortfolio %>') center/cover no-repeat;z-index:0;"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,<%- parseFloat(siteCustomize.bgOverlayPortfolio)||0 %>);z-index:0;"></div>
+  <%}%>
+  <div class="ap-section-inner">
+    <div class="ap-eyebrow">Portfolio</div>
+    <h2><%- siteCustomize.portfolioTitle %></h2>
+    <p><%- siteCustomize.portfolioSubtitle %></p>
+    <div class="ap-port-grid" data-aos="fade-up">
+      <div style="position:relative">
+        <div class="ap-port-donut-wrap"><canvas id="ap-port-donut"></canvas><div class="ap-port-donut-center"><span style="font-size:.7rem;color:<%- sc2.colorText3||'#64748b' %>">Total</span><span style="font-size:1.5rem;font-weight:900;color:<%- sc2.colorText||'#1e293b' %>"><%- sc2.portTotal||'$501K' %></span></div></div>
+      </div>
+      <div class="ap-port-allocs">
+        <div style="font-size:.8rem;font-weight:800;color:<%- sc2.colorText||'#1e293b' %>;margin-bottom:.75rem">Allocation</div>
+        <div class="ap-port-row"><span class="ap-port-dot" style="background:#f5a623"></span><span class="ap-port-name"><%- sc2.port1Name||'Cryptocurrency' %></span><div class="ap-port-bar-bg"><div class="ap-port-bar" style="width:<%- sc2.port1Pct||'30' %>%;background:#f5a623"></div></div><span class="ap-port-pct" style="color:#f5a623"><%- sc2.port1Pct||'30' %>%</span><span class="ap-port-usd"><%- sc2.port1USD||'$150K' %></span></div>
+        <div class="ap-port-row"><span class="ap-port-dot" style="background:#3d8ef0"></span><span class="ap-port-name"><%- sc2.port2Name||'Forex & FX' %></span><div class="ap-port-bar-bg"><div class="ap-port-bar" style="width:<%- sc2.port2Pct||'25' %>%;background:#3d8ef0"></div></div><span class="ap-port-pct" style="color:#3d8ef0"><%- sc2.port2Pct||'25' %>%</span><span class="ap-port-usd"><%- sc2.port2USD||'$125K' %></span></div>
+        <div class="ap-port-row"><span class="ap-port-dot" style="background:#9b59b6"></span><span class="ap-port-name"><%- sc2.port3Name||'Stocks' %></span><div class="ap-port-bar-bg"><div class="ap-port-bar" style="width:<%- sc2.port3Pct||'20' %>%;background:#9b59b6"></div></div><span class="ap-port-pct" style="color:#9b59b6"><%- sc2.port3Pct||'20' %>%</span><span class="ap-port-usd"><%- sc2.port3USD||'$100K' %></span></div>
+        <div class="ap-port-row"><span class="ap-port-dot" style="background:#00e676"></span><span class="ap-port-name"><%- sc2.port4Name||'Real Estate' %></span><div class="ap-port-bar-bg"><div class="ap-port-bar" style="width:<%- sc2.port4Pct||'15' %>%;background:#00e676"></div></div><span class="ap-port-pct" style="color:#00e676"><%- sc2.port4Pct||'15' %>%</span><span class="ap-port-usd"><%- sc2.port4USD||'$75K' %></span></div>
+        <div class="ap-port-row"><span class="ap-port-dot" style="background:#00d4ff"></span><span class="ap-port-name"><%- sc2.port5Name||'Commodities' %></span><div class="ap-port-bar-bg"><div class="ap-port-bar" style="width:<%- sc2.port5Pct||'10' %>%;background:#00d4ff"></div></div><span class="ap-port-pct" style="color:#00d4ff"><%- sc2.port5Pct||'10' %>%</span><span class="ap-port-usd"><%- sc2.port5USD||'$51K' %></span></div>
+        <div class="ap-port-ctas" style="margin-top:1.5rem;justify-content:flex-start">
+          <a href="/register" class="ap-btn-primary" style="font-size:.85rem;padding:.6rem 1.5rem"><i class="fas fa-chart-pie"></i> Get Started Free</a>
+          <a href="/plans" class="ap-btn-ghost" style="font-size:.85rem;padding:.6rem 1.5rem"><i class="fas fa-layer-group"></i> View Plans</a>
+        </div>
+      </div>
+      <div class="ap-port-right">
+        <div class="ap-holdings-card">
+          <h5>Top Holdings</h5>
+          <% var _hc=['#f7931a','#627eea','#f5a623','#555','#3d8ef0']; %>
+          <% [[sc2.hold1Name||'Bitcoin (BTC)',sc2.hold1Pct||'22.5%',sc2.hold1Chg||'+12.4%'],[sc2.hold2Name||'Ethereum (ETH)',sc2.hold2Pct||'18.3%',sc2.hold2Chg||'-0.3%'],[sc2.hold3Name||'Gold (XAU)',sc2.hold3Pct||'10.2%',sc2.hold3Chg||'+0.8%'],[sc2.hold4Name||'Apple (AAPL)',sc2.hold4Pct||'8.1%',sc2.hold4Chg||'+6.2%'],[sc2.hold5Name||'EUR/USD',sc2.hold5Pct||'7.5%',sc2.hold5Chg||'+3.8%']].forEach(function(h,i){ %>
+          <div class="ap-holding-row"><div class="ap-holding-left"><span class="ap-holding-dot" style="background:<%=_hc[i]%>"></span><%- h[0] %></div><span class="ap-holding-pct"><%- h[1] %></span><span class="ap-holding-chg" style="color:<%= h[2].startsWith('-')?'#ff4757':'#00e676' %>"><%- h[2] %></span></div>
+          <% }); %>
+        </div>
+        <div class="ap-growth-card">
+          <h5>Portfolio Growth</h5>
+          <div class="ap-growth-num"><%- sc2.portGrowthPct||'+27.6%' %></div>
+          <div class="ap-growth-lbl"><%- sc2.portGrowthLabel||'Total Return (6M)' %></div>
+          <canvas class="ap-growth-chart" id="ap-growth-chart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="ap-section" style="background:<% if(typeof siteCustomize!=='undefined'&&siteCustomize.bgContact){%>transparent<%}else{%>#f8fafc<%}%>">
+  <% if(typeof siteCustomize!=='undefined'&&siteCustomize.bgContact){%>
+  <div style="position:absolute;inset:0;background:url('<%- siteCustomize.bgContact %>') center/cover no-repeat;z-index:0;"></div>
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,<%- parseFloat(siteCustomize.bgOverlayContact)||0 %>);z-index:0;"></div>
+  <%}%>
+  <div class="ap-section-inner">
+    <div class="ap-eyebrow">Contact Us</div>
+    <h2><%- siteCustomize.contactTitle %></h2>
+    <p><%- siteCustomize.contactSubtitle %></p>
+    <div class="ap-contact-grid" data-aos="fade-up">
+      <div class="ap-contact-list">
+        <div class="ap-ci"><div class="ap-ci-icon"><i class="fas fa-envelope"></i></div><div><h5>Email Support</h5><p><%- siteCustomize.supportEmail %></p><span>Response within 2 hours</span></div></div>
+        <div class="ap-ci"><div class="ap-ci-icon"><i class="fas fa-comments"></i></div><div><h5>Live Chat</h5><p>Available in your dashboard</p><span>Instant 24/7</span></div></div>
+        <div class="ap-ci"><div class="ap-ci-icon"><i class="fab fa-telegram"></i></div><div><h5>Telegram</h5><p><%- siteCustomize.telegramLink || '@support' %></p><span>Community &amp; announcements</span></div></div>
+        <div class="ap-ci"><div class="ap-ci-icon"><i class="fas fa-phone"></i></div><div><h5>Phone Support</h5><p><%- siteCustomize.contactPhone %></p><span>Premium plan holders</span></div></div>
+      </div>
+      <div class="ap-contact-form-wrap">
+        <h4><%- siteCustomize.contactFormTitle %></h4>
+        <form onsubmit="submitContactForm(event)">
+          <div class="cf-row">
+            <div class="cf-group"><label>Full Name</label><input type="text" placeholder="John Smith" required></div>
+            <div class="cf-group"><label>Email Address</label><input type="email" placeholder="you@email.com" required></div>
+          </div>
+          <div class="cf-group"><label>Subject</label><select><option>General Inquiry</option><option>Investment Plans</option><option>Deposits &amp; Withdrawals</option><option>Technical Support</option></select></div>
+          <div class="cf-group"><label>Message</label><textarea rows="4" placeholder="How can we help you?"></textarea></div>
+          <button type="submit" class="cf-btn"><i class="fas fa-paper-plane"></i> Send Message</button>
+        </form>
+      </div>
+      <div class="ap-contact-art">
+        <div class="ap-headphones-art"><i class="fas fa-headset"></i></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST -->
+<div class="ap-trust">
+  <div class="ap-trust-item"><i class="fas fa-shield-alt" style="color:#3d8ef0"></i> Bank-grade security</div>
+  <div class="ap-trust-item"><i class="fas fa-bolt" style="color:#f5a623"></i> Real-time data</div>
+  <div class="ap-trust-item"><i class="fas fa-globe" style="color:#00e676"></i> 50+ markets</div>
+  <div class="ap-trust-item"><i class="fas fa-brain" style="color:#9b59b6"></i> AI-powered signals</div>
+  <div class="ap-trust-item"><i class="fas fa-users" style="color:#00d4ff"></i> 12,400+ investors</div>
+</div>
+
+<!-- BOTTOM BANNER SLIDESHOW -->
+<%
+  var _bottomSlideImgs = [];
+  try { _bottomSlideImgs = JSON.parse((typeof siteCustomize!=='undefined' && siteCustomize.bgBottomImages) || '[]'); } catch(e){}
+  _bottomSlideImgs = _bottomSlideImgs.filter(Boolean);
+%>
+<% if (_bottomSlideImgs.length > 0) { %>
+<section class="ap-bottom-banner" id="apBottomBanner">
+  <div class="slide-bg-wrap" id="bottomSlideBgWrap">
+    <% _bottomSlideImgs.forEach(function(url,i){ %>
+    <div class="slide-bg-layer <%= i===0?'active':'' %>" style="background-image:url('<%= url %>')"></div>
+    <% }); %>
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,<%= parseFloat((typeof siteCustomize!=='undefined'&&siteCustomize.bgBottomSlideOverlay)||0.4)||0.4 %>);z-index:1"></div>
+  </div>
+  <div class="slide-dots" id="bottomSlideDots">
+    <% _bottomSlideImgs.forEach(function(url,i){ %><div class="slide-dot <%= i===0?'active':'' %>" data-idx="<%= i %>"></div><% }); %>
+  </div>
+  <div class="ap-bottom-banner-content">
+    <div class="ap-eyebrow" style="color:#fff;border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.1);margin-bottom:1rem;">Start Your Journey Today</div>
+    <h2>Invest Smarter.<br>Earn Every Day.</h2>
+    <p>Join thousands of investors growing their wealth across Crypto, Forex, Stocks &amp; Real Estate — all from one powerful platform.</p>
+    <div class="ap-bottom-banner-btns">
+      <a href="/register" class="ap-bb-btn-primary"><i class="fas fa-rocket"></i> Open Free Account</a>
+      <a href="/plans" class="ap-bb-btn-ghost"><i class="fas fa-layer-group"></i> View Plans</a>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- FOOTER -->
+<footer class="ap-footer">
+  <div class="ap-footer-inner">
+    <div class="ap-footer-top">
+      <div class="ap-footer-logo"><%= siteCustomize.logoText %><span><%= siteCustomize.logoAccent %></span></div>
+      <div class="ap-footer-links">
+        <a href="#about">About</a><a href="#how">How It Works</a><a href="/markets">Markets</a>
+        <a href="/plans">Plans</a><a href="#analytics">Analytics</a><a href="#portfolio">Portfolio</a>
+        <a href="#contact">Contact</a><a href="/login">Sign In</a><a href="/register">Register</a>
+      </div>
+      <div class="ap-footer-socials">
+        <a href="#" class="ap-social-btn"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="ap-social-btn"><i class="fab fa-telegram"></i></a>
+        <a href="#" class="ap-social-btn"><i class="fab fa-linkedin"></i></a>
+        <a href="#" class="ap-social-btn"><i class="fab fa-github"></i></a>
+      </div>
+    </div>
+    <div class="ap-footer-bottom">&copy; 2025 <%- siteCustomize.logoText %><%- siteCustomize.logoAccent %> &mdash; All rights reserved. <%- siteCustomize.footerDisclaimer %></div>
+  </div>
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════
+   CHART DATA FROM ADMIN CUSTOMIZER
+══════════════════════════════════════════════ */
+var _sc = (function(){
+  try {
+    return {
+      mix:  [<%- (sc2.mix1Pct||37) %>,<%- (sc2.mix2Pct||23) %>,<%- (sc2.mix3Pct||20) %>,<%- (sc2.mix4Pct||12) %>,<%- (sc2.mix5Pct||8) %>],
+      port: [<%- (sc2.port1Pct||30) %>,<%- (sc2.port2Pct||25) %>,<%- (sc2.port3Pct||20) %>,<%- (sc2.port4Pct||15) %>,<%- (sc2.port5Pct||10) %>],
+      perfMonths:  '<%- (sc2.perfMonths||"Feb,Mar,Apr,May,Jun,Jul").replace(/'/g,"") %>'.split(','),
+      perfCrypto:  [<%- sc2.perfCryptoPts||'0,14,22,32,40,46' %>],
+      perfStocks:  [<%- sc2.perfStocksPts||'0,8,12,16,21,19' %>],
+      perfForex:   [<%- sc2.perfForexPts||'0,3,5,7,8,8.7' %>],
+      perfRE:      [<%- sc2.perfREPts||'0,5,9,12,14,16' %>],
+      cardBg:      '<%- (typeof siteCustomize!=="undefined" ? siteCustomize.colorCard   : "#ffffff") %>',
+      bg2:         '<%- (typeof siteCustomize!=="undefined" ? siteCustomize.colorBg2    : "#f8fafc") %>',
+      borderColor: '<%- (typeof siteCustomize!=="undefined" ? siteCustomize.colorBorder : "#e2e8f0") %>',
+      textColor:   '<%- (typeof siteCustomize!=="undefined" ? siteCustomize.colorText   : "#1e293b") %>',
+      text3Color:  '<%- (typeof siteCustomize!=="undefined" ? siteCustomize.colorText3  : "#94a3b8") %>',
+    };
+  } catch(e) {
+    return { mix:[37,23,20,12,8], port:[30,25,20,15,10],
+      perfMonths:['Feb','Mar','Apr','May','Jun','Jul'],
+      perfCrypto:[0,14,22,32,40,46], perfStocks:[0,8,12,16,21,19],
+      perfForex:[0,3,5,7,8,8.7], perfRE:[0,5,9,12,14,16],
+      cardBg:'#ffffff', bg2:'#f8fafc' };
+  }
+})();
+
+/* ══════════════════════════════════════════════
+   STATE — Top 10 crypto from Binance
+══════════════════════════════════════════════ */
+const fx = {
+  btc: {price:77525, chg:2.41},
+  eth: {price:2116,  chg:1.82},
+  bnb: {price:661,   chg:0.93},
+  sol: {price:86,    chg:3.14},
+  xrp: {price:1.36,  chg:-0.67},
+  doge:{price:0.1029,chg:-1.04},
+  ada: {price:0.2458,chg:1.22},
+  trx: {price:0.3666,chg:0.55},
+  avax:{price:9.42,  chg:-1.23},
+  ton: {price:1.81,  chg:2.10}
+};
+const cryptoHist=[58000,60500,64800,62000,66200,70400,fx.btc.price];
+const ethHist   =[1800,1900,2000,2050,2080,2100,fx.eth.price];
+const bnbHist   =[500,550,580,620,640,655,fx.bnb.price];
+const solHist   =[60,68,75,80,82,84,fx.sol.price];
+
+/* ══════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════ */
+const $=id=>document.getElementById(id);
+const fmtN=(n,d=0)=>n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+function getCtx(id,H=100){
+  const c=$(id);if(!c)return null;
+  const W=c.offsetWidth||260;const h=c.offsetHeight||H;
+  c.width=W*devicePixelRatio;c.height=h*devicePixelRatio;
+  const ctx=c.getContext('2d');ctx.scale(devicePixelRatio,devicePixelRatio);
+  return{ctx,W,H:h};
+}
+
+/* ══════════════════════════════════════════════
+   ROTATING GLOBE
+══════════════════════════════════════════════ */
+function drawBtcCoin(){
+  const c=$('globeCanvas');if(!c)return;
+  const sz=400,dpr=Math.min(window.devicePixelRatio||1,2);
+  c.width=c.height=sz*dpr;c.style.width=c.style.height=sz+'px';
+  const ctx=c.getContext('2d');ctx.scale(dpr,dpr);
+  const cx=sz/2,cy=sz/2,r=178;let rot=0;
+
+  function project(lat,lon){
+    const phi=lat*Math.PI/180,theta=(lon+rot)*Math.PI/180;
+    const x=r*Math.cos(phi)*Math.sin(theta),y=r*Math.sin(phi),z=r*Math.cos(phi)*Math.cos(theta);
+    return{x:cx+x,y:cy-y,z,v:z>0};
+  }
+
+  function frame(){
+    ctx.clearRect(0,0,sz,sz);
+    /* globe body */
+    const gb=ctx.createRadialGradient(cx-r*.22,cy-r*.25,r*.05,cx,cy,r);
+    gb.addColorStop(0,'#7ab8ff');gb.addColorStop(.28,'#4a9ef5');gb.addColorStop(.6,'#2563eb');gb.addColorStop(1,'#0f2d7a');
+    ctx.fillStyle=gb;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();
+    /* latitude lines */
+    for(let lat=-75;lat<=75;lat+=15){
+      ctx.beginPath();let f=true;
+      for(let lon=0;lon<=360;lon+=3){
+        const p=project(lat,lon);if(!p.v){f=true;continue;}
+        const a=Math.max(0,p.z/r)*.55+.1;
+        ctx.strokeStyle=`rgba(255,255,255,${a})`;ctx.lineWidth=.7;
+        if(f){ctx.moveTo(p.x,p.y);f=false;}else ctx.lineTo(p.x,p.y);
+      }ctx.stroke();
+    }
+    /* longitude lines */
+    for(let lon=0;lon<360;lon+=15){
+      ctx.beginPath();let f=true;
+      for(let lat=-90;lat<=90;lat+=3){
+        const p=project(lat,lon);if(!p.v){f=true;continue;}
+        const a=Math.max(0,p.z/r)*.45+.08;
+        ctx.strokeStyle=`rgba(255,255,255,${a})`;ctx.lineWidth=.7;
+        if(f){ctx.moveTo(p.x,p.y);f=false;}else ctx.lineTo(p.x,p.y);
+      }ctx.stroke();
+    }
+    /* dot intersections */
+    for(let lat=-75;lat<=75;lat+=15){
+      for(let lon=0;lon<360;lon+=15){
+        const p=project(lat,lon);if(!p.v)continue;
+        const a=(p.z/r)*.55+.08;
+        ctx.beginPath();ctx.arc(p.x,p.y,1.8,0,Math.PI*2);
+        ctx.fillStyle=`rgba(180,220,255,${a})`;ctx.fill();
+      }
+    }
+    /* ₿ symbol */
+    ctx.save();
+    ctx.font=`900 ${Math.round(r*.8)}px 'Arial Black',Arial,sans-serif`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle='rgba(255,255,255,.88)';
+    ctx.shadowColor='rgba(61,142,240,.7)';ctx.shadowBlur=22;
+    ctx.fillText('₿',cx,cy);
+    ctx.restore();
+    /* highlight sheen */
+    const sh=ctx.createRadialGradient(cx-r*.3,cy-r*.32,0,cx-r*.08,cy-r*.08,r*.9);
+    sh.addColorStop(0,'rgba(255,255,255,.28)');sh.addColorStop(.45,'rgba(255,255,255,.08)');sh.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.clip();ctx.fillStyle=sh;ctx.fillRect(0,0,sz,sz);ctx.restore();
+
+    rot+=.12;requestAnimationFrame(frame);
+  }
+  frame();
+  return; // everything below is unused — kept for future reference
+  const R=sz; // dead code guard
+
+  /* ─ clip helper ─ */
+  function coinClip(){ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.clip();}
+
+  /* ─ wide outer glow ─ */
+  const og=ctx.createRadialGradient(cx,cy,R*.45,cx,cy,R*1.5);
+  og.addColorStop(0,'rgba(160,0,0,0)');og.addColorStop(.42,'rgba(200,0,0,.16)');
+  og.addColorStop(.66,'rgba(230,0,0,.38)');og.addColorStop(.84,'rgba(180,0,0,.22)');og.addColorStop(1,'rgba(90,0,0,0)');
+  ctx.fillStyle=og;ctx.beginPath();ctx.arc(cx,cy,R*1.5,0,Math.PI*2);ctx.fill();
+  const ig=ctx.createRadialGradient(cx,cy,R*.78,cx,cy,R*1.08);
+  ig.addColorStop(0,'rgba(255,0,0,0)');ig.addColorStop(.5,'rgba(255,10,0,.6)');ig.addColorStop(1,'rgba(200,0,0,0)');
+  ctx.fillStyle=ig;ctx.beginPath();ctx.arc(cx,cy,R*1.08,0,Math.PI*2);ctx.fill();
+
+  /* ─ coin body ─ */
+  const bg=ctx.createRadialGradient(cx-R*.2,cy-R*.24,R*.05,cx,cy,R);
+  bg.addColorStop(0,'#220505');bg.addColorStop(.3,'#160303');bg.addColorStop(.65,'#0d0202');bg.addColorStop(1,'#050101');
+  ctx.fillStyle=bg;ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.fill();
+
+  /* directional sheen – top-left lighter */
+  const sh=ctx.createRadialGradient(cx-R*.28,cy-R*.32,0,cx-R*.05,cy-R*.05,R*1.1);
+  sh.addColorStop(0,'rgba(255,80,80,.1)');sh.addColorStop(.5,'rgba(255,30,30,.04)');sh.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=sh;ctx.save();coinClip();ctx.fillRect(0,0,sz,sz);ctx.restore();
+
+  /* ─ outer neon rim ─ */
+  ctx.save();
+  ctx.shadowColor='#ff0000';ctx.shadowBlur=28;
+  ctx.strokeStyle='#dd0000';ctx.lineWidth=5;
+  ctx.beginPath();ctx.arc(cx,cy,R-2.5,0,Math.PI*2);ctx.stroke();
+  ctx.shadowBlur=12;ctx.strokeStyle='rgba(255,50,50,.25)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(cx,cy,R-12,0,Math.PI*2);ctx.stroke();
+  ctx.restore();
+
+  /* ─ rim LED strip (every 5°) ─ */
+  const ledR=R-20;
+  for(let i=0;i<72;i++){
+    const a=(i/72)*Math.PI*2,bright=i%6===0;
+    ctx.save();ctx.shadowColor='#ff0000';ctx.shadowBlur=bright?9:3;
+    ctx.fillStyle=bright?'#ff1a1a':'rgba(160,0,0,.45)';
+    ctx.beginPath();ctx.arc(cx+ledR*Math.cos(a),cy+ledR*Math.sin(a),bright?2.8:1.5,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+  }
+
+  /* ─ circular rim text ─ */
+  ctx.save();
+  const rimTxt='BITCOIN•2140•01000010•01000011•SATOSHI•NAKAMOTO•SHA256•BLOCKCHAIN•';
+  const txtR=R-36;
+  ctx.font='bold 7px monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillStyle='rgba(200,0,0,.55)';
+  for(let i=0;i<rimTxt.length;i++){
+    const a=(i/rimTxt.length)*Math.PI*2-Math.PI/2;
+    ctx.save();ctx.translate(cx+txtR*Math.cos(a),cy+txtR*Math.sin(a));ctx.rotate(a+Math.PI/2);
+    ctx.fillText(rimTxt[i],0,0);ctx.restore();
+  }
+  ctx.restore();
+
+  /* ─ 8 concentric circuit rings ─ */
+  const rRings=[R*.86,R*.76,R*.67,R*.59,R*.51,R*.43,R*.35,R*.27];
+  rRings.forEach((r,i)=>{
+    const alpha=.18+i*.025;
+    ctx.strokeStyle=`rgba(145,0,0,${alpha})`;ctx.lineWidth=i<4?.9:.7;
+    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
+    if(i<5){
+      const n=i===0?72:i<3?56:40;
+      for(let t=0;t<n;t++){
+        const a=(t/n)*Math.PI*2,bright=t%Math.round(n/8)===0;
+        const len=bright?6:3;
+        ctx.save();ctx.strokeStyle=bright?'rgba(180,0,0,.7)':'rgba(110,0,0,.45)';ctx.lineWidth=bright?.8:.45;
+        ctx.beginPath();
+        ctx.moveTo(cx+(r-len)*Math.cos(a),cy+(r-len)*Math.sin(a));
+        ctx.lineTo(cx+(r+len)*Math.cos(a),cy+(r+len)*Math.sin(a));
+        ctx.stroke();ctx.restore();
+      }
+    }
+  });
+
+  /* ─ radial circuit traces ─ */
+  const traces=[
+    [[cx+R*.07,cy-R*.04],[cx+R*.36,cy-R*.04],[cx+R*.36,cy-R*.24],[cx+R*.54,cy-R*.24]],
+    [[cx+R*.07,cy+R*.04],[cx+R*.32,cy+R*.04],[cx+R*.32,cy+R*.22],[cx+R*.5,cy+R*.22],[cx+R*.5,cy+R*.38]],
+    [[cx-R*.07,cy+R*.04],[cx-R*.36,cy+R*.04],[cx-R*.36,cy+R*.24],[cx-R*.54,cy+R*.24]],
+    [[cx-R*.07,cy-R*.04],[cx-R*.32,cy-R*.04],[cx-R*.32,cy-R*.22],[cx-R*.5,cy-R*.22],[cx-R*.5,cy-R*.38]],
+    [[cx+R*.04,cy-R*.08],[cx+R*.04,cy-R*.42],[cx+R*.22,cy-R*.42],[cx+R*.22,cy-R*.56]],
+    [[cx-R*.04,cy+R*.08],[cx-R*.04,cy+R*.42],[cx-R*.22,cy+R*.42],[cx-R*.22,cy+R*.56]],
+    [[cx+R*.18,cy-R*.32],[cx+R*.34,cy-R*.32]],
+    [[cx-R*.18,cy+R*.32],[cx-R*.34,cy+R*.32]],
+  ];
+  ctx.save();ctx.strokeStyle='rgba(170,0,0,.68)';ctx.lineWidth=1.4;
+  traces.forEach(pts=>{ctx.beginPath();pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.stroke();});
+  ctx.restore();
+
+  /* ─ LED component dots ─ */
+  const leds=[
+    [cx+R*.36,cy-R*.24],[cx+R*.54,cy-R*.24],[cx+R*.5,cy+R*.38],
+    [cx-R*.36,cy+R*.24],[cx-R*.54,cy+R*.24],[cx-R*.5,cy-R*.38],
+    [cx+R*.22,cy-R*.56],[cx-R*.22,cy+R*.56],
+    [cx+R*.34,cy-R*.32],[cx-R*.34,cy+R*.32],
+    [cx+R*.32,cy+R*.22],[cx-R*.32,cy-R*.22],
+  ];
+  leds.forEach(([x,y],i)=>{
+    const sz2=i<4?4.2:3.2;
+    ctx.save();ctx.shadowColor='#ff1a1a';ctx.shadowBlur=12;
+    ctx.fillStyle='#ff2a2a';ctx.beginPath();ctx.arc(x,y,sz2,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#ff9090';ctx.beginPath();ctx.arc(x,y,sz2*.4,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+  });
+
+  /* ─ small rectangular components ─ */
+  [[cx+R*.38,cy],[cx-R*.38,cy],[cx,cy-R*.4],[cx,cy+R*.4]].forEach(([x,y],i)=>{
+    ctx.save();ctx.fillStyle='rgba(140,0,0,.55)';ctx.strokeStyle='rgba(200,0,0,.6)';ctx.lineWidth=.8;
+    const w=i%2===0?10:8,h=i%2===0?5:8;
+    ctx.fillRect(x-w/2,y-h/2,w,h);ctx.strokeRect(x-w/2,y-h/2,w,h);ctx.restore();
+  });
+
+  /* ─ Bitcoin ₿ symbol ─ */
+  ctx.save();
+  const fz=Math.round(R*.96);
+  ctx.font=`900 ${fz}px 'Arial Black',Arial,sans-serif`;
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillStyle='rgba(0,0,0,.88)';ctx.fillText('₿',cx+5,cy+6);
+  ctx.shadowColor='#ff0000';ctx.shadowBlur=40;
+  ctx.fillStyle='#880000';ctx.fillText('₿',cx,cy);
+  ctx.shadowBlur=18;ctx.fillStyle='rgba(255,20,20,.22)';ctx.fillText('₿',cx,cy);
+  ctx.restore();
+
+  /* ─ center inner glow over symbol ─ */
+  const cg=ctx.createRadialGradient(cx,cy,0,cx,cy,R*.28);
+  cg.addColorStop(0,'rgba(80,0,0,.0)');cg.addColorStop(.6,'rgba(50,0,0,.0)');cg.addColorStop(1,'rgba(30,0,0,.15)');
+  ctx.save();coinClip();ctx.fillStyle=cg;ctx.fillRect(0,0,sz,sz);ctx.restore();
+}
+
+/* ══════════════════════════════════════════════
+   CANVAS CHARTS
+══════════════════════════════════════════════ */
+function drawArea(id,data,line,fill,H=70){
+  const r=getCtx(id,H);if(!r)return;
+  const{ctx,W}=r;
+  ctx.clearRect(0,0,W,H);
+  const mn=Math.min(...data),mx=Math.max(...data),rng=mx-mn||1;
+  const pts=data.map((v,i)=>[(i/(data.length-1))*W,H-6-((v-mn)/rng)*(H-14)]);
+  const path=()=>{ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++){const m=(pts[i-1][0]+pts[i][0])/2;ctx.bezierCurveTo(m,pts[i-1][1],m,pts[i][1],pts[i][0],pts[i][1]);}};
+  ctx.beginPath();path();ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,fill+'55');g.addColorStop(1,fill+'00');
+  ctx.fillStyle=g;ctx.fill();
+  ctx.beginPath();path();ctx.strokeStyle=line;ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();
+}
+function drawBars(id,data,color){
+  const r=getCtx(id,70);if(!r)return;
+  const{ctx,W,H}=r;ctx.clearRect(0,0,W,H);
+  const mx=Math.max(...data);const bw=Math.floor(W/data.length*.55);const gap=(W-bw*data.length)/(data.length+1);
+  data.forEach((v,i)=>{
+    const bh=(v/mx)*(H-8),x=gap+i*(bw+gap),y=H-bh;
+    const g=ctx.createLinearGradient(0,y,0,H);g.addColorStop(0,color+'ff');g.addColorStop(1,color+'88');
+    ctx.fillStyle=g;ctx.beginPath();
+    if(ctx.roundRect)ctx.roundRect(x,y,bw,bh,[3,3,0,0]);else ctx.rect(x,y,bw,bh);
+    ctx.fill();
+  });
+}
+function drawDonut(id,data,colors,sz=150,holeFill){
+  const c=$(id);if(!c)return;
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  c.width=c.height=sz*dpr;
+  c.style.width=sz+'px';c.style.height=sz+'px';
+  const ctx=c.getContext('2d');ctx.scale(dpr,dpr);
+  const cx=sz/2,cy=sz/2,r=sz*.44,inner=sz*.29;
+  // gap between segments (in radians), skip if single segment
+  const gap=data.length>1?0.018:0;
+  const total=data.reduce((a,b)=>a+b,0);let st=-Math.PI/2;
+  data.forEach((v,i)=>{
+    const a=Math.max((v/total)*Math.PI*2 - gap, 0.001);
+    const g=ctx.createLinearGradient(0,0,sz,sz);
+    g.addColorStop(0,colors[i]);g.addColorStop(1,colors[i]+'bb');
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,st,st+a);ctx.closePath();
+    ctx.fillStyle=g;ctx.fill();
+    st+=a+gap;
+  });
+  // inner hole — use passed color or detect from card background
+  const bg=holeFill||_sc.cardBg||'#ffffff';
+  ctx.beginPath();ctx.arc(cx,cy,inner,0,Math.PI*2);ctx.fillStyle=bg;ctx.fill();
+}
+function drawPerfChart(){
+  const r=getCtx('ap-perf-chart',200);if(!r)return;
+  const{ctx,W,H}=r;
+  const labels=_sc.perfMonths||['Feb','Mar','Apr','May','Jun','Jul'];
+  const crypto=_sc.perfCrypto||[0,14,22,32,40,46];
+  const stocks=_sc.perfStocks||[0,8,12,16,21,19];
+  const forex=_sc.perfForex||[0,3,5,7,8,8.7];
+  const re=_sc.perfRE||[0,5,9,12,14,16];
+  const allPts=[...crypto,...stocks,...forex,...re];
+  const mx=Math.max(...allPts)*1.08||48;
+  const pad={l:6,r:6,t:10,b:22};
+  ctx.strokeStyle=_sc.borderColor||'rgba(0,0,0,.06)';ctx.lineWidth=1;
+  [.25,.5,.75,1].forEach(f=>{const y=pad.t+(1-f)*(H-pad.t-pad.b);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();});
+  const mkPts=d=>d.map((v,i)=>[pad.l+(i/(d.length-1))*(W-pad.l-pad.r),pad.t+(1-v/mx)*(H-pad.t-pad.b)]);
+  function line(pts,color,dash=[]){
+    ctx.beginPath();ctx.setLineDash(dash);ctx.moveTo(pts[0][0],pts[0][1]);
+    for(let i=1;i<pts.length;i++){const m=(pts[i-1][0]+pts[i][0])/2;ctx.bezierCurveTo(m,pts[i-1][1],m,pts[i][1],pts[i][0],pts[i][1]);}
+    ctx.setLineDash([]);ctx.strokeStyle=color;ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();
+  }
+  line(mkPts(crypto),'#3d8ef0');line(mkPts(stocks),'#00e676');line(mkPts(forex),'#f5a623',[5,3]);line(mkPts(re),'#9b59b6');
+  ctx.fillStyle=_sc.text3Color||'rgba(90,99,128,.8)';ctx.font='9px system-ui';ctx.textAlign='center';
+  labels.forEach((l,i)=>ctx.fillText(l,pad.l+(i/(labels.length-1))*(W-pad.l-pad.r),H-5));
+}
+
+/* ══════════════════════════════════════════════
+   TICKER UPDATE — crypto-only
+══════════════════════════════════════════════ */
+function updateTicker(){
+  const fmt=v=>(v>=0?'+':'')+v.toFixed(2)+'%';
+  const cls=v=>'ap-tick-chg '+(v>=0?'up':'dn');
+  function fmtP(v){
+    if(v>=1000)return fmtN(v,0);
+    if(v>=1)return v.toFixed(2);
+    if(v>=0.01)return v.toFixed(4);
+    return v.toFixed(6);
+  }
+  /* ticker prices */
+  [['btc',fmtN(fx.btc.price,0)],['eth',fmtN(fx.eth.price,0)],
+   ['bnb',fmtN(fx.bnb.price,0)],['sol',fmtP(fx.sol.price)],
+   ['xrp',fmtP(fx.xrp.price)],['doge',fx.doge.price.toFixed(4)],
+   ['ada',fx.ada.price.toFixed(4)],['trx',fx.trx.price.toFixed(4)],
+   ['avax',fmtP(fx.avax.price)],['ton',fmtP(fx.ton.price)]
+  ].forEach(([k,v])=>{const e=$('tk-'+k);if(e)e.textContent=v;});
+  /* ticker % changes */
+  [['btc',fx.btc.chg],['eth',fx.eth.chg],['bnb',fx.bnb.chg],['sol',fx.sol.chg],
+   ['xrp',fx.xrp.chg],['doge',fx.doge.chg],['ada',fx.ada.chg],['trx',fx.trx.chg],
+   ['avax',fx.avax.chg],['ton',fx.ton.chg]
+  ].forEach(([k,c])=>{const e=$('tkc-'+k);if(e){e.textContent=fmt(c);e.className=cls(c);}});
+  /* market card prices */
+  if($('c-btc'))$('c-btc').textContent='$'+fmtN(fx.btc.price,0);
+  if($('c-eth'))$('c-eth').textContent='$'+fmtN(fx.eth.price,0);
+  if($('c-bnb'))$('c-bnb').textContent='$'+fmtN(fx.bnb.price,0);
+  if($('c-sol'))$('c-sol').textContent='$'+fmtP(fx.sol.price);
+  /* market card change labels */
+  const setChg=(id,v,sfx)=>{const e=$(id);if(!e)return;e.innerHTML=`<i class="fas fa-caret-${v>=0?'up':'down'}"></i> ${Math.abs(v).toFixed(2)}%${sfx}`;e.className='ap-mcard-chg '+(v>=0?'up':'dn');};
+  setChg('cc-btc',fx.btc.chg,' Today');
+  setChg('cc-eth',fx.eth.chg,' ETH');
+  setChg('cc-bnb',fx.bnb.chg,' BNB');
+  setChg('cc-sol',fx.sol.chg,' SOL');
+  /* analytics live numbers */
+  if($('ana-btc-chg'))$('ana-btc-chg').textContent=(fx.btc.chg>=0?'+':'')+fx.btc.chg.toFixed(2)+'%';
+  if($('ana-eth-price'))$('ana-eth-price').textContent='$'+fmtN(fx.eth.price,0);
+  if($('ana-eth-chg'))$('ana-eth-chg').textContent=(fx.eth.chg>=0?'+':'')+fx.eth.chg.toFixed(2)+'%';
+  if($('ana-bnb-price'))$('ana-bnb-price').textContent='$'+fmtN(fx.bnb.price,0);
+  if($('ana-bnb-chg'))$('ana-bnb-chg').textContent=(fx.bnb.chg>=0?'+':'')+fx.bnb.chg.toFixed(2)+'%';
+  if($('ana-sol-price'))$('ana-sol-price').textContent='$'+fmtP(fx.sol.price);
+  if($('ana-sol-chg'))$('ana-sol-chg').textContent=(fx.sol.chg>=0?'+':'')+fx.sol.chg.toFixed(2)+'%';
+}
+
+/* ══════════════════════════════════════════════
+   ANALYTICS MINI CHARTS — all crypto
+══════════════════════════════════════════════ */
+function drawAnalytics(){
+  drawArea('ana-btc', cryptoHist,'#00e676','#00e676',60);
+  drawArea('ana-eth', ethHist,   '#627eea','#627eea',60);
+  drawArea('ana-bnb', bnbHist,   '#f3ba2f','#f3ba2f',60);
+  drawArea('ana-sol', solHist,   '#9945ff','#9945ff',60);
+  const gc=$('ap-growth-chart');if(gc){drawArea('ap-growth-chart',[5,8,12,18,23,27.6],'#00e676','#00e676',70);}
+}
+
+/* ══════════════════════════════════════════════
+   LIVE PRICES  (Binance WS + server-side cache)
+══════════════════════════════════════════════ */
+
+/* ── Binance WebSocket — all 10 landing-page pairs, real-time ── */
+(function initBinanceWS(){
+  const streams=[
+    'btcusdt@miniTicker','ethusdt@miniTicker','bnbusdt@miniTicker',
+    'solusdt@miniTicker','xrpusdt@miniTicker','dogeusdt@miniTicker',
+    'adausdt@miniTicker','trxusdt@miniTicker','avaxusdt@miniTicker',
+    'tonusdt@miniTicker'
+  ].join('/');
+  let ws,retryDelay=3000;
+
+  function connect(){
+    try{
+      ws=new WebSocket('wss://stream.binance.com:9443/stream?streams='+streams);
+      ws.onopen=()=>{ retryDelay=3000; };
+
+      ws.onmessage=function(e){
+        try{
+          const msg=JSON.parse(e.data);
+          const t=msg.data;
+          if(!t||!t.s)return;
+          const price=parseFloat(t.c);
+          const open =parseFloat(t.o);
+          const chg  =+((price-open)/open*100).toFixed(2);
+          switch(t.s){
+            case'BTCUSDT':
+              fx.btc.price=price;fx.btc.chg=chg;
+              cryptoHist[cryptoHist.length-1]=price;
+              drawArea('mc-crypto',cryptoHist,'#f7931a','#f7931a');
+              drawArea('ana-btc',cryptoHist,'#00e676','#00e676',60);
+              break;
+            case'ETHUSDT':
+              fx.eth.price=price;fx.eth.chg=chg;
+              ethHist[ethHist.length-1]=price;
+              drawArea('mc-eth',ethHist,'#627eea','#627eea');
+              drawArea('ana-eth',ethHist,'#627eea','#627eea',60);
+              break;
+            case'BNBUSDT':
+              fx.bnb.price=price;fx.bnb.chg=chg;
+              bnbHist[bnbHist.length-1]=price;
+              drawArea('mc-bnb',bnbHist,'#f3ba2f','#f3ba2f');
+              drawArea('ana-bnb',bnbHist,'#f3ba2f','#f3ba2f',60);
+              break;
+            case'SOLUSDT':
+              fx.sol.price=price;fx.sol.chg=chg;
+              solHist[solHist.length-1]=price;
+              drawArea('mc-sol',solHist,'#9945ff','#9945ff');
+              drawArea('ana-sol',solHist,'#9945ff','#9945ff',60);
+              break;
+            case'XRPUSDT': fx.xrp.price=price;fx.xrp.chg=chg;break;
+            case'DOGEUSDT':fx.doge.price=price;fx.doge.chg=chg;break;
+            case'ADAUSDT': fx.ada.price=price;fx.ada.chg=chg;break;
+            case'TRXUSDT': fx.trx.price=price;fx.trx.chg=chg;break;
+            case'AVAXUSDT':fx.avax.price=price;fx.avax.chg=chg;break;
+            case'TONUSDT': fx.ton.price=price;fx.ton.chg=chg;break;
+          }
+          updateTicker();
+        }catch(_){}
+      };
+
+      ws.onclose=()=>{ retryDelay=Math.min(retryDelay*1.5,30000); setTimeout(connect,retryDelay); };
+      ws.onerror=()=>ws.close();
+    }catch(_){setTimeout(connect,retryDelay);}
+  }
+  connect();
+})();
+
+/* ══════════════════════════════════════════════
+   AOS SCROLL ANIMATION
+══════════════════════════════════════════════ */
+function initAOS(){
+  const els=document.querySelectorAll('[data-aos]');
+  const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('aos-animate');}),{threshold:.12});
+  els.forEach(e=>io.observe(e));
+}
+
+/* ══════════════════════════════════════════════
+   HAMBURGER
+══════════════════════════════════════════════ */
+(function(){
+  const ham=$('apHam'),links=$('apLinks'),right=$('apNavRight');
+  if(!ham)return;
+  ham.addEventListener('click',()=>{
+    const o=links.classList.toggle('open');right.classList.toggle('open',o);
+    ham.innerHTML=o?'<i class="fas fa-times"></i>':'<i class="fas fa-bars"></i>';
+  });
+  links.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{links.classList.remove('open');right.classList.remove('open');ham.innerHTML='<i class="fas fa-bars"></i>';}));
+})();
+
+/* ══════════════════════════════════════════════
+   CONTACT FORM
+══════════════════════════════════════════════ */
+function submitContactForm(e){
+  e.preventDefault();const btn=e.target.querySelector('button');
+  btn.innerHTML='<i class="fas fa-check"></i> Message Sent!';btn.style.background='#00a854';
+  setTimeout(()=>{btn.innerHTML='<i class="fas fa-paper-plane"></i> Send Message';btn.style.background='';e.target.reset();},3000);
+}
+
+/* ══════════════════════════════════════════════
+   SECTION SLIDESHOWS
+══════════════════════════════════════════════ */
+function initSlideshow(wrapId, dotsId, intervalSec) {
+  var wrap = document.getElementById(wrapId);
+  var dotsEl = document.getElementById(dotsId);
+  if (!wrap) return;
+  var layers = wrap.querySelectorAll('.slide-bg-layer');
+  if (layers.length <= 1) return;
+  var dots = dotsEl ? dotsEl.querySelectorAll('.slide-dot') : [];
+  var cur = 0;
+
+  function goTo(idx) {
+    layers[cur].classList.remove('active');
+    if (dots[cur]) dots[cur].classList.remove('active');
+    cur = (idx + layers.length) % layers.length;
+    layers[cur].classList.add('active');
+    if (dots[cur]) dots[cur].classList.add('active');
+  }
+
+  // dot click navigation
+  dots.forEach(function(dot) {
+    dot.addEventListener('click', function() { goTo(parseInt(this.dataset.idx)); });
+  });
+
+  setInterval(function() { goTo(cur + 1); }, intervalSec * 1000);
+}
+
+/* ══════════════════════════════════════════════
+   BOOT
+══════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded',()=>{
+  drawBtcCoin();
+  drawArea('mc-crypto',cryptoHist,'#f7931a','#f7931a');
+  drawArea('mc-eth',   ethHist,   '#627eea','#627eea');
+  drawArea('mc-bnb',   bnbHist,   '#f3ba2f','#f3ba2f');
+  drawArea('mc-sol',   solHist,   '#9945ff','#9945ff');
+  var _donutColors=['#f5a623','#3d8ef0','#9b59b6','#00e676','#00d4ff'];
+  drawDonut('ap-donut', _sc.mix, _donutColors, 150, _sc.cardBg);
+  drawDonut('ap-port-donut', _sc.port, _donutColors, 220, _sc.bg2);
+  drawPerfChart();drawAnalytics();updateTicker();
+  window.addEventListener('resize',()=>{
+    drawArea('mc-crypto',cryptoHist,'#f7931a','#f7931a');
+    drawArea('mc-eth',   ethHist,   '#627eea','#627eea');
+    drawArea('mc-bnb',   bnbHist,   '#f3ba2f','#f3ba2f');
+    drawArea('mc-sol',   solHist,   '#9945ff','#9945ff');
+    drawDonut('ap-donut',_sc.mix,_donutColors,150,_sc.cardBg);
+    drawDonut('ap-port-donut',_sc.port,_donutColors,220,_sc.bg2);
+    drawPerfChart();drawAnalytics();
+  });
+  initAOS();
+
+  // Section slideshows
+  initSlideshow('heroSlideBgWrap',  'heroSlideDots',   <%= (typeof siteCustomize!=='undefined' && parseInt(siteCustomize.bgHeroSlideInterval))||5 %>);
+  initSlideshow('bottomSlideBgWrap','bottomSlideDots', <%= (typeof siteCustomize!=='undefined' && parseInt(siteCustomize.bgBottomSlideInterval))||6 %>);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<% pageTitle = 'Admin — Users' %>
+<%- include('../partials/head') %>
+<%- include('../partials/nav') %>
+<div class="admin-layout">
+  <nav class="admin-sidebar">
+    <div class="sidebar-title">Admin Panel</div>
+    <a href="/admin"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="/admin/users" class="active"><i class="fas fa-users"></i> Users</a>
+    <a href="/admin/plans"><i class="fas fa-layer-group"></i> Plans</a>
+    <a href="/admin/plan-requests"><i class="fas fa-tasks"></i> Plan Requests</a>
+    <a href="/admin/deposits"><i class="fas fa-plus-circle"></i> Deposits</a>
+    <a href="/admin/withdrawals"><i class="fas fa-minus-circle"></i> Withdrawals</a>
+    <a href="/admin/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+    <div class="sidebar-title">Site</div>
+    <a href="/admin/settings"><i class="fas fa-cog"></i> Settings</a>
+    <a href="/admin/customize"><i class="fas fa-paint-brush"></i> Customizer</a>
+    <a href="/dashboard"><i class="fas fa-home"></i> Front End</a>
+    <a href="/logout" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </nav>
+  <div class="admin-main">
+    <div class="page-header"><h1><i class="fas fa-users"></i> Users</h1></div>
+    <form method="GET" style="margin-bottom:1.5rem;"><div class="input-group" style="max-width:400px;"><input type="text" name="q" class="form-control" placeholder="Search username or email…" value="<%= q %>"><button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button></div></form>
+    <div class="card"><div class="table-responsive"><table class="table">
+      <thead><tr><th>Username</th><th>Email</th><th>Plan</th><th>Balance</th><th>Invested</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        <% users.forEach(u=>{%>
+        <tr>
+          <td><% if(u.isAdmin){%><i class="fas fa-shield-alt" style="color:var(--warning);"></i> <%}%><strong><%= u.username %></strong></td>
+          <td style="font-size:.85rem;color:var(--text-secondary);"><%= u.email %></td>
+          <td><span class="badge badge-info"><%= u.planName %></span></td>
+          <td class="text-success font-bold">$<%= (u.balance||0).toFixed(2) %></td>
+          <td>$<%= (u.totalInvested||0).toFixed(2) %></td>
+          <td><%- u.isActive?'<span class="badge badge-success">Active</span>':'<span class="badge badge-danger">Banned</span>'%></td>
+          <td>
+            <% if(!u.isAdmin){%>
+            <form method="POST" action="/admin/users/toggle" style="display:inline;"><input type="hidden" name="user_id" value="<%= u._id %>"><button class="btn btn-<%= u.isActive?'danger':'success'%> btn-sm" onclick="return confirm('<%= u.isActive?'Ban':'Unban'%> user?')" title="<%= u.isActive?'Ban':'Unban'%>"><i class="fas fa-<%= u.isActive?'ban':'check'%>"></i></button></form>
+            <button class="btn btn-success btn-sm" onclick="showCredit('<%= u._id %>','<%= u.username %>',<%= (u.balance||0).toFixed(2) %>)" title="Credit Balance"><i class="fas fa-plus"></i></button>
+            <button class="btn btn-danger btn-sm" onclick="showDebit('<%= u._id %>','<%= u.username %>',<%= (u.balance||0).toFixed(2) %>)" title="Debit Balance"><i class="fas fa-minus"></i></button>
+            <%}%>
+          </td>
+        </tr>
+        <%})%>
+      </tbody>
+    </table></div></div>
+  </div>
+</div>
+<!-- Credit Modal -->
+<div class="modal-overlay" id="creditModal">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('creditModal').classList.remove('active')"><i class="fas fa-times"></i></button>
+    <h3 style="margin-bottom:.5rem;"><i class="fas fa-plus-circle" style="color:var(--success);"></i> Credit User</h3>
+    <p id="credit-uname" style="color:var(--text-muted);margin-bottom:1.25rem;font-size:.88rem;"></p>
+    <form method="POST" action="/admin/users/credit">
+      <input type="hidden" name="user_id" id="credit-uid">
+      <div class="form-group"><label class="form-label">Amount to Add (USD)</label><input type="number" name="amount" class="form-control" min="0.01" step="0.01" required placeholder="e.g. 10.00"></div>
+      <button type="submit" class="btn btn-success btn-block"><i class="fas fa-check"></i> Credit Balance</button>
+    </form>
+  </div>
+</div>
+
+<!-- Debit Modal -->
+<div class="modal-overlay" id="debitModal">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('debitModal').classList.remove('active')"><i class="fas fa-times"></i></button>
+    <h3 style="margin-bottom:.5rem;"><i class="fas fa-minus-circle" style="color:var(--danger);"></i> Debit User</h3>
+    <p id="debit-uname" style="color:var(--text-muted);margin-bottom:1.25rem;font-size:.88rem;"></p>
+    <div id="debit-balance" style="background:var(--bg2);border-radius:8px;padding:.6rem .9rem;font-size:.85rem;margin-bottom:1rem;"></div>
+    <form method="POST" action="/admin/users/debit">
+      <input type="hidden" name="user_id" id="debit-uid">
+      <div class="form-group"><label class="form-label">Amount to Deduct (USD)</label><input type="number" name="amount" class="form-control" min="0.01" step="0.01" required placeholder="e.g. 5.00" id="debit-amount"></div>
+      <button type="submit" class="btn btn-danger btn-block" onclick="return confirm('Deduct this amount from user balance?')"><i class="fas fa-minus"></i> Debit Balance</button>
+    </form>
+  </div>
+</div>
+
+<script>
+function showCredit(id, name, balance) {
+  document.getElementById('credit-uid').value = id;
+  document.getElementById('credit-uname').textContent = 'User: ' + name + ' — Balance: $' + parseFloat(balance).toFixed(2);
+  document.getElementById('creditModal').classList.add('active');
+}
+function showDebit(id, name, balance) {
+  document.getElementById('debit-uid').value = id;
+  document.getElementById('debit-uname').textContent = 'User: ' + name;
+  document.getElementById('debit-balance').textContent = 'Current balance: $' + parseFloat(balance).toFixed(2);
+  document.getElementById('debit-amount').max = balance;
+  document.getElementById('debitModal').classList.add('active');
+}
+document.querySelectorAll('.modal-overlay').forEach(function(ov) {
+  ov.addEventListener('click', function(e) { if (e.target === ov) ov.classList.remove('active'); });
+});
+</script>
+<%- include('../partials/footer') %>

@@ -1,0 +1,91 @@
+<% pageTitle = 'Admin — Settings' %>
+<%- include('../partials/head') %>
+<%- include('../partials/nav') %>
+<div class="admin-layout">
+  <nav class="admin-sidebar">
+    <div class="sidebar-title">Admin Panel</div>
+    <a href="/admin"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
+    <a href="/admin/plans"><i class="fas fa-layer-group"></i> Plans</a>
+    <a href="/admin/plan-requests"><i class="fas fa-tasks"></i> Plan Requests</a>
+    <a href="/admin/deposits"><i class="fas fa-plus-circle"></i> Deposits</a>
+    <a href="/admin/withdrawals"><i class="fas fa-minus-circle"></i> Withdrawals</a>
+    <a href="/admin/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+    <div class="sidebar-title">Site</div>
+    <a href="/admin/settings" class="active"><i class="fas fa-cog"></i> Settings</a>
+    <a href="/admin/customize"><i class="fas fa-paint-brush"></i> Customizer</a>
+    <a href="/dashboard"><i class="fas fa-home"></i> Front End</a>
+    <a href="/logout" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </nav>
+  <div class="admin-main">
+    <div class="page-header"><h1><i class="fas fa-cog"></i> Site Settings</h1></div>
+    <div style="max-width:700px;">
+      <form method="POST" action="/admin/settings">
+        <div class="card" style="margin-bottom:1.5rem;">
+          <div class="card-header"><span class="card-title"><i class="fas fa-globe"></i> General</span></div>
+          <div class="form-group"><label class="form-label">Site Name</label><input type="text" name="siteName" class="form-control" required value="<%= settings.siteName %>"></div>
+          <div class="form-group"><label class="form-label">Announcement <span style="color:var(--text-muted);font-weight:400;">(shown on dashboard — leave blank to hide)</span></label><textarea name="announcement" class="form-control" rows="2" placeholder="e.g. Scheduled maintenance on Sunday…"><%= settings.announcement %></textarea></div>
+          <div class="form-group" style="display:flex;align-items:center;gap:.75rem;">
+            <input type="checkbox" name="maintenanceMode" id="maintenanceMode" <%= settings.maintenanceMode?'checked':''%>>
+            <label for="maintenanceMode" class="form-label" style="margin:0;color:var(--warning);">Maintenance Mode <span style="color:var(--text-muted);font-weight:400;">(locks site for non-admins)</span></label>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:1.5rem;">
+          <div class="card-header"><span class="card-title"><i class="fas fa-wallet"></i> USDT Deposit Addresses</span></div>
+          <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:1rem;padding:0 .25rem;"><i class="fas fa-info-circle"></i> Enter your USDT wallet address for each network. Leave blank to disable that network on the deposit page.</p>
+          <div class="form-group">
+            <label class="form-label"><span style="background:#f0b90b;color:#000;padding:2px 8px;border-radius:4px;font-size:.78rem;font-weight:700;margin-right:.5rem;">BNB Smart Chain</span> USDT BEP-20 Address</label>
+            <input type="text" name="usdtBep20Address" class="form-control" style="font-family:monospace;font-size:.85rem;" placeholder="0x…" value="<%= settings.usdtBep20Address || '' %>">
+            <p class="form-text">BNB Smart Chain (BSC) — fast &amp; low fees</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><span style="background:#627eea;color:#fff;padding:2px 8px;border-radius:4px;font-size:.78rem;font-weight:700;margin-right:.5rem;">Ethereum</span> USDT ERC-20 Address</label>
+            <input type="text" name="usdtErc20Address" class="form-control" style="font-family:monospace;font-size:.85rem;" placeholder="0x…" value="<%= settings.usdtErc20Address || '' %>">
+            <p class="form-text">Ethereum mainnet — widely supported</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><span style="background:#9945ff;color:#fff;padding:2px 8px;border-radius:4px;font-size:.78rem;font-weight:700;margin-right:.5rem;">Solana</span> USDT SPL Address</label>
+            <input type="text" name="usdtSolAddress" class="form-control" style="font-family:monospace;font-size:.85rem;" placeholder="sol1…" value="<%= settings.usdtSolAddress || '' %>">
+            <p class="form-text">Solana — ultra-fast, near-zero fees</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><span style="background:#eb0029;color:#fff;padding:2px 8px;border-radius:4px;font-size:.78rem;font-weight:700;margin-right:.5rem;">Tron</span> USDT TRC-20 Address</label>
+            <input type="text" name="usdtTrc20Address" class="form-control" style="font-family:monospace;font-size:.85rem;" placeholder="T…" value="<%= settings.usdtTrc20Address || '' %>">
+            <p class="form-text">Tron network (TRC-20) — low fees</p>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:1.5rem;">
+          <div class="card-header"><span class="card-title"><i class="fas fa-sliders-h"></i> Limits &amp; Rates</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+            <div class="form-group"><label class="form-label">Min Deposit ($)</label><input type="number" name="minDeposit" class="form-control" min="0" step="0.01" value="<%= settings.minDeposit %>"></div>
+            <div class="form-group"><label class="form-label">Min Withdrawal ($)</label><input type="number" name="minWithdrawal" class="form-control" min="0" step="0.01" value="<%= settings.minWithdrawal %>"></div>
+            <div class="form-group"><label class="form-label">Referral Rate (%)</label><input type="number" name="referralRate" class="form-control" min="0" max="100" step="0.1" value="<%= settings.referralRate %>"></div>
+          </div>
+        </div>
+        <!-- Live Price API Keys -->
+        <div class="card" style="margin-bottom:1.5rem;">
+          <div class="card-header"><span class="card-title"><i class="fas fa-satellite-dish"></i> Live Price API Keys</span></div>
+          <p style="font-size:.8rem;color:#64748b;margin:0 0 1rem">Crypto updates via Binance WebSocket (no key needed). Forex &amp; gold require Alpha Vantage; stocks require IEX Cloud.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-key" style="color:#f5a623"></i> Alpha Vantage API Key <small style="color:#94a3b8">(forex &amp; gold — <a href="https://www.alphavantage.co/support/#api-key" target="_blank">get free key</a>)</small></label>
+              <input type="text" name="alphaVantageKey" class="form-control" placeholder="e.g. ABCDE12345FGHIJ" value="<%= settings.alphaVantageKey||'' %>">
+            </div>
+            <div class="form-group">
+              <label class="form-label"><i class="fas fa-key" style="color:#3d8ef0"></i> IEX Cloud API Key <small style="color:#94a3b8">(stocks — <a href="https://iexcloud.io/cloud-login#/register" target="_blank">get free key</a>)</small></label>
+              <input type="text" name="iexCloudKey" class="form-control" placeholder="e.g. pk_xxxx or Tpk_xxxx (sandbox)" value="<%= settings.iexCloudKey||'' %>">
+            </div>
+          </div>
+          <div style="font-size:.75rem;color:#94a3b8;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:.75rem 1rem;margin-top:.5rem">
+            <strong>Rate limits:</strong> &nbsp;
+            Alpha Vantage free = 25 req/day (forex cached 5 min) &nbsp;|&nbsp;
+            IEX Cloud free = 50k msg/month (stocks cached 1 min) &nbsp;|&nbsp;
+            Binance WebSocket = unlimited real-time (no key required)
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="padding:.75rem 2.5rem;"><i class="fas fa-save"></i> Save Settings</button>
+      </form>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

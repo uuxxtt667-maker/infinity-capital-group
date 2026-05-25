@@ -1,0 +1,459 @@
+<% pageTitle = 'Investment Plans' %>
+<%
+  const paidPlans  = plans.filter(p => p.price > 0);
+  const gridPlans  = paidPlans.length > 1 ? paidPlans.slice(0, -1) : paidPlans;
+  const elitePlan  = paidPlans.length > 1 ? paidPlans[paidPlans.length - 1] : null;
+  const popularIdx = gridPlans.length >= 3 ? 2 : Math.floor(gridPlans.length / 2);
+  const cols       = Math.min(4, Math.max(1, gridPlans.length));
+%>
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<!-- ── LIVE CRYPTO TICKER ── -->
+<style>
+.pl-ticker { background:#070c18; border-bottom:1px solid #1a1f35; overflow:hidden; white-space:nowrap; padding:.5rem 0; position:relative; }
+.pl-ticker::before,.pl-ticker::after { content:''; position:absolute; top:0; width:60px; height:100%; z-index:2; pointer-events:none; }
+.pl-ticker::before { left:0;  background:linear-gradient(to right, #070c18, transparent); }
+.pl-ticker::after  { right:0; background:linear-gradient(to left,  #070c18, transparent); }
+.pl-ticker-track { display:inline-flex; animation:plTickAnim 40s linear infinite; }
+.pl-ticker-track:hover { animation-play-state:paused; }
+@keyframes plTickAnim { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+.pl-tick-item { display:inline-flex; align-items:center; gap:.4rem; padding:0 1.2rem; border-right:1px solid rgba(26,31,53,.9); font-size:.74rem; white-space:nowrap; }
+.pl-tick-sym  { font-weight:800; color:#e2e8f0; font-size:.72rem; }
+.pl-tick-px   { font-weight:700; color:#f1f5f9; font-variant-numeric:tabular-nums; }
+.pl-tick-chg.up { color:#00e676; font-weight:700; }
+.pl-tick-chg.dn { color:#ff4757; font-weight:700; }
+</style>
+<div class="pl-ticker">
+  <div class="pl-ticker-track" id="pl-tick-track">
+    <!-- JS fills in 2× set for seamless loop -->
+  </div>
+</div>
+<script>
+(function(){
+  var COINS=[
+    {sym:'BTC/USDT',pair:'BTCUSDT',price:77525,chg:2.41},
+    {sym:'ETH/USDT',pair:'ETHUSDT',price:2116,chg:1.82},
+    {sym:'BNB/USDT',pair:'BNBUSDT',price:661,chg:0.93},
+    {sym:'SOL/USDT',pair:'SOLUSDT',price:86,chg:3.14},
+    {sym:'XRP/USDT',pair:'XRPUSDT',price:1.36,chg:-0.67},
+    {sym:'DOGE/USDT',pair:'DOGEUSDT',price:0.1029,chg:-1.04},
+    {sym:'ADA/USDT',pair:'ADAUSDT',price:0.2458,chg:1.22},
+    {sym:'TRX/USDT',pair:'TRXUSDT',price:0.3666,chg:0.55},
+    {sym:'AVAX/USDT',pair:'AVAXUSDT',price:9.42,chg:-1.23},
+    {sym:'TON/USDT',pair:'TONUSDT',price:1.81,chg:2.10}
+  ];
+  var pMap={};
+  COINS.forEach(function(c){ pMap[c.pair]=c; });
+
+  function fmtPx(p){
+    if(p>=10000) return '$'+p.toLocaleString('en-US',{maximumFractionDigits:0});
+    if(p>=100)   return '$'+p.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+    if(p>=1)     return '$'+p.toFixed(3);
+    if(p>=0.01)  return '$'+p.toFixed(4);
+    return '$'+p.toFixed(6);
+  }
+  function buildHTML(){
+    var html='';
+    function row(c){
+      var up=c.chg>=0;
+      return '<span class="pl-tick-item">'+
+        '<span class="pl-tick-sym">'+c.sym+'</span>'+
+        '<span class="pl-tick-px" id="pltk-'+c.pair+'">'+fmtPx(c.price)+'</span>'+
+        '<span class="pl-tick-chg '+(up?'up':'dn')+'" id="pltkc-'+c.pair+'">'+(up?'▲':'▼')+Math.abs(c.chg).toFixed(2)+'%</span>'+
+      '</span>';
+    }
+    COINS.forEach(function(c){ html+=row(c); });
+    COINS.forEach(function(c){ html+=row(c); }); /* duplicate for seamless loop */
+    return html;
+  }
+  document.getElementById('pl-tick-track').innerHTML=buildHTML();
+
+  var streams=COINS.map(function(c){ return c.pair.toLowerCase()+'@miniTicker'; }).join('/');
+  var plRetry=1000;
+  function connectWS(){
+    try{
+      var ws=new WebSocket('wss://stream.binance.com:9443/stream?streams='+streams);
+      ws.onmessage=function(e){
+        try{
+          var msg=JSON.parse(e.data),d=msg.data||msg;
+          var price=parseFloat(d.c),open=parseFloat(d.o);
+          var chg=(price-open)/open*100;
+          var sym=(d.s||'').toUpperCase();
+          var c=pMap[sym]; if(!c) return;
+          c.price=price; c.chg=chg;
+          var upStr=(chg>=0?'▲':'▼')+Math.abs(chg).toFixed(2)+'%';
+          var cls='pl-tick-chg '+(chg>=0?'up':'dn');
+          document.querySelectorAll('[id="pltk-'+sym+'"]').forEach(function(el){ el.textContent=fmtPx(price); });
+          document.querySelectorAll('[id="pltkc-'+sym+'"]').forEach(function(el){ el.textContent=upStr; el.className=cls; });
+          plRetry=1000;
+        }catch(_){}
+      };
+      ws.onclose=function(){ plRetry=Math.min(plRetry*1.5,30000); setTimeout(connectWS,plRetry); };
+      ws.onerror=function(){ ws.close(); };
+    }catch(_){}
+  }
+  connectWS();
+})();
+</script>
+
+<style>
+  .pl-wrap { max-width:1280px; margin:0 auto; padding:0 1.75rem; }
+  .pl-hero { text-align:center; padding:3.5rem 1.75rem 2.5rem; background:radial-gradient(ellipse at 50% 0%, rgba(245,166,35,.07) 0%, transparent 65%); }
+  .pl-hero-badge { display:inline-flex; align-items:center; gap:.5rem; background:rgba(245,166,35,.1); border:1px solid rgba(245,166,35,.22); color:#f5a623; font-size:.73rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; padding:.4rem 1.1rem; border-radius:20px; margin-bottom:1.25rem; }
+  .pl-hero h1 { font-size:clamp(1.9rem,3.8vw,3rem); font-weight:900; color:#fff; margin:0 0 .75rem; line-height:1.1; }
+  .pl-hero p { font-size:1rem; color:#6b7494; margin:0; }
+
+  .pl-stats { display:grid; grid-template-columns:repeat(4,1fr); background:#0e1020; border-top:1px solid #1a1f35; border-bottom:1px solid #1a1f35; }
+  .pl-stat { text-align:center; padding:1.4rem 1rem; border-right:1px solid #1a1f35; }
+  .pl-stat:last-child { border-right:none; }
+  .pl-stat-val { font-size:1.85rem; font-weight:900; line-height:1; }
+  .pl-stat-lbl { font-size:.75rem; color:#5a6380; font-weight:600; margin-top:.3rem; }
+
+  .pl-section-hdr { text-align:center; padding:2.5rem 0 1.75rem; }
+  .pl-section-hdr h2 { font-size:1.65rem; font-weight:900; color:#fff; margin:0 0 .5rem; }
+  .pl-section-hdr p { font-size:.9rem; color:#6b7494; margin:0 0 .9rem; }
+
+  .pl-grid { display:grid; grid-template-columns:repeat(<%= cols %>,1fr); gap:1.25rem; align-items:stretch; }
+
+  .pl-card { background:#131726; border:1px solid #1e2540; border-radius:20px; padding:1.75rem; position:relative; display:flex; flex-direction:column; transition:all .24s; }
+  .pl-card:hover { transform:translateY(-5px); box-shadow:0 22px 55px rgba(0,0,0,.65); }
+  .pl-card.featured { box-shadow:0 0 32px rgba(0,0,0,.3); }
+  .pl-popular-pill { position:absolute; top:-14px; left:50%; transform:translateX(-50%); background:linear-gradient(90deg,#f5a623,#e08a10); color:#000; font-size:.67rem; font-weight:800; letter-spacing:.09em; text-transform:uppercase; padding:.3rem 1rem; border-radius:20px; white-space:nowrap; display:flex; align-items:center; gap:.3rem; }
+
+  .pl-tier-lbl { font-size:.68rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; margin-bottom:.3rem; }
+  .pl-name { font-size:1.1rem; font-weight:900; color:#fff; margin-bottom:.75rem; display:flex; align-items:center; gap:.5rem; }
+  .pl-rate { font-size:3.4rem; font-weight:900; line-height:1; margin-bottom:.15rem; letter-spacing:-.02em; }
+  .pl-rate-lbl { font-size:.75rem; color:#5a6380; margin-bottom:1.25rem; }
+
+  .pl-inv-range { background:rgba(255,255,255,.05); border-radius:10px; padding:.65rem 1rem; margin-bottom:1.25rem; }
+  .pl-inv-lbl { font-size:.67rem; color:#5a6380; margin-bottom:.25rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+  .pl-inv-val { font-size:1rem; font-weight:900; color:#fff; }
+
+  .pl-meta { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; margin-bottom:1.1rem; }
+  .pl-meta-item { background:rgba(255,255,255,.04); border-radius:8px; padding:.45rem .65rem; text-align:center; }
+  .pl-meta-lbl { font-size:.62rem; color:#5a6380; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+  .pl-meta-val { font-size:.82rem; font-weight:700; color:#c8d0e7; margin-top:.1rem; }
+
+  .pl-feats { list-style:none; margin:0 0 1.2rem; padding:0; display:flex; flex-direction:column; gap:.5rem; flex:1; }
+  .pl-feats li { display:flex; align-items:flex-start; gap:.55rem; font-size:.82rem; color:#8a94b8; line-height:1.35; }
+  .pl-feats li i { font-size:.65rem; width:14px; flex-shrink:0; color:#00e676; margin-top:.3rem; }
+
+  .pl-earns { background:rgba(0,230,118,.06); border:1px solid rgba(0,230,118,.1); border-radius:10px; padding:.6rem 1rem; margin-bottom:1.25rem; font-size:.78rem; color:#5a6380; text-align:center; line-height:1.6; }
+  .pl-earns strong { color:#00e676; font-size:.95rem; }
+
+  .pl-btn { display:block; text-align:center; padding:.72rem; border-radius:11px; font-size:.9rem; font-weight:700; text-decoration:none; transition:all .22s; border:1px solid transparent; }
+  .pl-btn.active-plan { opacity:.55; cursor:default; }
+
+  .pl-elite { position:relative; border-radius:20px; padding:2rem 2.25rem; margin-top:1.25rem; overflow:hidden; }
+  .pl-elite::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 15% 50%, rgba(255,255,255,.06) 0%, transparent 55%); pointer-events:none; }
+  .pl-elite-tag { position:absolute; top:1.4rem; right:1.75rem; background:linear-gradient(90deg,#f5a623,#e08a10); color:#000; font-size:.67rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; padding:.3rem 1rem; border-radius:20px; display:flex; align-items:center; gap:.35rem; }
+  .pl-elite-inner { display:grid; grid-template-columns:auto 1fr 1fr auto; gap:2.25rem; align-items:center; position:relative; z-index:1; }
+  .pl-elite-feats { display:grid; grid-template-columns:1fr 1fr; gap:.5rem .75rem; list-style:none; margin:0; padding:0; }
+  .pl-elite-feats li { display:flex; align-items:center; gap:.5rem; font-size:.8rem; }
+  .pl-elite-btn { display:inline-flex; align-items:center; gap:.55rem; padding:.9rem 1.9rem; border-radius:13px; font-size:.95rem; font-weight:800; text-decoration:none; transition:all .22s; white-space:nowrap; }
+  .pl-elite-btn:hover { transform:translateY(-2px); color:#000; }
+
+  .pl-trust { display:flex; align-items:center; justify-content:center; gap:3rem; padding:1.25rem 1.75rem; background:#0e1020; border-top:1px solid #1a1f35; border-bottom:1px solid #1a1f35; flex-wrap:wrap; margin-top:2.5rem; }
+  .pl-trust-item { display:flex; align-items:center; gap:.6rem; font-size:.82rem; color:#5a6380; }
+
+  .pl-hiw { padding:3rem 0 3.5rem; text-align:center; }
+  .pl-hiw h2 { font-size:1rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#fff; margin:0 0 2.25rem; }
+  .pl-hiw-steps { display:flex; justify-content:center; align-items:flex-start; gap:0; }
+  .pl-hiw-step { flex:1; max-width:210px; display:flex; flex-direction:column; align-items:center; gap:.75rem; position:relative; }
+  .pl-hiw-step:not(:last-child)::after { content:''; position:absolute; top:24px; left:calc(50% + 30px); width:calc(100% - 60px); height:1px; background:linear-gradient(90deg,rgba(61,142,240,.35),rgba(61,142,240,.08)); }
+  .pl-hiw-num { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1rem; font-weight:900; position:relative; z-index:1; }
+  .pl-hiw-lbl { font-size:.9rem; font-weight:700; color:#fff; }
+  .pl-hiw-sub { font-size:.75rem; color:#5a6380; text-align:center; line-height:1.45; }
+
+  .pl-calc { background:#131726; border:1px solid #1e2540; border-radius:20px; padding:1.75rem; margin-bottom:3rem; }
+  .pl-calc h4 { font-size:1rem; font-weight:800; color:#fff; margin:0 0 1.35rem; display:flex; align-items:center; gap:.5rem; }
+  .pl-calc-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+  .pl-calc-result { background:rgba(0,230,118,.05); border:1px solid rgba(0,230,118,.1); border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:center; gap:.4rem; }
+  .pl-calc-result .cr-lbl { font-size:.72rem; color:#5a6380; font-weight:600; }
+  .pl-calc-result .cr-val { font-size:1.4rem; font-weight:900; color:#00e676; }
+  .pl-calc-result .cr-sub { font-size:.88rem; font-weight:700; color:#f5a623; }
+  .pl-calc-result .cr-note { font-size:.72rem; color:#5a6380; margin-top:.25rem; }
+
+  @media(max-width:1100px){ .pl-grid{grid-template-columns:repeat(2,1fr)} .pl-stats{grid-template-columns:repeat(4,1fr)} .pl-elite-inner{grid-template-columns:1fr 1fr;gap:1.5rem} .pl-calc-grid{grid-template-columns:1fr} }
+  @media(max-width:760px){ .pl-grid{grid-template-columns:1fr 1fr} .pl-stats{grid-template-columns:repeat(2,1fr)} .pl-elite-inner{grid-template-columns:1fr;text-align:center} .pl-elite-feats{grid-template-columns:1fr} .pl-hiw-steps{flex-wrap:wrap;gap:1.5rem} .pl-hiw-step::after{display:none} }
+  @media(max-width:500px){ .pl-grid{grid-template-columns:1fr} .pl-stats{grid-template-columns:1fr 1fr} }
+</style>
+
+<!-- HERO -->
+<div class="pl-hero">
+  <div class="pl-hero-badge"><i class="fas fa-shield-alt"></i> <%- siteCustomize.heroBadge %></div>
+  <h1><%- siteCustomize.heroTitle %></h1>
+  <p><%- siteCustomize.heroSubtitle %></p>
+</div>
+
+<!-- STATS BAR -->
+<div class="pl-stats">
+  <div class="pl-stat"><div class="pl-stat-val" style="color:#f5a623">$48M+</div><div class="pl-stat-lbl">Assets Managed</div></div>
+  <div class="pl-stat"><div class="pl-stat-val" style="color:#3d8ef0">12,400+</div><div class="pl-stat-lbl">Active Investors</div></div>
+  <div class="pl-stat">
+    <div class="pl-stat-val" style="color:#9b59b6">
+      <%= elitePlan ? (elitePlan.annualRoi !== undefined ? elitePlan.annualRoi : (elitePlan.dailyRoi||0)) : (paidPlans.length ? (paidPlans[paidPlans.length-1].annualRoi !== undefined ? paidPlans[paidPlans.length-1].annualRoi : (paidPlans[paidPlans.length-1].dailyRoi||0)) : 0) %>% Max
+    </div>
+    <div class="pl-stat-lbl">Annual ROI</div>
+  </div>
+  <div class="pl-stat"><div class="pl-stat-val" style="color:#00e676">100%</div><div class="pl-stat-lbl">On-Time Payouts</div></div>
+</div>
+
+<div class="pl-wrap">
+
+  <div class="pl-section-hdr">
+    <h2><%- siteCustomize.plansTitle %></h2>
+    <p><%- siteCustomize.plansSubtitle %></p>
+    <% if (gridPlans[popularIdx]) { %>
+    <span style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.2);color:#f5a623;font-size:.72rem;font-weight:700;padding:.3rem .9rem;border-radius:12px"><i class="fas fa-fire"></i> MOST POPULAR &mdash; <%= gridPlans[popularIdx].name %>: Best value for mid-tier investors</span>
+    <% } %>
+  </div>
+
+  <!-- PLAN CARDS -->
+  <div class="pl-grid">
+    <% gridPlans.forEach(function(p, idx) {
+      const isPopular  = (idx === popularIdx);
+      const c          = p.color || '#3d8ef0';
+      const annRoi     = p.annualRoi !== undefined ? p.annualRoi : (p.dailyRoi || 0);
+      const totalRet   = (p.price * annRoi / 100 * (p.durationDays / 365)).toFixed(0);
+      const dailyEst   = (p.price * annRoi / 100 / 365).toFixed(4);
+      const feats      = (p.features || '').split('\n').map(f => f.trim()).filter(Boolean);
+    %>
+    <div class="pl-card <%= isPopular ? 'featured' : '' %>"
+         style="border-color:<%= c %>40;<%= isPopular ? 'background:linear-gradient(158deg,#0d1525 0%,#131726 55%);box-shadow:0 0 32px '+c+'22;' : '' %>">
+      <% if (isPopular) { %><div class="pl-popular-pill"><i class="fas fa-fire"></i> MOST POPULAR</div><% } %>
+
+      <div class="pl-tier-lbl" style="color:<%= c %>90"><i class="<%= p.icon %>"></i></div>
+      <div class="pl-name" style="color:#fff"><i class="<%= p.icon %>" style="color:<%= c %>"></i> <%= p.name.toUpperCase() %></div>
+
+      <div class="pl-rate" style="color:<%= c %>"><%= annRoi %>%</div>
+      <div class="pl-rate-lbl">Annual ROI</div>
+
+      <!-- Investment range -->
+      <div class="pl-inv-range">
+        <div class="pl-inv-lbl">Investment Range</div>
+        <div class="pl-inv-val">
+          $<%= (p.price||0).toLocaleString() %>
+          <% if (p.maxPrice > 0) { %> &ndash; $<%= p.maxPrice.toLocaleString() %><% } else { %> &ndash; Unlimited<% } %>
+        </div>
+      </div>
+
+      <!-- Meta: duration + withdrawal -->
+      <div class="pl-meta">
+        <div class="pl-meta-item">
+          <div class="pl-meta-lbl">Duration</div>
+          <div class="pl-meta-val"><%= p.durationDays %> days</div>
+        </div>
+        <div class="pl-meta-item">
+          <div class="pl-meta-lbl">Withdrawals</div>
+          <div class="pl-meta-val"><%= p.withdrawalFreq || 'Monthly' %></div>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <ul class="pl-feats">
+        <li><i class="fas fa-check"></i> <%= annRoi %>% annual return</li>
+        <li><i class="fas fa-check"></i> ~$<%= dailyEst %>/day on min. investment</li>
+        <li><i class="fas fa-check"></i> <%= p.withdrawalFreq || 'Monthly' %> withdrawals</li>
+        <% feats.forEach(function(f) { %>
+        <li><i class="fas fa-check"></i> <%= f %></li>
+        <% }); %>
+        <li><i class="fas fa-check"></i> Referral commissions</li>
+      </ul>
+
+      <!-- Earnings box -->
+      <% if (totalRet > 0) { %>
+      <div class="pl-earns">
+        <span>$<%= (p.price||0).toLocaleString() %> invested &rarr;</span>
+        <strong>+$<%= Number(totalRet).toLocaleString() %> total</strong>
+        <span style="font-size:.72rem;"> over <%= p.durationDays %> days</span>
+      </div>
+      <% } %>
+
+      <!-- CTA -->
+      <% if (user) { %>
+        <% if (user.planId === p._id && planActive) { %>
+          <span class="pl-btn active-plan" style="background:<%= c %>22;color:<%= c %>;border-color:<%= c %>44"><i class="fas fa-check"></i> Active Plan</span>
+        <% } else { %>
+          <a href="/invest?plan=<%= p._id %>" class="pl-btn"
+             style="background:<%= isPopular ? c : c+'18' %>;color:<%= isPopular ? '#000' : c %>;border-color:<%= c %>44;">
+            Invest in <%= p.name %> &rarr;
+          </a>
+        <% } %>
+      <% } else { %>
+        <a href="/register" class="pl-btn" style="background:<%= isPopular ? c : c+'18' %>;color:<%= isPopular ? '#000' : c %>;border-color:<%= c %>44;">
+          Get Started &rarr;
+        </a>
+      <% } %>
+    </div>
+    <% }); %>
+  </div><!-- /pl-grid -->
+
+  <!-- ELITE / LAST PLAN -->
+  <% if (elitePlan) {
+    const ec       = elitePlan.color || '#f5a623';
+    const eliteRoi = elitePlan.annualRoi !== undefined ? elitePlan.annualRoi : (elitePlan.dailyRoi || 0);
+    const eliteRet = (elitePlan.price * eliteRoi / 100 * (elitePlan.durationDays / 365)).toFixed(0);
+    const eliteDay = (elitePlan.price * eliteRoi / 100 / 365).toFixed(4);
+    const elFeats  = (elitePlan.features || '').split('\n').map(f => f.trim()).filter(Boolean);
+  %>
+  <div class="pl-elite" style="background:linear-gradient(135deg,#1a1200,#211800,#1a1200);border:1px solid <%= ec %>44;">
+    <div class="pl-elite-tag"><i class="<%= elitePlan.icon %>"></i> EXCLUSIVE TIER</div>
+    <div class="pl-elite-inner">
+      <div>
+        <div style="font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:<%= ec %>55;margin-bottom:.25rem;">Final Frontier</div>
+        <div style="font-size:1.4rem;font-weight:900;color:<%= ec %>;display:flex;align-items:center;gap:.5rem;margin-bottom:.25rem;"><i class="<%= elitePlan.icon %>"></i> <%= elitePlan.name.toUpperCase() %></div>
+        <div style="font-size:4.2rem;font-weight:900;color:<%= ec %>;line-height:1;letter-spacing:-.03em;"><%= eliteRoi %>%</div>
+        <div style="font-size:.78rem;color:<%= ec %>80;margin-top:.15rem;">Annual ROI</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:.72rem;color:<%= ec %>80;margin-bottom:.3rem;">Investment Range</div>
+        <div style="font-size:1.8rem;font-weight:900;color:#fff;">
+          $<%= (elitePlan.price||0).toLocaleString() %>
+          <% if (elitePlan.maxPrice > 0) { %>
+          <span style="font-size:1rem;color:<%= ec %>80;"> – $<%= elitePlan.maxPrice.toLocaleString() %></span>
+          <% } %>
+        </div>
+        <div style="font-size:.78rem;color:<%= ec %>80;margin-top:.4rem;">
+          Duration: <strong style="color:<%= ec %>"><%= elitePlan.durationDays %> days</strong>
+          &bull; Withdrawals: <strong style="color:<%= ec %>"><%= elitePlan.withdrawalFreq || 'Monthly' %></strong>
+        </div>
+        <% if (eliteRet > 0) { %>
+        <div style="font-size:.8rem;color:<%= ec %>80;margin-top:.4rem;">$<%= (elitePlan.price||0).toLocaleString() %> &rarr; earns <strong style="color:<%= ec %>">+$<%= Number(eliteRet).toLocaleString() %> total</strong></div>
+        <% } %>
+      </div>
+      <ul class="pl-elite-feats" style="color:<%= ec %>cc;">
+        <li><i class="fas fa-check" style="color:<%= ec %>"></i> <%= eliteRoi %>% annual return</li>
+        <li><i class="fas fa-check" style="color:<%= ec %>"></i> ~$<%= eliteDay %>/day on min.</li>
+        <% elFeats.slice(0,6).forEach(function(f){ %>
+        <li><i class="fas fa-check" style="color:<%= ec %>"></i> <%= f %></li>
+        <% }); %>
+        <% if (!elFeats.length) { %>
+        <li><i class="fas fa-check" style="color:<%= ec %>"></i> Priority withdrawals</li>
+        <li><i class="fas fa-check" style="color:<%= ec %>"></i> VIP account manager</li>
+        <li><i class="fas fa-check" style="color:<%= ec %>"></i> Capital protection guarantee</li>
+        <li><i class="fas fa-check" style="color:<%= ec %>"></i> Compound interest option</li>
+        <% } %>
+      </ul>
+      <div style="text-align:center;">
+        <% if (user) { %>
+          <% if (user.planId === elitePlan._id && planActive) { %>
+            <span class="pl-elite-btn" style="background:<%= ec %>22;color:<%= ec %>;border:1px solid <%= ec %>44;opacity:.65;cursor:default"><i class="fas fa-check"></i> Active Plan</span>
+          <% } else { %>
+            <a href="/invest?plan=<%= elitePlan._id %>" class="pl-elite-btn" style="background:linear-gradient(135deg,<%= ec %>,<%= ec %>cc);color:#000;box-shadow:0 8px 28px <%= ec %>40;">
+              <i class="<%= elitePlan.icon %>"></i> Join <%= elitePlan.name %> &rarr;
+            </a>
+          <% } %>
+        <% } else { %>
+          <a href="/register" class="pl-elite-btn" style="background:linear-gradient(135deg,<%= ec %>,<%= ec %>cc);color:#000;box-shadow:0 8px 28px <%= ec %>40;">
+            <i class="<%= elitePlan.icon %>"></i> Get Started &rarr;
+          </a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <% } %>
+
+</div><!-- /pl-wrap -->
+
+<!-- TRUST BAR -->
+<div class="pl-trust">
+  <div class="pl-trust-item"><i class="fas fa-lock" style="color:#3d8ef0"></i> Secured Funds</div>
+  <div class="pl-trust-item"><i class="fas fa-file-contract" style="color:#f5a623"></i> Regulated Company</div>
+  <div class="pl-trust-item"><i class="fas fa-hand-holding-usd" style="color:#00e676"></i> Guaranteed Payouts</div>
+  <div class="pl-trust-item"><i class="fas fa-globe" style="color:#9b59b6"></i> Global Investors</div>
+  <div class="pl-trust-item"><i class="fas fa-eye" style="color:#f5a623"></i> Transparent</div>
+</div>
+
+<div class="pl-wrap">
+
+  <!-- HOW IT WORKS -->
+  <div class="pl-hiw">
+    <h2>How It Works</h2>
+    <div class="pl-hiw-steps">
+      <div class="pl-hiw-step">
+        <div class="pl-hiw-num" style="background:rgba(61,142,240,.14);border:1px solid rgba(61,142,240,.3);color:#3d8ef0">&#9312;</div>
+        <div class="pl-hiw-lbl">Choose Plan</div>
+        <div class="pl-hiw-sub">Pick your investment tier</div>
+      </div>
+      <div class="pl-hiw-step">
+        <div class="pl-hiw-num" style="background:rgba(245,166,35,.14);border:1px solid rgba(245,166,35,.3);color:#f5a623">&#9313;</div>
+        <div class="pl-hiw-lbl">Deposit USDT</div>
+        <div class="pl-hiw-sub">Secure crypto transfer</div>
+      </div>
+      <div class="pl-hiw-step">
+        <div class="pl-hiw-num" style="background:rgba(0,230,118,.14);border:1px solid rgba(0,230,118,.3);color:#00e676">&#9314;</div>
+        <div class="pl-hiw-lbl">We Invest</div>
+        <div class="pl-hiw-sub">Expert fund managers</div>
+      </div>
+      <div class="pl-hiw-step">
+        <div class="pl-hiw-num" style="background:rgba(155,89,182,.14);border:1px solid rgba(155,89,182,.3);color:#9b59b6">&#9315;</div>
+        <div class="pl-hiw-lbl">Earn Returns</div>
+        <div class="pl-hiw-sub">Annual ROI paid out</div>
+      </div>
+      <div class="pl-hiw-step">
+        <div class="pl-hiw-num" style="background:rgba(245,166,35,.14);border:1px solid rgba(245,166,35,.3);color:#f5a623">&#9316;</div>
+        <div class="pl-hiw-lbl">Withdraw</div>
+        <div class="pl-hiw-sub">Per your plan schedule</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROI CALCULATOR -->
+  <div class="pl-calc">
+    <h4><i class="fas fa-calculator" style="color:#3d8ef0"></i> Annual ROI Calculator</h4>
+    <div class="pl-calc-grid">
+      <div>
+        <div class="form-group">
+          <label class="form-label">Select Plan</label>
+          <select class="form-control" id="calc-plan" onchange="calcROI()">
+            <% paidPlans.forEach(function(p) {
+              const roi = p.annualRoi !== undefined ? p.annualRoi : (p.dailyRoi || 0);
+            %>
+            <option value="<%= p.price %>:<%= roi %>:<%= p.durationDays %>">
+              <%= p.name %> — $<%= (p.price||0).toLocaleString() %> min &middot; <%= roi %>% / year
+            </option>
+            <% }); %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Investment Amount ($)</label>
+          <input type="number" id="calc-amount" class="form-control"
+            value="<%= paidPlans[0] ? paidPlans[0].price : 500 %>"
+            min="0" oninput="calcROI()">
+        </div>
+      </div>
+      <div class="pl-calc-result">
+        <div class="cr-lbl">Projected Earnings</div>
+        <div class="cr-val" id="calc-total">—</div>
+        <div class="cr-sub" id="calc-daily">—</div>
+        <div class="cr-note" id="calc-note">—</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /pl-wrap -->
+
+<script>
+function calcROI() {
+  var parts  = document.getElementById('calc-plan').value.split(':');
+  var minAmt = +parts[0], annRate = +parts[1], days = +parts[2];
+  var amtEl  = document.getElementById('calc-amount');
+  var amt    = Math.max(minAmt, +amtEl.value || minAmt);
+  amtEl.min  = minAmt;
+  if (+amtEl.value < minAmt) amtEl.value = minAmt;
+
+  var annual  = amt * annRate / 100;
+  var total   = annual * days / 365;
+  var daily   = annual / 365;
+
+  document.getElementById('calc-total').textContent = 'Total: $' + total.toLocaleString('en-US', {maximumFractionDigits:2});
+  document.getElementById('calc-daily').textContent = 'Daily: $' + daily.toLocaleString('en-US', {maximumFractionDigits:4}) + ' &bull; Annual: $' + annual.toLocaleString('en-US', {maximumFractionDigits:2});
+  document.getElementById('calc-daily').innerHTML   = 'Daily: $' + daily.toFixed(4) + ' &bull; Annual: $' + annual.toFixed(2);
+  document.getElementById('calc-note').textContent  = '$' + amt.toLocaleString() + ' at ' + annRate + '% p.a. for ' + days + ' days';
+}
+document.addEventListener('DOMContentLoaded', calcROI);
+</script>
+
+<%- include('partials/footer') %>

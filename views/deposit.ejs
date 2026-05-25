@@ -1,0 +1,327 @@
+<% pageTitle = 'Deposit' %>
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<style>
+/* ── Network selector cards ─── */
+.net-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:.85rem; margin:1rem 0; }
+.net-card {
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: .85rem 1rem;
+  cursor: pointer;
+  transition: border-color .18s, box-shadow .18s, background .18s;
+  position: relative;
+  background: var(--card);
+}
+.net-card:hover { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue)22; }
+.net-card input[type=radio] { position:absolute; opacity:0; width:0; height:0; }
+.net-card.selected { border-color: var(--blue); background: var(--blue)11; box-shadow: 0 0 0 3px var(--blue)33; }
+.net-card .net-badge {
+  display: inline-block;
+  font-size: .7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-bottom: .45rem;
+  letter-spacing: .02em;
+}
+.net-card .net-name { font-weight: 700; font-size: .93rem; color: var(--text); }
+.net-card .net-sub  { font-size: .78rem; color: var(--text2); margin-top: .2rem; }
+.net-card .net-check {
+  position: absolute;
+  top: .6rem; right: .7rem;
+  font-size: 1.1rem;
+  color: var(--blue);
+  display: none;
+}
+.net-card.selected .net-check { display: block; }
+
+/* ── Copy box ─── */
+.copy-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .65rem .9rem;
+  font-family: monospace;
+  font-size: .82rem;
+  word-break: break-all;
+  cursor: pointer;
+  position: relative;
+  transition: background .15s;
+}
+.copy-box:hover { background: var(--blue)12; }
+.copy-hint { font-size:.72rem; color:var(--text3); margin-top:.25rem; }
+.copy-box.copied { border-color: var(--green); background: var(--green)11; }
+
+/* ── Step badge ─── */
+.step-badge {
+  display:inline-flex; align-items:center; gap:.5rem;
+  background:var(--blue)15; color:var(--blue);
+  border-radius:20px; padding:.3rem .8rem;
+  font-size:.82rem; font-weight:600; margin-bottom:1rem;
+}
+</style>
+
+<div class="container">
+  <div class="page-header">
+    <h1><i class="fas fa-plus-circle"></i> Deposit USDT</h1>
+    <p>Fund your account — USDT accepted on multiple networks.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;">
+    <div>
+
+    <% if (step===1) { %>
+    <%/* ══════════════ STEP 1: choose network + amount ══════════════ */%>
+
+    <% if (!networks || networks.length === 0) { %>
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fas fa-exclamation-triangle" style="color:var(--gold)"></i> Deposits Unavailable</span></div>
+      <div class="alert alert-warning" style="margin:1rem;">
+        <i class="fas fa-wrench"></i> Deposit addresses have not been configured yet.<br>
+        Please contact support or try again later.
+      </div>
+    </div>
+    <% } else { %>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fas fa-coins"></i> Create Deposit</span></div>
+      <% if (selPlan) { %>
+      <div class="alert alert-info mb-3">
+        <i class="fas fa-info-circle"></i> Depositing for: <strong><%= selPlan.name %></strong>
+        ($<%= selPlan.price %> required)
+      </div>
+      <% } %>
+      <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+
+      <form method="POST" action="/deposit" id="depForm">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <input type="hidden" name="plan_id" value="<%= selPlan ? selPlan._id : '' %>">
+        <input type="hidden" name="create_deposit" value="1">
+        <input type="hidden" name="network_key" id="network_key" value="">
+
+        <div class="form-group">
+          <label class="form-label">Amount (USD)</label>
+          <div style="position:relative;">
+            <span style="position:absolute;left:.8rem;top:50%;transform:translateY(-50%);color:var(--text2);font-weight:600;">$</span>
+            <input type="number" id="amount_usd" name="amount_usd"
+              class="form-control" style="padding-left:1.8rem;"
+              placeholder="<%= minDeposit %>"
+              min="<%= minDeposit %>" step="0.01" required
+              value="<%= selPlan ? selPlan.price : '' %>">
+          </div>
+          <p class="form-text">Minimum: $<%= minDeposit.toFixed(2) %></p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Select Network</label>
+          <div class="net-grid">
+            <% networks.forEach(function(n, i) {
+              var badge = '';
+              if (n.key === 'USDT_BEP20') badge = 'background:#f0b90b;color:#000;';
+              if (n.key === 'USDT_ERC20') badge = 'background:#627eea;color:#fff;';
+              if (n.key === 'USDT_SOL')   badge = 'background:#9945ff;color:#fff;';
+              if (n.key === 'USDT_TRC20') badge = 'background:#eb0029;color:#fff;';
+            %>
+            <label class="net-card" data-key="<%= n.key %>">
+              <input type="radio" name="_net_visual" value="<%= n.key %>">
+              <span class="net-check"><i class="fas fa-check-circle"></i></span>
+              <div class="net-badge" style="<%= badge %>"><%= n.standard %></div>
+              <div class="net-name"><%= n.label %></div>
+              <div class="net-sub">⏱ <%= n.confirmTime %></div>
+              <div class="net-sub" style="margin-top:.3rem;color:var(--green);font-weight:600;">USDT</div>
+            </label>
+            <% }); %>
+          </div>
+          <p class="form-text" id="net-err" style="color:var(--red);display:none;">Please select a network.</p>
+        </div>
+
+        <div class="form-group" id="usdt-preview" style="display:none;">
+          <label class="form-label">You will send</label>
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1rem;font-size:1.1rem;font-weight:700;color:var(--blue);">
+            <span id="crypto_amount_display">—</span> USDT
+          </div>
+          <p class="form-text" style="color:var(--text3);">Rate: 1 USDT = 1 USD</p>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg" onclick="return checkNet()">
+          <i class="fas fa-arrow-right"></i> Generate Deposit Address
+        </button>
+      </form>
+    </div>
+
+    <% } /* end networks check */ %>
+    <% } else { %>
+    <%/* ══════════════ STEP 2: send payment ══════════════ */%>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fas fa-paper-plane"></i> Send Payment</span></div>
+      <div class="step-badge"><i class="fas fa-shield-alt"></i> Complete your deposit</div>
+      <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        Send <strong>USDT only</strong> on the <strong><%= deposit.networkLabel %> (<%= deposit.cryptoType.split('(')[1]?.replace(')','') || '' %>)</strong> network.
+        Sending on the wrong network will result in permanent loss of funds.
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:.85rem;margin-bottom:1.25rem;">
+        <div>
+          <div style="font-size:.75rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem;">SEND AMOUNT</div>
+          <div class="copy-box" onclick="copyText(this, '<%= deposit.cryptoAmount %>'); ">
+            <strong style="font-size:1.1rem;color:var(--blue);"><%= deposit.cryptoAmount %> USDT</strong>
+            <div style="font-size:.8rem;color:var(--text3);margin-top:.15rem;">≈ $<%= parseFloat(deposit.amountUsd).toFixed(2) %> USD</div>
+            <div class="copy-hint"><i class="fas fa-copy"></i> Click to copy</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:.75rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem;">WALLET ADDRESS</div>
+          <div class="copy-box" onclick="copyText(this, '<%= deposit.walletAddress %>')">
+            <%= deposit.walletAddress %>
+            <div class="copy-hint"><i class="fas fa-copy"></i> Click to copy</div>
+          </div>
+        </div>
+        <div style="font-size:.82rem;background:var(--bg2);border-radius:8px;padding:.65rem .9rem;display:flex;gap:1.5rem;flex-wrap:wrap;">
+          <span><i class="fas fa-network-wired" style="color:var(--blue);margin-right:.35rem;"></i><strong>Network:</strong> <%= deposit.networkLabel %></span>
+          <span><i class="fas fa-tag" style="color:var(--blue);margin-right:.35rem;"></i><strong>Token:</strong> USDT</span>
+        </div>
+      </div>
+
+      <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+      <form method="POST" action="/deposit">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <input type="hidden" name="deposit_id" value="<%= deposit._id %>">
+        <input type="hidden" name="submit_txhash" value="1">
+        <div class="form-group">
+          <label class="form-label">Transaction Hash / TXID</label>
+          <input type="text" name="tx_hash" class="form-control" style="font-family:monospace;"
+            placeholder="Paste your TX hash" required>
+          <p class="form-text">Find this in your wallet after sending.</p>
+        </div>
+        <button type="submit" class="btn btn-success btn-block">
+          <i class="fas fa-check-circle"></i> Submit Transaction Hash
+        </button>
+      </form>
+    </div>
+
+    <% } %>
+    </div>
+
+    <%/* ── Right column: info + history ── */%>
+    <div>
+      <div class="card mb-3">
+        <div class="card-header"><span class="card-title"><i class="fas fa-info-circle"></i> Deposit Info</span></div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:.75rem;font-size:.88rem;padding:.25rem 0;">
+          <li><i class="fas fa-check" style="color:var(--green);margin-right:.5rem;"></i>Minimum deposit: <strong>$<%= minDeposit.toFixed(2) %></strong></li>
+          <li><i class="fas fa-check" style="color:var(--green);margin-right:.5rem;"></i>Token: <strong>USDT only</strong> (Tether)</li>
+          <li><i class="fas fa-check" style="color:var(--green);margin-right:.5rem;"></i>Rate: <strong>1 USDT = 1 USD</strong></li>
+          <li><i class="fas fa-check" style="color:var(--green);margin-right:.5rem;"></i>Confirmation: <strong>1–3 hours</strong></li>
+          <li><i class="fas fa-exclamation-triangle" style="color:var(--gold);margin-right:.5rem;"></i>Always verify the wallet address and network before sending.</li>
+          <li><i class="fas fa-times-circle" style="color:var(--red);margin-right:.5rem;"></i>Do <strong>NOT</strong> send any other token — only USDT.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title"><i class="fas fa-history"></i> My Deposits</span></div>
+        <% if (!myDeps.length) { %>
+        <div class="empty-state"><i class="fas fa-inbox"></i><p>No deposits yet.</p></div>
+        <% } else { %>
+        <div class="table-responsive"><table class="table">
+          <thead><tr><th>Amount</th><th>Network</th><th>TX Hash</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>
+            <% myDeps.forEach(d => { %>
+            <tr>
+              <td><strong>$<%= parseFloat(d.amountUsd).toFixed(2) %></strong></td>
+              <td style="font-size:.78rem;"><%= d.networkLabel || d.cryptoType %></td>
+              <td style="max-width:140px;">
+                <% if (d.txHash) { %>
+                <div style="font-family:monospace;font-size:.68rem;word-break:break-all;color:var(--text);line-height:1.4;" title="<%= d.txHash %>">
+                  <%= d.txHash.length > 20 ? d.txHash.slice(0,10) + '…' + d.txHash.slice(-8) : d.txHash %>
+                </div>
+                <span style="font-size:.65rem;color:var(--green);"><i class="fas fa-check-circle"></i> Submitted</span>
+                <% } else { %>
+                <span style="font-size:.72rem;color:var(--text-muted);font-style:italic;"><i class="fas fa-hourglass-half"></i> Not submitted</span>
+                <% } %>
+              </td>
+              <td>
+                <% if (d.status === 'confirmed') { %>
+                <span class="badge badge-success"><i class="fas fa-check-circle"></i> Confirmed</span>
+                <% } else if (d.status === 'rejected') { %>
+                <span class="badge badge-danger"><i class="fas fa-times-circle"></i> Rejected</span>
+                <% } else if (d.txHash) { %>
+                <span class="badge badge-warning"><i class="fas fa-clock"></i> Pending Review</span>
+                <% } else { %>
+                <span class="badge badge-secondary"><i class="fas fa-hourglass-half"></i> Awaiting TX</span>
+                <% } %>
+              </td>
+              <td style="font-size:.78rem;color:var(--text2);"><%= new Date(d.createdAt).toLocaleDateString() %></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table></div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Network card selection ── */
+document.querySelectorAll('.net-card').forEach(function(card) {
+  card.addEventListener('click', function() {
+    document.querySelectorAll('.net-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    card.querySelector('input[type=radio]').checked = true;
+    document.getElementById('network_key').value = card.dataset.key;
+    document.getElementById('net-err').style.display = 'none';
+    updatePreview();
+  });
+});
+
+function updatePreview() {
+  var amt = parseFloat(document.getElementById('amount_usd').value) || 0;
+  var netKey = document.getElementById('network_key').value;
+  var preview = document.getElementById('usdt-preview');
+  var display = document.getElementById('crypto_amount_display');
+  if (netKey && amt > 0) {
+    display.textContent = amt.toFixed(6);
+    preview.style.display = 'block';
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+document.getElementById('amount_usd') && document.getElementById('amount_usd').addEventListener('input', updatePreview);
+
+function checkNet() {
+  var netKey = document.getElementById('network_key').value;
+  if (!netKey) {
+    document.getElementById('net-err').style.display = 'block';
+    document.querySelector('.net-grid').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return false;
+  }
+  return true;
+}
+
+/* ── Copy to clipboard ── */
+function copyText(el, text) {
+  navigator.clipboard.writeText(text).then(function() {
+    el.classList.add('copied');
+    var hint = el.querySelector('.copy-hint');
+    if (hint) hint.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    setTimeout(function() {
+      el.classList.remove('copied');
+      if (hint) hint.innerHTML = '<i class="fas fa-copy"></i> Click to copy';
+    }, 2200);
+  }).catch(function() {
+    /* fallback */
+    var ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    el.classList.add('copied');
+    setTimeout(function() { el.classList.remove('copied'); }, 2200);
+  });
+}
+</script>
+
+<%- include('partials/footer') %>

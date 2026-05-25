@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Database files (runtime data — do not commit)
+data/
+
+# Logs
+*.log
+logs/
+
+# Environment / secrets
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Cloudflared binary
+cloudflared

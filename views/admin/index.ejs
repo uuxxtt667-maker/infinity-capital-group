@@ -1,0 +1,42 @@
+<% pageTitle = 'Admin Dashboard' %>
+<%- include('../partials/head') %>
+<%- include('../partials/nav') %>
+<div class="admin-layout">
+  <nav class="admin-sidebar">
+    <div class="sidebar-title">Admin Panel</div>
+    <a href="/admin" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
+    <a href="/admin/plans"><i class="fas fa-layer-group"></i> Plans</a>
+    <a href="/admin/plan-requests"><i class="fas fa-tasks"></i> Plan Requests</a>
+    <a href="/admin/deposits"><i class="fas fa-plus-circle"></i> Deposits</a>
+    <a href="/admin/withdrawals"><i class="fas fa-minus-circle"></i> Withdrawals</a>
+    <a href="/admin/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+    <div class="sidebar-title">Site</div>
+    <a href="/admin/settings"><i class="fas fa-cog"></i> Settings</a>
+    <a href="/admin/customize"><i class="fas fa-paint-brush"></i> Customizer</a>
+    <a href="/dashboard"><i class="fas fa-home"></i> Front End</a>
+    <a href="/logout" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </nav>
+  <div class="admin-main">
+    <div class="page-header"><h1><i class="fas fa-shield-alt"></i> Admin Dashboard</h1></div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-icon cyan"><i class="fas fa-users"></i></div><div class="stat-info"><div class="stat-label">Total Users</div><div class="stat-value"><%= stats.totalUsers %></div></div></div>
+      <div class="stat-card"><div class="stat-icon green"><i class="fas fa-arrow-down"></i></div><div class="stat-info"><div class="stat-label">Total Deposited</div><div class="stat-value">$<%= stats.totalDeposited.toFixed(2) %></div><div class="stat-sub"><% if(stats.pendingDeps>0){%><a href="/admin/deposits" style="color:var(--warning);"><%= stats.pendingDeps %> pending</a><%}%></div></div></div>
+      <div class="stat-card"><div class="stat-icon red"><i class="fas fa-arrow-up"></i></div><div class="stat-info"><div class="stat-label">Total Withdrawn</div><div class="stat-value">$<%= stats.totalWithdrawn.toFixed(2) %></div><div class="stat-sub"><% if(stats.pendingWds>0){%><a href="/admin/withdrawals" style="color:var(--warning);"><%= stats.pendingWds %> pending</a><%}%></div></div></div>
+      <div class="stat-card"><div class="stat-icon gold"><i class="fas fa-wallet"></i></div><div class="stat-info"><div class="stat-label">User Balances</div><div class="stat-value">$<%= stats.totalBalances.toFixed(2) %></div></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:0;">
+      <div class="card"><div class="card-header"><span class="card-title"><i class="fas fa-users"></i> Recent Users</span><a href="/admin/users" class="btn btn-outline btn-sm">All</a></div>
+        <div class="table-responsive"><table class="table"><thead><tr><th>User</th><th>Plan</th><th>Balance</th></tr></thead><tbody>
+        <% recentUsers.forEach(u=>{%><tr><td><%= u.username %></td><td><span class="badge badge-info"><%= u.planName %></span></td><td class="text-success">$<%= (u.balance||0).toFixed(2) %></td></tr><%})%>
+        </tbody></table></div>
+      </div>
+      <div class="card"><div class="card-header"><span class="card-title"><i class="fas fa-plus-circle"></i> Recent Deposits</span><a href="/admin/deposits" class="btn btn-outline btn-sm">All</a></div>
+        <div class="table-responsive"><table class="table"><thead><tr><th>User</th><th>Amount</th><th>Status</th></tr></thead><tbody>
+        <% recentDeps.forEach(d=>{%><tr><td><%= d.username %></td><td><strong>$<%= d.amountUsd.toFixed(2) %></strong></td><td><%- badge(d.status)%></td></tr><%})%>
+        </tbody></table></div>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

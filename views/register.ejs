@@ -1,0 +1,442 @@
+<% pageTitle = 'Create Investor Account' %>
+<%- include('partials/head') %>
+
+<style>
+  body { background:#0b0d1a; display:block; }
+
+  /* ── TOP NAV ── */
+  .rg-topnav { background:#0b0d1a; padding:.9rem 2rem; display:flex; align-items:center; justify-content:space-between; }
+  .rg-logo { font-size:1.4rem; font-weight:900; color:#fff; letter-spacing:-.5px; text-decoration:none; }
+  .rg-logo span { color:var(--gold); }
+  .rg-signin-txt { font-size:.88rem; color:var(--text2); }
+  .rg-signin-txt a { color:var(--blue); font-weight:600; }
+  .rg-signin-txt a:hover { color:#6bb3ff; }
+
+  /* ── STEPPER ── */
+  .rg-stepper-bar { background:#10131f; border-top:1px solid #1a1f35; border-bottom:1px solid #1a1f35; padding:1.1rem 2rem; }
+  .rg-stepper { display:flex; align-items:flex-start; justify-content:center; gap:0; max-width:600px; margin:0 auto; }
+  .rg-step-node { display:flex; flex-direction:column; align-items:center; gap:.35rem; min-width:90px; }
+  .rg-step-circle { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.9rem; font-weight:800; border:2px solid #2a3050; background:transparent; color:var(--text3); transition:all .3s; }
+  .rg-step-circle.active { background:var(--blue); border-color:var(--blue); color:#fff; box-shadow:0 0 0 4px rgba(61,142,240,.2); }
+  .rg-step-circle.done { background:#1e4a2a; border-color:var(--green); color:var(--green); }
+  .rg-step-label { font-size:.75rem; font-weight:700; color:var(--text3); text-align:center; }
+  .rg-step-label.active { color:var(--blue); }
+  .rg-step-sub { font-size:.65rem; color:var(--text3); text-align:center; }
+  .rg-step-connector { flex:1; height:2px; background:#1a1f35; margin-top:19px; }
+  .rg-step-connector.done { background:var(--green); }
+
+  /* ── PAGE WRAPPER ── */
+  .rg-page { max-width:1180px; margin:2rem auto; padding:0 1.5rem 3rem; display:grid; grid-template-columns:340px 1fr; gap:1.5rem; align-items:start; }
+
+  /* ── SIDEBAR ── */
+  .rg-sidebar { background:#10131f; border:1px solid #1a1f35; border-radius:18px; padding:2rem 1.75rem; }
+  .rg-sb-heading { font-size:1.55rem; font-weight:900; color:#fff; margin-bottom:.4rem; line-height:1.2; }
+  .rg-sb-heading span { color:var(--gold); }
+  .rg-sb-tag { font-size:.88rem; color:var(--text2); margin-bottom:.5rem; }
+  .rg-sb-desc { font-size:.82rem; color:var(--text3); margin-bottom:1.75rem; line-height:1.6; }
+  .rg-feat-list { display:flex; flex-direction:column; gap:.85rem; margin-bottom:1.75rem; }
+  .rg-feat-item { display:flex; align-items:flex-start; gap:.9rem; background:#13162a; border:1px solid #1e2540; border-radius:12px; padding:.85rem 1rem; }
+  .rg-feat-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:.95rem; flex-shrink:0; }
+  .rg-feat-icon.blue  { background:rgba(61,142,240,.12); color:var(--blue); }
+  .rg-feat-icon.green { background:rgba(0,230,118,.12); color:var(--green); }
+  .rg-feat-icon.gold  { background:rgba(245,166,35,.12); color:var(--gold); }
+  .rg-feat-icon.purple{ background:rgba(155,89,182,.12); color:var(--purple); }
+  .rg-feat-text h5 { font-size:.85rem; font-weight:800; color:#fff; margin-bottom:.12rem; }
+  .rg-feat-text p { font-size:.75rem; color:var(--text3); margin:0; line-height:1.5; }
+  .rg-stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; margin-bottom:1.25rem; }
+  .rg-stat-box { background:#13162a; border:1px solid #1e2540; border-radius:10px; padding:.8rem 1rem; text-align:center; }
+  .rg-stat-val { font-size:1.15rem; font-weight:900; display:block; }
+  .rg-stat-lbl { font-size:.68rem; color:var(--text3); display:block; margin-top:.1rem; }
+  .rg-sb-footer { font-size:.78rem; color:var(--text3); text-align:center; line-height:1.6; }
+
+  /* ── FORM PANEL ── */
+  .rg-form-panel { background:#10131f; border:1px solid #1a1f35; border-radius:18px; padding:2rem 2.25rem; }
+  .rg-form-header { display:flex; align-items:center; gap:.75rem; margin-bottom:.4rem; }
+  .rg-form-header-icon { width:40px; height:40px; border-radius:12px; background:rgba(61,142,240,.12); border:1px solid rgba(61,142,240,.2); display:flex; align-items:center; justify-content:center; color:var(--blue); font-size:1.1rem; flex-shrink:0; }
+  .rg-form-title { font-size:1.35rem; font-weight:900; color:#fff; }
+  .rg-form-sub { font-size:.82rem; color:var(--text3); margin:0 0 1.75rem; line-height:1.5; }
+
+  /* ── GRID ── */
+  .rg-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem; }
+  .rg-group { display:flex; flex-direction:column; gap:.35rem; margin-bottom:1rem; }
+  .rg-grid .rg-group { margin-bottom:0; }
+  .rg-label { font-size:.78rem; font-weight:700; color:var(--text2); }
+
+  /* ── INPUT WITH ICON ── */
+  .rg-inp-wrap { position:relative; }
+  .rg-inp-icon { position:absolute; left:.85rem; top:50%; transform:translateY(-50%); color:var(--text3); font-size:.85rem; pointer-events:none; }
+  .rg-inp-wrap input,
+  .rg-inp-wrap select { width:100%; background:#0d1020; border:1px solid #1e2540; border-radius:10px; padding:.65rem .9rem .65rem 2.5rem; color:#fff; font-size:.88rem; outline:none; transition:border-color .2s; font-family:inherit; -webkit-appearance:none; appearance:none; box-sizing:border-box; }
+  .rg-inp-wrap input::placeholder { color:var(--text3); }
+  .rg-inp-wrap input:focus,
+  .rg-inp-wrap select:focus { border-color:rgba(61,142,240,.5); background:#0f1224; }
+  .rg-inp-wrap select option { background:#0d1020; }
+
+  /* ── PASSWORD STRENGTH ── */
+  .rg-pwd-strength { margin-top:.4rem; display:none; }
+  .rg-pwd-bar-bg { height:3px; background:#1e2540; border-radius:2px; overflow:hidden; }
+  .rg-pwd-bar { height:100%; border-radius:2px; width:0; transition:width .3s,background .3s; }
+  .rg-pwd-lbl { font-size:.68rem; margin-top:.25rem; }
+
+  /* ── PASSWORD MATCH ── */
+  .rg-pwd-match { font-size:.72rem; margin-top:.3rem; display:none; }
+  .rg-pwd-match.ok { color:var(--green); display:flex; align-items:center; gap:.3rem; }
+  .rg-pwd-match.fail { color:var(--red); display:flex; align-items:center; gap:.3rem; }
+
+  /* ── CHECKBOXES ── */
+  .rg-checks { display:flex; flex-direction:column; gap:.6rem; margin:1.25rem 0 1.5rem; }
+  .rg-check-row { display:flex; align-items:flex-start; gap:.7rem; font-size:.8rem; color:var(--text2); line-height:1.5; cursor:pointer; }
+  .rg-check-row input[type=checkbox] { display:none; }
+  .rg-custom-check { width:18px; height:18px; border-radius:5px; border:2px solid #2a3050; background:transparent; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:.1rem; transition:all .2s; }
+  .rg-check-row input:checked ~ .rg-custom-check { background:var(--blue); border-color:var(--blue); }
+  .rg-custom-check i { font-size:.6rem; color:#fff; display:none; }
+  .rg-check-row input:checked ~ .rg-custom-check i { display:block; }
+  .rg-check-row a { color:var(--gold); }
+  .rg-check-row a:hover { color:var(--gold-light); }
+
+  /* ── SUBMIT ── */
+  .rg-submit-btn { width:100%; background:var(--blue); color:#fff; border:none; border-radius:11px; padding:.9rem; font-size:1rem; font-weight:700; cursor:pointer; transition:all .2s; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:.5rem; }
+  .rg-submit-btn:hover { background:var(--blue2); transform:translateY(-1px); box-shadow:0 8px 24px rgba(61,142,240,.3); }
+
+  /* ── DIVIDER ── */
+  .rg-divider { text-align:center; position:relative; margin:1.25rem 0; }
+  .rg-divider::before { content:''; position:absolute; top:50%; left:0; right:0; height:1px; background:#1e2540; }
+  .rg-divider span { background:#10131f; position:relative; padding:0 1rem; font-size:.78rem; color:var(--text3); }
+
+  /* ── SOCIAL BUTTONS ── */
+  .rg-social-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.75rem; margin-bottom:1.25rem; }
+  .rg-social-btn { background:#13162a; border:1px solid #1e2540; border-radius:10px; padding:.65rem; font-size:.82rem; font-weight:600; color:var(--text2); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:.5rem; transition:all .2s; font-family:inherit; }
+  .rg-social-btn:hover { border-color:#2a3050; color:#fff; background:#1a1f35; }
+
+  /* ── FOOTER ── */
+  .rg-foot-txt { text-align:center; font-size:.82rem; color:var(--text3); }
+  .rg-foot-txt a { color:var(--blue); font-weight:600; }
+
+  /* ── ALERT ── */
+  .rg-alert { background:rgba(255,71,87,.08); border:1px solid rgba(255,71,87,.25); border-radius:10px; color:var(--red); padding:.75rem 1.1rem; font-size:.85rem; display:flex; align-items:center; gap:.6rem; margin-bottom:1.25rem; }
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:860px){
+    .rg-page { grid-template-columns:1fr; }
+    .rg-sidebar { display:none; }
+  }
+  @media(max-width:560px){
+    .rg-grid { grid-template-columns:1fr; }
+    .rg-social-row { grid-template-columns:1fr; }
+    .rg-form-panel { padding:1.5rem 1.25rem; }
+  }
+</style>
+
+<!-- TOP NAV -->
+<div class="rg-topnav">
+  <a href="/" class="rg-logo"><%= siteCustomize.logoText %><span><%= siteCustomize.logoAccent %></span></a>
+  <span class="rg-signin-txt">Already have an account? <a href="/login">Sign in</a></span>
+</div>
+
+<!-- STEPPER -->
+<div class="rg-stepper-bar">
+  <div class="rg-stepper">
+    <div class="rg-step-node">
+      <div class="rg-step-circle active">1</div>
+      <div class="rg-step-label active">Personal Info</div>
+      <div class="rg-step-sub">Basic details</div>
+    </div>
+    <div class="rg-step-connector"></div>
+    <div class="rg-step-node">
+      <div class="rg-step-circle">2</div>
+      <div class="rg-step-label">KYC &mdash; Identity</div>
+      <div class="rg-step-sub">Verify identity</div>
+    </div>
+    <div class="rg-step-connector"></div>
+    <div class="rg-step-node">
+      <div class="rg-step-circle">3</div>
+      <div class="rg-step-label">KYC &mdash; Selfie</div>
+      <div class="rg-step-sub">Verify yourself</div>
+    </div>
+    <div class="rg-step-connector"></div>
+    <div class="rg-step-node">
+      <div class="rg-step-circle">4</div>
+      <div class="rg-step-label">Done</div>
+      <div class="rg-step-sub">All set!</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE BODY -->
+<div class="rg-page">
+
+  <!-- SIDEBAR -->
+  <aside class="rg-sidebar">
+    <div class="rg-sb-heading">Join <span><%= siteCustomize.logoText %><%= siteCustomize.logoAccent %></span></div>
+    <div class="rg-sb-tag">A trusted platform for smart investors</div>
+    <div class="rg-sb-desc">Build your portfolio and grow your wealth with confidence.</div>
+
+    <div class="rg-feat-list">
+      <div class="rg-feat-item">
+        <div class="rg-feat-icon blue"><i class="fas fa-shield-alt"></i></div>
+        <div class="rg-feat-text">
+          <h5>Secure &amp; Compliant</h5>
+          <p>Bank-level SSL encryption and global compliance.</p>
+        </div>
+      </div>
+      <div class="rg-feat-item">
+        <div class="rg-feat-icon green"><i class="fas fa-users"></i></div>
+        <div class="rg-feat-text">
+          <h5>Trusted by Thousands</h5>
+          <p>Join 12.4K+ investors from 30+ countries.</p>
+        </div>
+      </div>
+      <div class="rg-feat-item">
+        <div class="rg-feat-icon gold"><i class="fas fa-bolt"></i></div>
+        <div class="rg-feat-text">
+          <h5>High Performance</h5>
+          <p>Reliable platform with 100% uptime and real-time data.</p>
+        </div>
+      </div>
+      <div class="rg-feat-item">
+        <div class="rg-feat-icon purple"><i class="fas fa-headset"></i></div>
+        <div class="rg-feat-text">
+          <h5>Dedicated Support</h5>
+          <p>Get help anytime from our expert support team.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rg-stats-grid">
+      <div class="rg-stat-box">
+        <span class="rg-stat-val" style="color:var(--gold)">+42.8%</span>
+        <span class="rg-stat-lbl">Annual Returns</span>
+      </div>
+      <div class="rg-stat-box">
+        <span class="rg-stat-val" style="color:var(--blue)">12.4K+</span>
+        <span class="rg-stat-lbl">Active Investors</span>
+      </div>
+      <div class="rg-stat-box">
+        <span class="rg-stat-val" style="color:var(--green)">100%</span>
+        <span class="rg-stat-lbl">Payout Rate</span>
+      </div>
+      <div class="rg-stat-box">
+        <span class="rg-stat-val" style="color:var(--purple)">30+</span>
+        <span class="rg-stat-lbl">Countries</span>
+      </div>
+    </div>
+
+    <div class="rg-sb-footer">Your financial future starts here.<br>Let&rsquo;s build it together.</div>
+  </aside>
+
+  <!-- FORM PANEL -->
+  <div class="rg-form-panel">
+    <div class="rg-form-header">
+      <div class="rg-form-header-icon"><i class="fas fa-shield-alt"></i></div>
+      <div class="rg-form-title"><%= siteCustomize.registerTitle %></div>
+    </div>
+    <div class="rg-form-sub"><%= siteCustomize.registerSubtitle %></div>
+
+    <% if (error && error.length) { %>
+    <div class="rg-alert"><i class="fas fa-exclamation-circle"></i> <%- Array.isArray(error) ? error[0] : error %></div>
+    <% } %>
+
+    <form method="POST" action="/register" id="regForm">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <input type="hidden" name="ref_code" value="<%= ref %>">
+
+      <div class="rg-grid">
+        <div class="rg-group">
+          <label class="rg-label">First Name</label>
+          <div class="rg-inp-wrap">
+            <i class="rg-inp-icon fas fa-user"></i>
+            <input type="text" name="first_name" placeholder="Muhammad" required>
+          </div>
+        </div>
+        <div class="rg-group">
+          <label class="rg-label">Last Name</label>
+          <div class="rg-inp-wrap">
+            <i class="rg-inp-icon fas fa-user"></i>
+            <input type="text" name="last_name" placeholder="Ahmed" required>
+          </div>
+        </div>
+        <div class="rg-group">
+          <label class="rg-label">Email Address</label>
+          <div class="rg-inp-wrap">
+            <i class="rg-inp-icon fas fa-envelope"></i>
+            <input type="email" name="email" placeholder="you@email.com" required>
+          </div>
+        </div>
+        <div class="rg-group">
+          <label class="rg-label">Phone Number</label>
+          <div class="rg-inp-wrap">
+            <i class="rg-inp-icon fas fa-phone"></i>
+            <input type="tel" name="phone" placeholder="+92 300 0000000">
+          </div>
+        </div>
+        <div class="rg-group">
+          <label class="rg-label">Username</label>
+          <div class="rg-inp-wrap">
+            <i class="rg-inp-icon fas fa-at"></i>
+            <input type="text" name="username" placeholder="cooluser123" required minlength="3" maxlength="30">
+          </div>
+        </div>
+        <div class="rg-group">
+          <label class="rg-label">Date of Birth</label>
+          <div class="rg-inp-wrap">
+            <i class="rg-inp-icon fas fa-calendar"></i>
+            <input type="date" name="dob">
+          </div>
+        </div>
+        <div class="rg-group">
+          <label class="rg-label">Gender</label>
+          <div class="rg-inp-wrap">
+            <i class="rg-inp-icon fas fa-user-circle"></i>
+            <select name="gender">
+              <option value="">Select</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="rg-group">
+          <label class="rg-label">Nationality</label>
+          <div class="rg-inp-wrap">
+            <i class="rg-inp-icon fas fa-flag"></i>
+            <select name="nationality">
+              <option value="">Select country</option>
+              <option>Pakistan</option>
+              <option>United States</option>
+              <option>United Kingdom</option>
+              <option>United Arab Emirates</option>
+              <option>India</option>
+              <option>Saudi Arabia</option>
+              <option>Bangladesh</option>
+              <option>Canada</option>
+              <option>Australia</option>
+              <option>Germany</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="rg-group">
+        <label class="rg-label">Full Residential Address</label>
+        <div class="rg-inp-wrap">
+          <i class="rg-inp-icon fas fa-map-marker-alt"></i>
+          <input type="text" name="address" placeholder="Street, Area, City, Country">
+        </div>
+      </div>
+
+      <div class="rg-grid">
+        <div class="rg-group">
+          <label class="rg-label">Password</label>
+          <div class="rg-inp-wrap">
+            <i class="rg-inp-icon fas fa-lock"></i>
+            <input type="password" name="password" id="regPwd" placeholder="Min 8 characters" required minlength="8">
+          </div>
+          <div class="rg-pwd-strength" id="pwdStrength">
+            <div class="rg-pwd-bar-bg"><div class="rg-pwd-bar" id="pwdBar"></div></div>
+            <div class="rg-pwd-lbl" id="pwdLbl"></div>
+          </div>
+        </div>
+        <div class="rg-group">
+          <label class="rg-label">Confirm Password</label>
+          <div class="rg-inp-wrap">
+            <i class="rg-inp-icon fas fa-lock"></i>
+            <input type="password" name="confirm_password" id="regPwdC" placeholder="Repeat password" required>
+          </div>
+          <div class="rg-pwd-match" id="pwdMatch"></div>
+        </div>
+      </div>
+
+      <div class="rg-checks">
+        <label class="rg-check-row">
+          <input type="checkbox" name="agree_terms" id="chk1" required>
+          <span class="rg-custom-check"><i class="fas fa-check"></i></span>
+          <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a> of Apexinvest</span>
+        </label>
+        <label class="rg-check-row">
+          <input type="checkbox" name="agree_age" id="chk2" required>
+          <span class="rg-custom-check"><i class="fas fa-check"></i></span>
+          <span>I confirm I am 18+ years old and my funds are legally owned by me</span>
+        </label>
+      </div>
+
+      <button type="submit" class="rg-submit-btn">
+        <i class="fas fa-user-plus"></i> Create My Investor Account
+      </button>
+    </form>
+
+    <div class="rg-divider"><span>or sign up with</span></div>
+
+    <div class="rg-social-row">
+      <button class="rg-social-btn" onclick="alert('OAuth setup required')">
+        <i class="fab fa-google" style="color:#ea4335"></i> Google
+      </button>
+      <button class="rg-social-btn" onclick="alert('OAuth setup required')">
+        <i class="fab fa-apple"></i> Apple
+      </button>
+      <button class="rg-social-btn" onclick="alert('OAuth setup required')">
+        <i class="fab fa-facebook" style="color:#1877f2"></i> Facebook
+      </button>
+    </div>
+
+    <div class="rg-foot-txt">Already have an account? <a href="/login">Sign in here</a></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const pwd  = document.getElementById('regPwd');
+  const pwdC = document.getElementById('regPwdC');
+  const bar  = document.getElementById('pwdBar');
+  const lbl  = document.getElementById('pwdLbl');
+  const str  = document.getElementById('pwdStrength');
+  const match= document.getElementById('pwdMatch');
+
+  function strength(v){
+    let s=0;
+    if(v.length>=8) s++;
+    if(/[A-Z]/.test(v)) s++;
+    if(/[0-9]/.test(v)) s++;
+    if(/[^A-Za-z0-9]/.test(v)) s++;
+    return s;
+  }
+
+  pwd.addEventListener('input',()=>{
+    const v=pwd.value;
+    if(!v){ str.style.display='none'; return; }
+    str.style.display='block';
+    const s=strength(v);
+    const pct=[25,50,75,100][s-1]||0;
+    const colors=['#ff4757','#f5a623','#6bb3ff','#00e676'];
+    const labels=['Weak','Fair','Good','Strong'];
+    bar.style.width=pct+'%';
+    bar.style.background=colors[s-1]||'#ff4757';
+    lbl.textContent=labels[s-1]||'Too short';
+    lbl.style.color=colors[s-1]||'#ff4757';
+    checkMatch();
+  });
+
+  function checkMatch(){
+    if(!pwdC.value){ match.className='rg-pwd-match'; return; }
+    if(pwd.value===pwdC.value){
+      match.className='rg-pwd-match ok';
+      match.innerHTML='<i class="fas fa-check-circle"></i> Passwords match';
+    } else {
+      match.className='rg-pwd-match fail';
+      match.innerHTML='<i class="fas fa-times-circle"></i> Passwords do not match';
+    }
+  }
+  pwdC.addEventListener('input', checkMatch);
+
+  /* Custom checkbox visual sync */
+  ['chk1','chk2'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('change',()=>{
+      const box=el.nextElementSibling;
+      box.style.background=el.checked?'var(--blue)':'transparent';
+      box.style.borderColor=el.checked?'var(--blue)':'#2a3050';
+    });
+  });
+})();
+</script>
+</body></html>

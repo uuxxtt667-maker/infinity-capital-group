@@ -1,0 +1,85 @@
+<% pageTitle = 'Admin — Plan Requests' %>
+<%- include('../partials/head') %>
+<%- include('../partials/nav') %>
+<div class="admin-layout">
+  <nav class="admin-sidebar">
+    <div class="sidebar-title">Admin Panel</div>
+    <a href="/admin"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
+    <a href="/admin/plans"><i class="fas fa-layer-group"></i> Plans</a>
+    <a href="/admin/plan-requests" class="active"><i class="fas fa-tasks"></i> Plan Requests<% if (pendingCount > 0) { %> <span class="badge badge-warning" style="margin-left:.4rem"><%= pendingCount %></span><% } %></a>
+    <a href="/admin/deposits"><i class="fas fa-plus-circle"></i> Deposits</a>
+    <a href="/admin/withdrawals"><i class="fas fa-minus-circle"></i> Withdrawals</a>
+    <a href="/admin/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+    <div class="sidebar-title">Site</div>
+    <a href="/admin/settings"><i class="fas fa-cog"></i> Settings</a>
+    <a href="/admin/customize"><i class="fas fa-paint-brush"></i> Customizer</a>
+    <a href="/dashboard"><i class="fas fa-home"></i> Front End</a>
+    <a href="/logout" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </nav>
+  <div class="admin-main">
+    <div class="page-header"><h1><i class="fas fa-tasks"></i> Plan Activation Requests</h1></div>
+
+    <div class="tabs mb-3">
+      <% [['pending','Pending'],['approved','Approved'],['rejected','Rejected'],['all','All']].forEach(([s,l])=>{ %>
+      <a href="/admin/plan-requests?status=<%= s %>" class="tab-btn <%= filter===s?'active':'' %>" style="text-decoration:none;"><%= l %></a>
+      <% }) %>
+    </div>
+
+    <div class="card">
+      <% if (!reqs.length) { %>
+      <div class="empty-state"><i class="fas fa-inbox"></i><p>No plan requests found.</p></div>
+      <% } else { %>
+      <div class="table-responsive"><table class="table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Plan</th>
+            <th>Amount</th>
+            <th>Est. Daily</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% reqs.forEach(function(r) {
+            const annRoi = 0; /* shown in plan name */
+          %>
+          <tr>
+            <td>
+              <strong><%= r.username %></strong>
+              <div style="font-size:.75rem;color:var(--text3)">Balance: $<%= (r.userBalance||0).toFixed(2) %></div>
+            </td>
+            <td>
+              <span style="font-weight:800"><%= r.planName %></span>
+            </td>
+            <td><strong>$<%= (r.amountUsd||0).toFixed(2) %></strong></td>
+            <td style="font-size:.8rem;color:var(--text2)">—</td>
+            <td><%- badge(r.status) %></td>
+            <td style="font-size:.8rem;color:var(--text3)"><%= new Date(r.createdAt).toLocaleDateString() %></td>
+            <td>
+              <% if (r.status === 'pending') { %>
+              <form method="POST" action="/admin/plan-requests/action" style="display:inline;"
+                onsubmit="return confirm('Approve this plan activation? $'+<%= r.amountUsd %>.toFixed(2)+' will be invested and the plan will be activated.')">
+                <input type="hidden" name="request_id" value="<%= r._id %>">
+                <input type="hidden" name="action" value="approve">
+                <button class="btn btn-success btn-sm" title="Approve"><i class="fas fa-check"></i> Approve</button>
+              </form>
+              <form method="POST" action="/admin/plan-requests/action" style="display:inline;"
+                onsubmit="return confirm('Reject this request? Funds will be refunded to the user.')">
+                <input type="hidden" name="request_id" value="<%= r._id %>">
+                <input type="hidden" name="action" value="reject">
+                <button class="btn btn-danger btn-sm" title="Reject" style="margin-left:.25rem"><i class="fas fa-times"></i> Reject</button>
+              </form>
+              <% } %>
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table></div>
+      <% } %>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

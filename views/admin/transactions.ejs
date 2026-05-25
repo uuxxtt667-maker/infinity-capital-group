@@ -1,0 +1,55 @@
+<% pageTitle = 'Admin — Transactions' %>
+<%- include('../partials/head') %>
+<%- include('../partials/nav') %>
+<div class="admin-layout">
+  <nav class="admin-sidebar">
+    <div class="sidebar-title">Admin Panel</div>
+    <a href="/admin"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
+    <a href="/admin/plans"><i class="fas fa-layer-group"></i> Plans</a>
+    <a href="/admin/plan-requests"><i class="fas fa-tasks"></i> Plan Requests</a>
+    <a href="/admin/deposits"><i class="fas fa-plus-circle"></i> Deposits</a>
+    <a href="/admin/withdrawals"><i class="fas fa-minus-circle"></i> Withdrawals</a>
+    <a href="/admin/transactions" class="active"><i class="fas fa-exchange-alt"></i> Transactions</a>
+    <div class="sidebar-title">Site</div>
+    <a href="/admin/settings"><i class="fas fa-cog"></i> Settings</a>
+    <a href="/admin/customize"><i class="fas fa-paint-brush"></i> Customizer</a>
+    <a href="/dashboard"><i class="fas fa-home"></i> Front End</a>
+    <a href="/logout" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </nav>
+  <div class="admin-main">
+    <div class="page-header"><h1><i class="fas fa-exchange-alt"></i> Transactions</h1></div>
+    <div class="tabs mb-3">
+      <% [['all','All'],['deposit','Deposits'],['withdrawal','Withdrawals'],['plan_purchase','Plans'],['referral_earning','Referrals'],['roi','ROI'],['manual','Manual'],['click','Clicks']].forEach(([t,l])=>{%>
+      <a href="/admin/transactions?type=<%= t %>" class="tab-btn <%= typeFilter===t?'active':'' %>" style="text-decoration:none;"><%= l %></a>
+      <%})%>
+    </div>
+    <div class="card">
+      <% if (!txs.length) { %>
+        <div class="empty-state"><i class="fas fa-receipt"></i><p>No transactions found.</p></div>
+      <% } else { %>
+      <div class="table-responsive"><table class="table">
+        <thead><tr><th>User</th><th>Type</th><th>Amount</th><th>Description</th><th>Date</th></tr></thead>
+        <tbody>
+          <% txs.forEach(t=>{%>
+          <tr>
+            <td><strong><%= t.username %></strong></td>
+            <td>
+              <% const typeColors = {deposit:'success',withdrawal:'danger',plan_purchase:'info',referral_earning:'warning',roi:'cyan',manual:'secondary',click:'muted'}; %>
+              <span class="badge badge-<%= typeColors[t.type]||'secondary' %>" style="font-size:.72rem;text-transform:capitalize;"><%= (t.type||'').replace(/_/g,' ') %></span>
+            </td>
+            <td class="<%= (t.amount||0)>=0?'text-success':'text-danger' %> font-bold">
+              <%= (t.amount||0)>=0?'+':'' %>$<%= Math.abs(t.amount||0).toFixed(4) %>
+            </td>
+            <td style="font-size:.82rem;color:var(--text-muted);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= t.description||'—' %></td>
+            <td style="font-size:.8rem;color:var(--text-muted);white-space:nowrap;"><%= new Date(t.createdAt).toLocaleString() %></td>
+          </tr>
+          <%})%>
+        </tbody>
+      </table></div>
+      <div style="padding:.75rem 1rem;font-size:.82rem;color:var(--text-muted);border-top:1px solid var(--border);">Showing latest <%= txs.length %> transactions</div>
+      <% } %>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

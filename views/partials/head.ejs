@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' | ' : '' %><%= siteName %></title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <% if (siteCustomize.fontUrl) { %><link rel="stylesheet" href="<%= siteCustomize.fontUrl %>"><% } %>
+  <link rel="stylesheet" href="/css/style.css">
+  <%
+    /* determine page class from path */
+    var _pageCls = 'page-home';
+    if (path.startsWith('/admin'))     _pageCls = 'page-admin';
+    else if (path === '/')             _pageCls = 'page-home';
+    else if (path.startsWith('/dash')) _pageCls = 'page-dashboard';
+    else if (path.startsWith('/plan')) _pageCls = 'page-plans';
+    else if (path.startsWith('/dep'))  _pageCls = 'page-deposit';
+    else if (path.startsWith('/with')) _pageCls = 'page-withdraw';
+    else if (path.startsWith('/log'))  _pageCls = 'page-login';
+    else if (path.startsWith('/reg'))  _pageCls = 'page-register';
+    var c = siteCustomize;
+    /* build background map — img: direct image URL, ov: overlay opacity, col: solid colour fallback */
+    var _bgs = {
+      'page-home':      { img: c.bgHome,      ov: c.bgOverlayHome,      col: c.colorBgHome      },
+      'page-dashboard': { img: c.bgDashboard,  ov: c.bgOverlayDashboard, col: c.colorBgDashboard },
+      'page-plans':     { img: c.bgPlans,      ov: c.bgOverlayPlans,     col: c.colorBgPlans     },
+      'page-deposit':   { img: c.bgDeposit,    ov: c.bgOverlayDeposit,   col: ''                 },
+      'page-withdraw':  { img: c.bgWithdraw,   ov: c.bgOverlayWithdraw,  col: ''                 },
+      'page-login':     { img: c.bgLogin,      ov: c.bgOverlayLogin,     col: ''                 },
+      'page-register':  { img: c.bgRegister,   ov: c.bgOverlayRegister,  col: ''                 },
+      'page-admin':     { img: c.bgAdmin,      ov: c.bgOverlayAdmin,     col: ''                 },
+    };
+  %>
+  <style>
+    /* ── Live CSS Overrides from Admin Customizer ── */
+    :root {
+      --bg:       <%= c.colorBg %>;
+      --bg2:      <%= c.colorBg2 %>;
+      --bg3:      <%= c.colorBg2 %>;
+      --card:     <%= c.colorCard %>;
+      --card2:    <%= c.colorCard %>;
+      --border:   <%= c.colorBorder %>;
+      --border2:  <%= c.colorBorder %>;
+      --blue:     <%= c.colorPrimary %>;
+      --blue2:    <%= c.colorPrimary %>;
+      --gold:     <%= c.colorGold %>;
+      --gold2:    <%= c.colorGold %>;
+      --gold-light:<%= c.colorGold %>33;
+      --green:    <%= c.colorGreen %>;
+      --red:      <%= c.colorRed %>;
+      --purple:   <%= c.colorPurple %>;
+      --text:     <%= c.colorText %>;
+      --text2:    <%= c.colorText2 %>;
+      --text3:    <%= c.colorText3 %>;
+    }
+    body { font-family: <%- c.fontFamily %>; font-size: <%- c.fontSizeBase %>; }
+    <% /* ── Page backgrounds ── */
+       var _bg = _bgs[_pageCls];
+       if (_bg) {
+         /* solid colour fallback */
+         if (_bg.col) { %>
+    body.<%= _pageCls %> { background-color: <%= _bg.col %> !important; }
+    <%   }
+         /* background image */
+         if (_bg.img) { %>
+    body.<%= _pageCls %> {
+      background-image: url('<%= _bg.img %>') !important;
+      background-size: cover !important;
+      background-position: center top !important;
+      background-attachment: fixed !important;
+    }
+    <%   }
+         if (_bg.img && parseFloat(_bg.ov) > 0) { %>
+    body.<%= _pageCls %>::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,<%= _bg.ov %>);
+      z-index: 0;
+      pointer-events: none;
+    }
+    body.<%= _pageCls %> .navbar,
+    body.<%= _pageCls %> .ticker-bar,
+    body.<%= _pageCls %> .site-footer,
+    body.<%= _pageCls %> .admin-layout { position: relative; z-index: 1; }
+    body.<%= _pageCls %> .main-content,
+    body.<%= _pageCls %> .admin-main   { position: relative; z-index: 1; }
+    <%   }
+       } %>
+  </style>
+</head>
+<body class="<%= _pageCls %>">

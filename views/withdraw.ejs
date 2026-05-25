@@ -1,0 +1,139 @@
+<% pageTitle = 'Withdraw' %>
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<style>
+.net-card {
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: .7rem 1rem;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  position: relative;
+  background: var(--card);
+  margin-bottom: .6rem;
+}
+.net-card:hover { border-color: var(--blue); }
+.net-card input[type=radio] { position:absolute; opacity:0; width:0; height:0; }
+.net-card.selected { border-color: var(--blue); background: var(--blue)11; }
+.net-card .net-check { position:absolute; top:.55rem; right:.7rem; color:var(--blue); display:none; }
+.net-card.selected .net-check { display:block; }
+</style>
+
+<div class="container">
+  <div class="page-header"><h1><i class="fas fa-minus-circle"></i> Withdraw Earnings</h1></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;">
+    <div>
+      <div class="card mb-3" style="background:linear-gradient(135deg,rgba(0,230,118,.08),rgba(0,180,100,.04));border-color:rgba(0,230,118,.2);">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div><div style="font-size:.8rem;color:var(--text-muted);">Available Balance</div><div style="font-size:2rem;font-weight:900;color:var(--success);">$<%= (user.balance||0).toFixed(4) %></div></div>
+          <i class="fas fa-wallet" style="font-size:2.5rem;color:var(--success);opacity:.3;"></i>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title"><i class="fas fa-paper-plane"></i> Request Withdrawal</span></div>
+        <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+        <form method="POST" action="/withdraw" onsubmit="return confirm('Submit withdrawal request?')">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <input type="hidden" name="network_key" id="wd_network_key" value="">
+
+          <div class="form-group">
+            <label class="form-label">Amount (USD)</label>
+            <div style="position:relative;">
+              <span style="position:absolute;left:.8rem;top:50%;transform:translateY(-50%);color:var(--text2);font-weight:600;">$</span>
+              <input type="number" name="amount" class="form-control" style="padding-left:1.8rem;"
+                placeholder="<%= minWithdrawal %>"
+                min="<%= minWithdrawal %>" max="<%= (user.balance||0).toFixed(4) %>"
+                step="0.01" required>
+            </div>
+            <p class="form-text">Min: $<%= minWithdrawal.toFixed(2) %> &bull; Max: $<%= (user.balance||0).toFixed(4) %></p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">USDT Network</label>
+            <% networks.forEach(function(n) {
+              var badge = '';
+              if (n.key === 'USDT_BEP20') badge = 'background:#f0b90b;color:#000;';
+              if (n.key === 'USDT_ERC20') badge = 'background:#627eea;color:#fff;';
+              if (n.key === 'USDT_SOL')   badge = 'background:#9945ff;color:#fff;';
+              if (n.key === 'USDT_TRC20') badge = 'background:#eb0029;color:#fff;';
+            %>
+            <label class="net-card" data-key="<%= n.key %>">
+              <input type="radio" name="_net_visual" value="<%= n.key %>">
+              <span class="net-check"><i class="fas fa-check-circle"></i></span>
+              <strong><span style="font-size:.72rem;font-weight:700;padding:2px 7px;border-radius:4px;margin-right:.5rem;<%= badge %>"><%= n.standard %></span><%= n.label %></strong>
+            </label>
+            <% }); %>
+            <p class="form-text" id="wd-net-err" style="color:var(--red);display:none;">Please select a network.</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Your USDT Wallet Address</label>
+            <input type="text" name="wallet_address" class="form-control" style="font-family:monospace;font-size:.85rem;"
+              placeholder="Your USDT wallet address" required minlength="20">
+            <p class="form-text">Make sure the address matches the selected network above. Crypto withdrawals are irreversible.</p>
+          </div>
+
+          <button type="submit" class="btn btn-warning btn-block btn-lg" onclick="return checkWdNet()">
+            <i class="fas fa-paper-plane"></i> Submit Withdrawal
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div>
+      <div class="card mb-3">
+        <div class="card-header"><span class="card-title"><i class="fas fa-info-circle"></i> Withdrawal Info</span></div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:.7rem;font-size:.88rem;padding:.25rem 0;">
+          <li><i class="fas fa-check" style="color:var(--green);margin-right:.5rem;"></i>Minimum: <strong>$<%= minWithdrawal.toFixed(2) %></strong></li>
+          <li><i class="fas fa-check" style="color:var(--green);margin-right:.5rem;"></i>Token: <strong>USDT only</strong></li>
+          <li><i class="fas fa-check" style="color:var(--green);margin-right:.5rem;"></i>Processing: <strong>within 24 hours</strong></li>
+          <li><i class="fas fa-check" style="color:var(--green);margin-right:.5rem;"></i>One pending withdrawal at a time</li>
+          <li><i class="fas fa-exclamation-triangle" style="color:var(--gold);margin-right:.5rem;"></i>Verify network matches your wallet.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title"><i class="fas fa-history"></i> Withdrawal History</span></div>
+        <% if (!hist.length) { %><div class="empty-state"><i class="fas fa-inbox"></i><p>No withdrawals yet.</p></div>
+        <% } else { %>
+        <div class="table-responsive"><table class="table">
+          <thead><tr><th>Amount</th><th>Network</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>
+            <% hist.forEach(w => { %>
+            <tr>
+              <td><strong>$<%= (w.amountUsd||0).toFixed(2) %></strong></td>
+              <td style="font-size:.8rem;"><%= w.networkLabel || w.cryptoType %></td>
+              <td><%- badge(w.status) %></td>
+              <td style="font-size:.8rem;color:var(--text-muted);"><%= new Date(w.createdAt).toLocaleDateString() %></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table></div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.net-card').forEach(function(card) {
+  card.addEventListener('click', function() {
+    document.querySelectorAll('.net-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    card.querySelector('input[type=radio]').checked = true;
+    document.getElementById('wd_network_key').value = card.dataset.key;
+    document.getElementById('wd-net-err').style.display = 'none';
+  });
+});
+function checkWdNet() {
+  if (!document.getElementById('wd_network_key').value) {
+    document.getElementById('wd-net-err').style.display = 'block';
+    return false;
+  }
+  return true;
+}
+</script>
+
+<%- include('partials/footer') %>
