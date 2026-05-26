@@ -1,7 +1,7 @@
 {
   "siteName": "Infinity Capital Group",
   "maintenanceMode": false,
-  "announcement": "Test announcement",
+  "announcement": "",
   "usdtBep20Address": "0x9798d4006effe481657c684240875a7e5e728e61",
   "usdtErc20Address": "0x9798d4006effe481657c684240875a7e5e728e61",
   "usdtSolAddress": "AsdEzGwyZ4ufErFtKoZV6SUYBpZshg3ZnUqJnBH4aqDJ",
