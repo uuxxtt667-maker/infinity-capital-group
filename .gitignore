@@ -1,8 +1,11 @@
 # Dependencies
 node_modules/
 
-# Database files (runtime data — do not commit)
-data/
+# Database files (user data — do not commit)
+data/*.db
+
+# Settings/customize IS committed so Hostinger gets site config
+# data/settings.json  ← intentionally NOT ignored
 
 # Logs
 *.log
