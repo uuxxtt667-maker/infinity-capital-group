@@ -1,0 +1,201 @@
+<% pageTitle = 'Admin — Profile & Security' %>
+<%- include('../partials/head') %>
+<%- include('../partials/nav') %>
+<div class="admin-layout">
+  <nav class="admin-sidebar">
+    <div class="sidebar-title">Admin Panel</div>
+    <a href="/admin"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
+    <a href="/admin/plans"><i class="fas fa-layer-group"></i> Plans</a>
+    <a href="/admin/plan-requests"><i class="fas fa-tasks"></i> Plan Requests</a>
+    <a href="/admin/deposits"><i class="fas fa-plus-circle"></i> Deposits</a>
+    <a href="/admin/withdrawals"><i class="fas fa-minus-circle"></i> Withdrawals</a>
+    <a href="/admin/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+    <div class="sidebar-title">Site</div>
+    <a href="/admin/settings"><i class="fas fa-cog"></i> Settings</a>
+    <a href="/admin/customize"><i class="fas fa-paint-brush"></i> Customizer</a>
+    <a href="/admin/profile" class="active"><i class="fas fa-user-shield"></i> Profile &amp; Security</a>
+    <a href="/dashboard"><i class="fas fa-home"></i> Front End</a>
+    <a href="/logout" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </nav>
+
+  <div class="admin-main">
+    <div class="page-header">
+      <h1><i class="fas fa-user-shield"></i> Admin Profile &amp; Security</h1>
+    </div>
+
+    <div style="max-width:700px;display:flex;flex-direction:column;gap:1.5rem;">
+
+      <!-- ─── Account Info ─── -->
+      <div class="card">
+        <div class="card-header"><span class="card-title"><i class="fas fa-id-card"></i> Account Info</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;padding:.25rem 0 .75rem;">
+          <div>
+            <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:.35rem;">Username</div>
+            <div style="font-size:1rem;font-weight:700;color:var(--text)"><i class="fas fa-user" style="color:var(--gold);margin-right:.4rem"></i><%= user.username %></div>
+          </div>
+          <div>
+            <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:.35rem;">Email Address</div>
+            <div style="font-size:.95rem;font-weight:600;color:var(--text)"><i class="fas fa-envelope" style="color:var(--gold);margin-right:.4rem"></i><%= user.email %></div>
+          </div>
+        </div>
+        <div style="font-size:.78rem;color:var(--text-muted);padding:.5rem .75rem;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+          <i class="fas fa-info-circle" style="color:var(--gold);margin-right:.4rem"></i>
+          Your email is used for password recovery. Keep it up to date.
+        </div>
+      </div>
+
+      <!-- ─── Change Password ─── -->
+      <div class="card">
+        <div class="card-header"><span class="card-title"><i class="fas fa-key"></i> Change Password</span></div>
+        <form method="POST" action="/admin/profile/change-password" onsubmit="return confirm('Change admin password? You will be logged out.')">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <div class="form-group">
+            <label class="form-label">Current Password</label>
+            <div style="position:relative;max-width:420px;">
+              <input type="password" name="current_password" class="form-control" placeholder="Enter current password" required autocomplete="current-password" id="cp-cur">
+              <button type="button" style="position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;padding:.2rem;" onclick="eye('cp-cur','cp-eye1')"><i class="fas fa-eye" id="cp-eye1"></i></button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;max-width:600px;">
+            <div class="form-group">
+              <label class="form-label">New Password</label>
+              <div style="position:relative;">
+                <input type="password" name="new_password" class="form-control" placeholder="Min. 8 characters" required minlength="8" autocomplete="new-password" id="cp-new">
+                <button type="button" style="position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;padding:.2rem;" onclick="eye('cp-new','cp-eye2')"><i class="fas fa-eye" id="cp-eye2"></i></button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirm New Password</label>
+              <div style="position:relative;">
+                <input type="password" name="confirm_password" class="form-control" placeholder="Repeat new password" required autocomplete="new-password" id="cp-conf">
+                <button type="button" style="position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;padding:.2rem;" onclick="eye('cp-conf','cp-eye3')"><i class="fas fa-eye" id="cp-eye3"></i></button>
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-warning" style="padding:.65rem 1.75rem;">
+            <i class="fas fa-key"></i> Update Password
+          </button>
+        </form>
+      </div>
+
+      <!-- ─── Change Email ─── -->
+      <div class="card">
+        <div class="card-header"><span class="card-title"><i class="fas fa-envelope"></i> Change Email Address</span></div>
+        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:1.25rem;">
+          Your email is required for password recovery via the Forgot Password flow. Make sure it's correct.
+        </p>
+        <form method="POST" action="/admin/profile/change-email">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;max-width:600px;">
+            <div class="form-group">
+              <label class="form-label">New Email Address</label>
+              <input type="email" name="new_email" class="form-control" placeholder="new@email.com" required value="<%= user.email %>">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirm Password</label>
+              <div style="position:relative;">
+                <input type="password" name="password" class="form-control" placeholder="Your current password" required autocomplete="current-password" id="ce-pwd">
+                <button type="button" style="position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;padding:.2rem;" onclick="eye('ce-pwd','ce-eye')"><i class="fas fa-eye" id="ce-eye"></i></button>
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="padding:.65rem 1.75rem;">
+            <i class="fas fa-save"></i> Save New Email
+          </button>
+        </form>
+      </div>
+
+      <!-- ─── Emergency Recovery Key ─── -->
+      <div class="card" style="border-color:rgba(245,166,35,.3);">
+        <div class="card-header" style="background:rgba(245,166,35,.06);"><span class="card-title"><i class="fas fa-life-ring" style="color:var(--gold)"></i> Emergency Recovery Key</span></div>
+        <p style="font-size:.83rem;color:var(--text-muted);margin-bottom:1rem;line-height:1.6;">
+          Generate a one-time recovery key you can store offline. If you ever lose access to your email and forget your password,
+          use this key at <strong style="color:var(--text)">/admin-recover</strong> to reset the admin password.
+          <br><strong style="color:var(--warning)">⚠ The key is shown only once — save it immediately.</strong>
+        </p>
+
+        <% if (recoveryKeyPlain) { %>
+        <div style="background:#0d1117;border:2px dashed var(--gold);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.25rem;">
+          <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:.5rem;">
+            <i class="fas fa-exclamation-triangle"></i> Copy and store this key — it will not be shown again
+          </div>
+          <div style="font-family:monospace;font-size:1.05rem;font-weight:700;color:#f0f6fc;letter-spacing:.05em;word-break:break-all;line-height:1.7;"><%= recoveryKeyPlain %></div>
+          <button onclick="copyKey()" style="margin-top:.75rem;background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.35);color:var(--gold);padding:.4rem 1rem;border-radius:7px;cursor:pointer;font-size:.8rem;font-weight:700;">
+            <i class="fas fa-copy"></i> Copy to Clipboard
+          </button>
+        </div>
+        <% } %>
+
+        <% if (hasRecoveryKey) { %>
+        <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;font-size:.83rem;color:var(--text-muted);">
+          <span style="background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.25);padding:.25rem .75rem;border-radius:20px;font-size:.72rem;font-weight:700;"><i class="fas fa-check"></i> Key stored</span>
+          A recovery key is active on this account.
+        </div>
+        <% } %>
+
+        <form method="POST" action="/admin/profile/generate-recovery-key"
+          onsubmit="return <%= hasRecoveryKey ? "confirm('This will invalidate the old recovery key. Continue?')" : 'true' %>">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+            <div style="position:relative;min-width:220px;flex:1;max-width:320px;">
+              <input type="password" name="password" class="form-control" placeholder="Confirm your password" required autocomplete="current-password" id="rk-pwd">
+              <button type="button" style="position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;padding:.2rem;" onclick="eye('rk-pwd','rk-eye')"><i class="fas fa-eye" id="rk-eye"></i></button>
+            </div>
+            <button type="submit" class="btn btn-gold" style="padding:.65rem 1.5rem;">
+              <i class="fas fa-<%= hasRecoveryKey ? 'sync-alt' : 'plus-circle' %>"></i>
+              <%= hasRecoveryKey ? 'Regenerate Key' : 'Generate Recovery Key' %>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ─── Password Recovery Info ─── -->
+      <div class="card" style="border-color:rgba(99,102,241,.25);">
+        <div class="card-header" style="background:rgba(99,102,241,.06);"><span class="card-title"><i class="fas fa-question-circle" style="color:#818cf8"></i> How to Recover Access</span></div>
+        <div style="display:flex;flex-direction:column;gap:.85rem;font-size:.85rem;color:var(--text-muted);line-height:1.6;">
+          <div style="display:flex;gap:.75rem;align-items:flex-start;">
+            <span style="background:rgba(245,166,35,.15);color:var(--gold);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0;font-size:.8rem;">1</span>
+            <div><strong style="color:var(--text)">Via Email OTP</strong> — Go to the login page and click
+              <a href="/forgot-password" target="_blank" style="color:var(--gold)">Forgot password?</a>.
+              A 6-digit code will be sent to <strong style="color:var(--text)"><%= user.email %></strong>.
+            </div>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:flex-start;">
+            <span style="background:rgba(245,166,35,.15);color:var(--gold);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0;font-size:.8rem;">2</span>
+            <div><strong style="color:var(--text)">Via Emergency Recovery Key</strong> — If you can't access your email,
+              go to <a href="/admin-recover" target="_blank" style="color:var(--gold)">/admin-recover</a>,
+              enter your recovery key and set a new password.
+            </div>
+          </div>
+          <div style="display:flex;gap:.75rem;align-items:flex-start;">
+            <span style="background:rgba(245,166,35,.15);color:var(--gold);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0;font-size:.8rem;">3</span>
+            <div><strong style="color:var(--text)">Server-side Reset</strong> — If all else fails, on your server run:<br>
+              <code style="background:var(--bg2);border:1px solid var(--border);padding:.2rem .5rem;border-radius:5px;font-size:.78rem;color:var(--text);">node reset-admin.js</code>
+              to reset the admin password back to <code style="background:var(--bg2);border:1px solid var(--border);padding:.2rem .5rem;border-radius:5px;font-size:.78rem;">Admin@1234</code>.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end max-width -->
+  </div>
+</div>
+
+<script>
+function eye(inputId, eyeId) {
+  var inp = document.getElementById(inputId);
+  var ico = document.getElementById(eyeId);
+  if (inp.type === 'password') { inp.type = 'text';     ico.className = 'fas fa-eye-slash'; }
+  else                         { inp.type = 'password'; ico.className = 'fas fa-eye'; }
+}
+function copyKey() {
+  var el = document.querySelector('[style*="monospace"][style*="font-weight:700"]');
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent.trim()).then(function() {
+    alert('Recovery key copied to clipboard!');
+  });
+}
+</script>
+
+<%- include('../partials/footer') %>

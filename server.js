@@ -61,6 +61,51 @@ app.use('/admin',        require('./routes/admin'));
 app.use('/markets',      require('./routes/markets'));
 app.use('/',             require('./routes/prices'));
 
+// ── Admin account recovery (no login required) ───────────────
+const bcryptSrv  = require('bcryptjs');
+const { generateCSRF: _csrf, verifyCSRF: _vcsrf } = require('./middleware/helpers');
+const { getSettings: _gs, saveSettings: _ss } = require('./middleware/settings');
+
+app.get('/admin-recover', (req, res) => {
+  if (req.session.userId) return res.redirect('/admin');
+  res.render('admin-recover', { csrf: _csrf(req) });
+});
+
+app.post('/admin-recover', async (req, res) => {
+  if (!_vcsrf(req)) { req.flash('error', 'Invalid request.'); return res.redirect('/admin-recover'); }
+  const { recovery_key, new_password, confirm_password } = req.body;
+  const s = _gs();
+
+  if (!s.adminRecoveryKeyHash) {
+    req.flash('error', 'No recovery key is set. Use Forgot Password or the server-side reset script.');
+    return res.redirect('/admin-recover');
+  }
+  if (!recovery_key || !bcryptSrv.compareSync(recovery_key.trim(), s.adminRecoveryKeyHash)) {
+    req.flash('error', 'Invalid recovery key.');
+    return res.redirect('/admin-recover');
+  }
+  if (!new_password || new_password.length < 8) {
+    req.flash('error', 'Password must be at least 8 characters.');
+    return res.redirect('/admin-recover');
+  }
+  if (new_password !== confirm_password) {
+    req.flash('error', 'Passwords do not match.');
+    return res.redirect('/admin-recover');
+  }
+
+  const { db: _db } = require('./database');
+  const adminUser = await _db.users.findOneAsync({ isAdmin: true });
+  if (!adminUser) { req.flash('error', 'Admin account not found.'); return res.redirect('/admin-recover'); }
+
+  const hash = bcryptSrv.hashSync(new_password, 12);
+  await _db.users.updateAsync({ _id: adminUser._id }, { $set: { password: hash, twoFAEnabled: false } });
+  // Invalidate the used recovery key (one-time use)
+  _ss({ adminRecoveryKeyHash: null });
+
+  req.flash('success', 'Admin password reset successfully. Please sign in with your new password.');
+  res.redirect('/login');
+});
+
 // 404
 app.use((req, res) => res.status(404).send('<h2>404 — Page not found. <a href="/">Go home</a></h2>'));
 

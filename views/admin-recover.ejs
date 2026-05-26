@@ -1,0 +1,112 @@
+<% pageTitle = 'Admin Account Recovery' %>
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<style>
+.ar-outer {
+  min-height: calc(100vh - 68px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 2rem 1rem; position: relative; z-index: 1;
+}
+.ar-card {
+  width: 100%; max-width: 500px;
+  background: var(--card); border: 1px solid rgba(245,166,35,.3);
+  border-radius: 20px; padding: 2.75rem 2.5rem 2.25rem;
+  position: relative; z-index: 1;
+}
+.ar-icon {
+  width: 68px; height: 68px; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(245,166,35,.18), rgba(245,166,35,.05));
+  border: 2px solid rgba(245,166,35,.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.7rem; color: var(--gold); margin: 0 auto 1.4rem;
+}
+.ar-title { font-size: 1.35rem; font-weight: 800; color: var(--text); text-align: center; margin-bottom: .35rem; }
+.ar-sub   { font-size: .83rem; color: var(--text3); text-align: center; margin-bottom: 1.75rem; line-height: 1.55; }
+.ar-label { font-size: .75rem; font-weight: 700; color: var(--text2); margin-bottom: .4rem; display: block; }
+.ar-wrap  { position: relative; margin-bottom: 1rem; }
+.ar-icon2 { position: absolute; left: .9rem; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: .85rem; }
+.ar-input {
+  width: 100%; padding: .72rem 2.6rem .72rem 2.4rem;
+  border: 1.5px solid var(--border); border-radius: 10px;
+  background: var(--bg2); color: var(--text); font-size: .9rem;
+  outline: none; transition: border-color .2s, box-shadow .2s;
+  box-sizing: border-box;
+}
+.ar-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-light); }
+.ar-input::placeholder { color: var(--text3); }
+.ar-eye { position: absolute; right: .8rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text3); cursor: pointer; padding: .2rem; font-size: .82rem; }
+.ar-btn {
+  width: 100%; padding: .82rem; border: none; border-radius: 11px;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: #000; font-size: .95rem; font-weight: 800;
+  cursor: pointer; transition: transform .15s, box-shadow .15s; margin-bottom: .9rem;
+}
+.ar-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px var(--gold-light); }
+.ar-back { text-align: center; font-size: .82rem; color: var(--text3); }
+.ar-back a { color: var(--gold); font-weight: 700; text-decoration: none; }
+.ar-divider { display: flex; align-items: center; gap: .65rem; color: var(--text3); font-size: .75rem; margin: .75rem 0 1rem; }
+.ar-divider::before, .ar-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+</style>
+
+<div class="ar-outer">
+  <div class="ar-card">
+    <div class="ar-icon"><i class="fas fa-life-ring"></i></div>
+    <div class="ar-title">Admin Account Recovery</div>
+    <div class="ar-sub">
+      Enter your emergency recovery key and set a new admin password.<br>
+      <span style="color:var(--gold);font-weight:600">This page is for admin access only.</span>
+    </div>
+
+    <form method="POST" action="/admin-recover">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+
+      <label class="ar-label" for="ar-key">Emergency Recovery Key</label>
+      <div class="ar-wrap">
+        <i class="fas fa-key ar-icon2"></i>
+        <input type="password" id="ar-key" name="recovery_key" class="ar-input"
+          placeholder="Paste your recovery key here" required autocomplete="off" id="arKey">
+        <button type="button" class="ar-eye" onclick="arEye('arKey','arEye1')"><i class="fas fa-eye" id="arEye1"></i></button>
+      </div>
+
+      <div class="ar-divider">then set a new password</div>
+
+      <label class="ar-label" for="ar-pwd">New Password</label>
+      <div class="ar-wrap">
+        <i class="fas fa-lock ar-icon2"></i>
+        <input type="password" id="ar-pwd" name="new_password" class="ar-input"
+          placeholder="Min. 8 characters" required minlength="8" autocomplete="new-password">
+        <button type="button" class="ar-eye" onclick="arEye('ar-pwd','arEye2')"><i class="fas fa-eye" id="arEye2"></i></button>
+      </div>
+
+      <label class="ar-label" for="ar-pwd2">Confirm New Password</label>
+      <div class="ar-wrap">
+        <i class="fas fa-lock ar-icon2"></i>
+        <input type="password" id="ar-pwd2" name="confirm_password" class="ar-input"
+          placeholder="Repeat new password" required autocomplete="new-password">
+        <button type="button" class="ar-eye" onclick="arEye('ar-pwd2','arEye3')"><i class="fas fa-eye" id="arEye3"></i></button>
+      </div>
+
+      <button type="submit" class="ar-btn">
+        <i class="fas fa-unlock-alt" style="margin-right:.4rem"></i>Reset Admin Password
+      </button>
+    </form>
+
+    <div class="ar-back">
+      Remember your password? <a href="/login">Sign in &rarr;</a> &nbsp;&bull;&nbsp;
+      <a href="/forgot-password" style="color:var(--text3)">Forgot password (email)</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function arEye(inputId, eyeId) {
+  var inp = document.getElementById(inputId);
+  var ico = document.getElementById(eyeId);
+  if (!inp || !ico) return;
+  if (inp.type === 'password') { inp.type = 'text';     ico.className = 'fas fa-eye-slash'; }
+  else                         { inp.type = 'password'; ico.className = 'fas fa-eye'; }
+}
+</script>
+
+<%- include('partials/footer') %>

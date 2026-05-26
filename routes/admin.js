@@ -1,6 +1,9 @@
 const router   = require('express').Router();
+const bcrypt   = require('bcryptjs');
+const crypto   = require('crypto');
 const { db }   = require('../database');
 const { requireAdmin } = require('../middleware/auth');
+const { generateCSRF, verifyCSRF } = require('../middleware/helpers');
 const { getSettings, saveSettings, getCustomize, saveCustomize, CUSTOMIZE_DEFAULTS } = require('../middleware/settings');
 
 router.use(requireAdmin);
@@ -479,6 +482,90 @@ router.post('/customize/reset', (req, res) => {
   saveCustomize(reset);
   req.flash('success', `${section ? section.charAt(0).toUpperCase()+section.slice(1) : 'All'} settings reset to defaults.`);
   res.redirect('/admin/customize?tab=' + (section || 'branding'));
+});
+
+// ── Admin Profile & Security ─────────────────────────────────
+router.get('/profile', (req, res) => {
+  const s = getSettings();
+  const recoveryKeyPlain = req.session.newRecoveryKey || null;
+  delete req.session.newRecoveryKey;           // clear before render
+  req.session.save(() => {                     // persist cleared session
+    res.render('admin/profile', {
+      csrf:             generateCSRF(req),
+      hasRecoveryKey:   !!s.adminRecoveryKeyHash,
+      recoveryKeyPlain,
+    });
+  });
+});
+
+router.post('/profile/change-password', async (req, res) => {
+  if (!verifyCSRF(req)) { req.flash('error', 'Invalid request.'); return res.redirect('/admin/profile'); }
+  const user = res.locals.user;
+  const { current_password, new_password, confirm_password } = req.body;
+
+  if (!bcrypt.compareSync(current_password || '', user.password)) {
+    req.flash('error', 'Current password is incorrect.');
+    return res.redirect('/admin/profile');
+  }
+  if (!new_password || new_password.length < 8) {
+    req.flash('error', 'New password must be at least 8 characters.');
+    return res.redirect('/admin/profile');
+  }
+  if (new_password !== confirm_password) {
+    req.flash('error', 'New passwords do not match.');
+    return res.redirect('/admin/profile');
+  }
+
+  const hash = bcrypt.hashSync(new_password, 12);
+  await db.users.updateAsync({ _id: user._id }, { $set: { password: hash } });
+  req.flash('success', 'Password updated. Please sign in again.');
+  req.session.destroy(() => res.redirect('/login'));
+});
+
+router.post('/profile/change-email', async (req, res) => {
+  if (!verifyCSRF(req)) { req.flash('error', 'Invalid request.'); return res.redirect('/admin/profile'); }
+  const user = res.locals.user;
+  const { new_email, password } = req.body;
+
+  if (!bcrypt.compareSync(password || '', user.password)) {
+    req.flash('error', 'Password is incorrect. Email not changed.');
+    return res.redirect('/admin/profile');
+  }
+  const email = (new_email || '').trim().toLowerCase();
+  if (!email || !email.includes('@')) {
+    req.flash('error', 'Please enter a valid email address.');
+    return res.redirect('/admin/profile');
+  }
+  const taken = await db.users.findOneAsync({ email, _id: { $ne: user._id } });
+  if (taken) {
+    req.flash('error', 'That email is already in use by another account.');
+    return res.redirect('/admin/profile');
+  }
+
+  await db.users.updateAsync({ _id: user._id }, { $set: { email, emailVerified: true } });
+  req.flash('success', `Email updated to ${email}. This address will be used for password recovery.`);
+  res.redirect('/admin/profile');
+});
+
+router.post('/profile/generate-recovery-key', async (req, res) => {
+  if (!verifyCSRF(req)) { req.flash('error', 'Invalid request.'); return res.redirect('/admin/profile'); }
+  const user = res.locals.user;
+  const { password } = req.body;
+
+  if (!bcrypt.compareSync(password || '', user.password)) {
+    req.flash('error', 'Password is incorrect. Recovery key not changed.');
+    return res.redirect('/admin/profile');
+  }
+
+  // Generate a strong random key
+  const plain = crypto.randomBytes(24).toString('base64url'); // ~32 URL-safe chars
+  const hash  = bcrypt.hashSync(plain, 10);
+  saveSettings({ adminRecoveryKeyHash: hash });
+
+  // Store in session to show once, then clear
+  req.session.newRecoveryKey = plain;
+  req.flash('success', 'New recovery key generated. Copy it now — it will not be shown again.');
+  res.redirect('/admin/profile');
 });
 
 module.exports = router;

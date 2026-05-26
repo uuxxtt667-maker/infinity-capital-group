@@ -11,6 +11,11 @@
   "referralRate": 5,
   "alphaVantageKey": "",
   "iexCloudKey": "",
+  "smtpHost": "",
+  "smtpPort": 587,
+  "smtpUser": "",
+  "smtpPass": "",
+  "smtpFrom": "",
   "btcAddress": "bc1qtest",
   "usdtAddress": "Ttest",
   "customize": {
@@ -186,5 +191,6 @@
     "perfForexPts": "0,3,5,7,8,8.7",
     "perfREReturn": "7%",
     "perfREPts": "0,5,9,12,14,16"
-  }
+  },
+  "adminRecoveryKeyHash": "$2a$10$bj95T1i44gnmfjdIlpHtg.eI6w9RXcMDQxp79BRFHGv.gYKALrnES"
 }
