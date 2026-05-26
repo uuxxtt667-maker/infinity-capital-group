@@ -33,9 +33,64 @@ router.post('/login', async (req, res) => {
     req.flash('info', 'Your email is not verified. We sent a new code to ' + user.email);
     return res.redirect('/verify-email');
   }
+  // 2FA enabled → send OTP and redirect to 2FA page
+  if (user.twoFAEnabled) {
+    const otp = gen6();
+    const otpExpires = new Date(Date.now() + 15 * 60 * 1000);
+    req.session.login2fa = { userId: user._id, otp, otpExpires: otpExpires.toISOString() };
+    try { await sendOTP(user.email, otp, '2fa', null); } catch (e) { console.error('[mailer]', e.message); }
+    req.flash('info', `A security code was sent to ${user.email}.`);
+    return res.redirect('/login/2fa');
+  }
   req.session.userId = user._id;
   req.flash('success', `Welcome back, ${user.username}!`);
   res.redirect('/dashboard');
+});
+
+/* ════════════════════════════════════════════
+   LOGIN 2FA
+════════════════════════════════════════════ */
+router.get('/login/2fa', (req, res) => {
+  if (req.session.userId) return res.redirect('/dashboard');
+  if (!req.session.login2fa) return res.redirect('/login');
+  res.render('login-2fa', { csrf: generateCSRF(req) });
+});
+
+router.post('/login/2fa', async (req, res) => {
+  if (!verifyCSRF(req)) { req.flash('error', 'Invalid request.'); return res.redirect('/login/2fa'); }
+  if (!req.session.login2fa) return res.redirect('/login');
+
+  const { otp } = req.body;
+  const { userId, otp: storedOtp, otpExpires } = req.session.login2fa;
+
+  if (!otp || otp.trim() !== storedOtp) {
+    req.flash('error', 'Incorrect code. Please try again.');
+    return res.redirect('/login/2fa');
+  }
+  if (new Date() > new Date(otpExpires)) {
+    req.flash('error', 'Code expired. Please sign in again.');
+    delete req.session.login2fa;
+    return res.redirect('/login');
+  }
+
+  delete req.session.login2fa;
+  req.session.userId = userId;
+  const user = await db.users.findOneAsync({ _id: userId });
+  req.flash('success', `Welcome back, ${(user || {}).username || ''}!`);
+  res.redirect('/dashboard');
+});
+
+router.post('/login/2fa/resend', async (req, res) => {
+  if (!req.session.login2fa) return res.redirect('/login');
+  const user = await db.users.findOneAsync({ _id: req.session.login2fa.userId });
+  if (!user) return res.redirect('/login');
+
+  const otp = gen6();
+  const otpExpires = new Date(Date.now() + 15 * 60 * 1000);
+  req.session.login2fa = { userId: user._id, otp, otpExpires: otpExpires.toISOString() };
+  try { await sendOTP(user.email, otp, '2fa', null); } catch (e) { console.error('[mailer]', e.message); }
+  req.flash('info', `A new security code was sent to ${user.email}.`);
+  res.redirect('/login/2fa');
 });
 
 /* ════════════════════════════════════════════

@@ -9,7 +9,8 @@
         <li><a href="/deposit"   class="<%= path==='/deposit'?'active':'' %>"><i class="fas fa-plus-circle"></i> Deposit</a></li>
         <li><a href="/withdraw"  class="<%= path==='/withdraw'?'active':'' %>"><i class="fas fa-minus-circle"></i> Withdraw</a></li>
         <li><a href="/referrals" class="<%= path==='/referrals'?'active':'' %>"><i class="fas fa-users"></i> Referrals</a></li>
-        <% if (user.isAdmin) { %><li><a href="/admin" style="color:var(--gold)"><i class="fas fa-shield-alt"></i> Admin</a></li><% } %>
+        <li><a href="/security" class="<%= path==='/security'?'active':'' %>"><i class="fas fa-shield-alt"></i> Security</a></li>
+        <% if (user.isAdmin) { %><li><a href="/admin" style="color:var(--gold)"><i class="fas fa-user-shield"></i> Admin</a></li><% } %>
         <li><span class="nav-balance"><i class="fas fa-wallet"></i> <span data-balance>$<%= (user.balance||0).toFixed(4) %></span></span></li>
         <li><a href="/logout" class="nav-logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
       <% } else { %>

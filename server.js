@@ -54,6 +54,7 @@ app.use('/plans',        require('./routes/plans'));
 app.use('/deposit',      require('./routes/deposit'));
 app.use('/invest',       require('./routes/invest'));
 app.use('/withdraw',     require('./routes/withdraw'));
+app.use('/security',     require('./routes/security'));
 app.use('/referrals',    require('./routes/referrals'));
 app.use('/transactions', require('./routes/transactions'));
 app.use('/admin',        require('./routes/admin'));

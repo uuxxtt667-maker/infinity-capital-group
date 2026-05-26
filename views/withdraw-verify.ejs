@@ -1,0 +1,216 @@
+<% pageTitle = 'Confirm Withdrawal' %>
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<style>
+.wv-outer {
+  min-height: calc(100vh - 68px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 2rem 1rem; position: relative; z-index: 1;
+}
+.wv-card {
+  width: 100%; max-width: 500px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px; padding: 2.5rem 2.5rem 2rem;
+  position: relative; z-index: 1;
+}
+.wv-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(245,166,35,.18), rgba(245,166,35,.05));
+  border: 2px solid rgba(245,166,35,.35);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; color: var(--gold); margin: 0 auto 1.2rem;
+}
+.wv-title { font-size: 1.3rem; font-weight: 800; color: var(--text); text-align: center; margin-bottom: .3rem; }
+.wv-sub   { font-size: .83rem; color: var(--text3); text-align: center; margin-bottom: 1.5rem; line-height: 1.55; }
+
+/* Summary pill */
+.wv-summary {
+  background: rgba(245,166,35,.07); border: 1px solid rgba(245,166,35,.2);
+  border-radius: 12px; padding: .9rem 1.1rem; margin-bottom: 1.5rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+}
+.wv-sum-item { text-align: center; }
+.wv-sum-lbl  { font-size: .7rem; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.wv-sum-val  { font-size: 1rem; font-weight: 800; color: var(--text); }
+
+.wv-label  { font-size: .75rem; font-weight: 700; color: var(--text2); margin-bottom: .45rem; display: block; }
+.wv-inputs { display: flex; gap: .5rem; justify-content: center; margin-bottom: 1.4rem; }
+.wv-digit  {
+  width: 50px; height: 58px; text-align: center;
+  font-size: 1.55rem; font-weight: 800;
+  border: 2px solid var(--border); border-radius: 12px;
+  background: var(--bg2); color: var(--text); outline: none;
+  transition: border-color .2s, box-shadow .2s; caret-color: transparent;
+}
+.wv-digit:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-light); }
+.wv-digit.filled { border-color: var(--gold); }
+
+.wv-divider { display: flex; align-items: center; gap: .65rem; color: var(--text3); font-size: .75rem; margin: .5rem 0 1.2rem; }
+.wv-divider::before, .wv-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+
+.wv-pin-wrap { position: relative; margin-bottom: 1.4rem; }
+.wv-pin-icon { position: absolute; left: .9rem; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: .85rem; }
+.wv-pin-input {
+  width: 100%; padding: .72rem 2.6rem .72rem 2.4rem;
+  border: 1.5px solid var(--border); border-radius: 10px;
+  background: var(--bg2); color: var(--text); font-size: 1rem;
+  outline: none; transition: border-color .2s, box-shadow .2s;
+  box-sizing: border-box; letter-spacing: .25em; font-weight: 700;
+}
+.wv-pin-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-light); }
+.wv-pin-input::placeholder { color: var(--text3); letter-spacing: normal; font-weight: 400; }
+.wv-pin-eye { position: absolute; right: .85rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text3); cursor: pointer; padding: .2rem; font-size: .85rem; }
+
+.wv-btn {
+  width: 100%; padding: .82rem; border: none; border-radius: 11px;
+  background: linear-gradient(135deg, #f5a623, #e8910a);
+  color: #000; font-size: .95rem; font-weight: 800;
+  cursor: pointer; transition: transform .15s, box-shadow .15s; margin-bottom: .9rem;
+}
+.wv-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(245,166,35,.35); }
+.wv-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+.wv-cancel { display: block; text-align: center; font-size: .82rem; color: var(--text3); text-decoration: none; }
+.wv-cancel:hover { color: var(--red); }
+.wv-footer  { text-align: center; font-size: .82rem; color: var(--text3); margin-top: .75rem; }
+.wv-footer button { background: none; border: none; color: var(--gold); font-weight: 700; cursor: pointer; font-size: .82rem; padding: 0; text-decoration: underline; text-decoration-style: dotted; }
+.wv-timer   { color: var(--text3); font-size: .75rem; margin-top: .3rem; text-align: center; }
+</style>
+
+<div class="wv-outer">
+  <div class="wv-card">
+    <div class="wv-icon"><i class="fas fa-paper-plane"></i></div>
+    <div class="wv-title">Confirm Your Withdrawal</div>
+    <div class="wv-sub">
+      Two security checks required: an email OTP code<br>and your withdrawal PIN.
+    </div>
+
+    <!-- Summary -->
+    <div class="wv-summary">
+      <div class="wv-sum-item">
+        <div class="wv-sum-lbl">Amount</div>
+        <div class="wv-sum-val" style="color:var(--gold)">$<%= pending.amount.toFixed(2) %></div>
+      </div>
+      <div class="wv-sum-item">
+        <div class="wv-sum-lbl">Network</div>
+        <div class="wv-sum-val" style="font-size:.85rem"><%= pending.networkLabel %></div>
+      </div>
+      <div class="wv-sum-item">
+        <div class="wv-sum-lbl">Wallet</div>
+        <div class="wv-sum-val" style="font-size:.75rem;font-family:monospace;word-break:break-all">
+          <%= pending.wallet.slice(0,8) %>…<%= pending.wallet.slice(-6) %>
+        </div>
+      </div>
+    </div>
+
+    <form method="POST" action="/withdraw/verify" id="wvForm">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <input type="hidden" name="otp"   id="wvOtpHidden">
+
+      <!-- OTP -->
+      <label class="wv-label" style="text-align:center;display:block">
+        <i class="fas fa-envelope" style="color:var(--gold);margin-right:.3rem"></i>Email Verification Code
+      </label>
+      <div class="wv-inputs" id="wvOtpInputs">
+        <input class="wv-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code">
+        <input class="wv-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="wv-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="wv-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="wv-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="wv-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+      </div>
+
+      <div class="wv-divider">and your withdrawal PIN</div>
+
+      <!-- PIN -->
+      <label class="wv-label">
+        <i class="fas fa-lock" style="color:var(--gold);margin-right:.3rem"></i>Withdrawal PIN
+      </label>
+      <div class="wv-pin-wrap">
+        <i class="fas fa-lock wv-pin-icon"></i>
+        <input type="password" name="pin" id="wvPin" class="wv-pin-input"
+          placeholder="Enter your PIN" maxlength="6" inputmode="numeric"
+          pattern="[0-9]{4,6}" required autocomplete="off">
+        <button type="button" class="wv-pin-eye" onclick="wvEye()"><i class="fas fa-eye" id="wvEyeIcon"></i></button>
+      </div>
+
+      <button type="submit" class="wv-btn" id="wvSubmit" disabled>
+        <i class="fas fa-check-circle" style="margin-right:.4rem"></i>Confirm & Submit Withdrawal
+      </button>
+    </form>
+
+    <a href="/withdraw" class="wv-cancel"><i class="fas fa-times" style="margin-right:.3rem"></i>Cancel withdrawal</a>
+
+    <div class="wv-footer">
+      Didn't get the code?
+      <form method="POST" action="/withdraw/verify/resend" style="display:inline">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <button type="submit">Resend OTP</button>
+      </form>
+    </div>
+    <div class="wv-timer" id="wvTimer"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var digits    = Array.from(document.querySelectorAll('.wv-digit'));
+  var otpHidden = document.getElementById('wvOtpHidden');
+  var pinInput  = document.getElementById('wvPin');
+  var submitBtn = document.getElementById('wvSubmit');
+
+  function getCode(){ return digits.map(function(d){ return d.value; }).join(''); }
+  function canGo(){ return getCode().length===6 && (pinInput.value||'').length>=4; }
+  function refresh(){
+    var c=getCode();
+    otpHidden.value=c;
+    digits.forEach(function(d){ d.classList.toggle('filled', d.value!==''); });
+    submitBtn.disabled = !canGo();
+  }
+
+  digits.forEach(function(d,i){
+    d.addEventListener('input',function(){
+      if(d.value.length>1){
+        var p=d.value.replace(/\D/g,'').slice(0,6);
+        p.split('').forEach(function(ch,j){ if(digits[j]) digits[j].value=ch; });
+        digits[Math.min(p.length,5)].focus(); refresh(); return;
+      }
+      d.value=d.value.replace(/\D/,'');
+      if(d.value&&i<5) digits[i+1].focus();
+      refresh();
+    });
+    d.addEventListener('keydown',function(e){
+      if(e.key==='Backspace'&&!d.value&&i>0){ digits[i-1].focus(); digits[i-1].value=''; refresh(); }
+    });
+    d.addEventListener('paste',function(e){
+      e.preventDefault();
+      var text=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+      text.split('').forEach(function(ch,j){ if(digits[j]) digits[j].value=ch; });
+      digits[Math.min(text.length,5)].focus(); refresh();
+    });
+  });
+  pinInput.addEventListener('input', function(){ this.value=this.value.replace(/\D/g,''); refresh(); });
+
+  // Timer
+  var expiry = Date.now() + 15*60*1000;
+  var timerEl = document.getElementById('wvTimer');
+  function tick(){
+    var left=Math.max(0,expiry-Date.now());
+    var m=Math.floor(left/60000),s=Math.floor((left%60000)/1000);
+    timerEl.textContent='OTP expires in '+m+':'+(s<10?'0':'')+s;
+    if(left>0) setTimeout(tick,1000);
+    else timerEl.textContent='OTP expired — click Resend.';
+  }
+  tick();
+  if(digits[0]) digits[0].focus();
+})();
+function wvEye(){
+  var inp=document.getElementById('wvPin');
+  var eye=document.getElementById('wvEyeIcon');
+  if(inp.type==='password'){ inp.type='text'; eye.className='fas fa-eye-slash'; }
+  else { inp.type='password'; eye.className='fas fa-eye'; }
+}
+</script>
+
+<%- include('partials/footer') %>

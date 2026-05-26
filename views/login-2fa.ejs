@@ -1,0 +1,140 @@
+<% pageTitle = 'Two-Factor Authentication' %>
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<style>
+.tfa-outer {
+  min-height: calc(100vh - 68px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 2rem 1rem; position: relative; z-index: 1;
+}
+.tfa-card {
+  width: 100%; max-width: 460px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px; padding: 2.75rem 2.5rem 2.25rem;
+  position: relative; z-index: 1;
+}
+.tfa-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(245,166,35,.18), rgba(245,166,35,.05));
+  border: 2px solid rgba(245,166,35,.35);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; color: var(--gold); margin: 0 auto 1.4rem;
+}
+.tfa-title { font-size: 1.35rem; font-weight: 800; color: var(--text); text-align: center; margin-bottom: .4rem; }
+.tfa-sub   { font-size: .84rem; color: var(--text3); text-align: center; margin-bottom: 2rem; line-height: 1.55; }
+.tfa-label { font-size: .75rem; font-weight: 700; color: var(--text2); margin-bottom: .45rem; display: block; }
+.tfa-inputs { display: flex; gap: .55rem; justify-content: center; margin-bottom: 1.5rem; }
+.tfa-digit {
+  width: 52px; height: 60px; text-align: center;
+  font-size: 1.6rem; font-weight: 800;
+  border: 2px solid var(--border); border-radius: 12px;
+  background: var(--bg2); color: var(--text); outline: none;
+  transition: border-color .2s, box-shadow .2s; caret-color: transparent;
+}
+.tfa-digit:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-light); }
+.tfa-digit.filled { border-color: var(--gold); }
+.tfa-btn {
+  width: 100%; padding: .82rem; border: none; border-radius: 11px;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: #000; font-size: .95rem; font-weight: 800;
+  cursor: pointer; transition: transform .15s, box-shadow .15s; margin-bottom: 1rem;
+}
+.tfa-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px var(--gold-light); }
+.tfa-footer { text-align: center; font-size: .82rem; color: var(--text3); }
+.tfa-footer button { background: none; border: none; color: var(--gold); font-weight: 700; cursor: pointer; font-size: .82rem; padding: 0; text-decoration: underline; text-decoration-style: dotted; }
+.tfa-footer a { color: var(--text3); text-decoration: none; font-size: .78rem; }
+.tfa-timer { color: var(--text3); font-size: .78rem; margin-top: .35rem; text-align: center; }
+</style>
+
+<div class="tfa-outer">
+  <div class="tfa-card">
+    <div class="tfa-icon"><i class="fas fa-shield-alt"></i></div>
+    <div class="tfa-title">Verification Required</div>
+    <div class="tfa-sub">
+      A 6-digit security code was sent to your email.<br>
+      Enter it below to complete sign in.
+    </div>
+
+    <form method="POST" action="/login/2fa" id="tfaForm">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <input type="hidden" name="otp"   id="tfaHidden">
+
+      <label class="tfa-label" style="text-align:center;display:block">Security Code</label>
+      <div class="tfa-inputs" id="tfaInputs">
+        <input class="tfa-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code">
+        <input class="tfa-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="tfa-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="tfa-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="tfa-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="tfa-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+      </div>
+
+      <button type="submit" class="tfa-btn" id="tfaSubmit" disabled>
+        <i class="fas fa-sign-in-alt" style="margin-right:.4rem"></i>Verify & Sign In
+      </button>
+    </form>
+
+    <div class="tfa-footer">
+      Didn't receive it?
+      <form method="POST" action="/login/2fa/resend" style="display:inline">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <button type="submit">Resend code</button>
+      </form>
+      &nbsp;&bull;&nbsp;
+      <a href="/login">← Back to login</a>
+    </div>
+    <div class="tfa-timer" id="tfaTimer"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var digits = Array.from(document.querySelectorAll('.tfa-digit'));
+  var hidden = document.getElementById('tfaHidden');
+  var submitBtn = document.getElementById('tfaSubmit');
+
+  function getCode(){ return digits.map(function(d){ return d.value; }).join(''); }
+  function refresh(){
+    var c = getCode();
+    hidden.value = c;
+    submitBtn.disabled = c.length < 6;
+    digits.forEach(function(d){ d.classList.toggle('filled', d.value !== ''); });
+  }
+  digits.forEach(function(d, i){
+    d.addEventListener('input', function(){
+      if(d.value.length > 1){
+        var p = d.value.replace(/\D/g,'').slice(0,6);
+        p.split('').forEach(function(ch,j){ if(digits[j]) digits[j].value=ch; });
+        digits[Math.min(p.length,5)].focus(); refresh(); return;
+      }
+      d.value = d.value.replace(/\D/,'');
+      if(d.value && i<5) digits[i+1].focus();
+      refresh();
+    });
+    d.addEventListener('keydown', function(e){
+      if(e.key==='Backspace' && !d.value && i>0){ digits[i-1].focus(); digits[i-1].value=''; refresh(); }
+    });
+    d.addEventListener('paste', function(e){
+      e.preventDefault();
+      var text=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+      text.split('').forEach(function(ch,j){ if(digits[j]) digits[j].value=ch; });
+      digits[Math.min(text.length,5)].focus(); refresh();
+    });
+  });
+
+  var expiry = Date.now() + 15*60*1000;
+  var timerEl = document.getElementById('tfaTimer');
+  function tick(){
+    var left = Math.max(0, expiry - Date.now());
+    var m = Math.floor(left/60000), s = Math.floor((left%60000)/1000);
+    timerEl.textContent = 'Code expires in ' + m + ':' + (s<10?'0':'')+s;
+    if(left > 0) setTimeout(tick, 1000);
+    else timerEl.textContent = 'Code expired — click Resend.';
+  }
+  tick();
+  if(digits[0]) digits[0].focus();
+})();
+</script>
+
+<%- include('partials/footer') %>

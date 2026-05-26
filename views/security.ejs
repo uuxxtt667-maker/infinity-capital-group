@@ -1,0 +1,206 @@
+<% pageTitle = 'Security Settings' %>
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<style>
+.sec-wrap { max-width: 760px; margin: 0 auto; padding: 1.5rem 1.5rem 3rem; }
+.sec-section { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem 2rem; margin-bottom: 1.5rem; }
+.sec-section-title { font-size: 1rem; font-weight: 800; color: var(--text); margin-bottom: .25rem; display: flex; align-items: center; gap: .6rem; }
+.sec-section-sub   { font-size: .82rem; color: var(--text3); margin-bottom: 1.5rem; }
+.sec-badge-on  { background: rgba(5,150,105,.15); color: #059669; border: 1px solid rgba(5,150,105,.25); font-size: .72rem; font-weight: 700; padding: .2rem .65rem; border-radius: 20px; letter-spacing: .04em; }
+.sec-badge-off { background: rgba(148,163,184,.12); color: var(--text3); border: 1px solid var(--border); font-size: .72rem; font-weight: 700; padding: .2rem .65rem; border-radius: 20px; letter-spacing: .04em; }
+.sec-divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+.sec-label { font-size: .75rem; font-weight: 700; color: var(--text2); margin-bottom: .4rem; display: block; }
+.sec-input {
+  width: 100%; padding: .68rem 1rem;
+  border: 1.5px solid var(--border); border-radius: 10px;
+  background: var(--bg2); color: var(--text); font-size: .9rem;
+  outline: none; transition: border-color .2s, box-shadow .2s;
+  box-sizing: border-box;
+}
+.sec-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-light); }
+.sec-input::placeholder { color: var(--text3); }
+.sec-pwd-wrap { position: relative; }
+.sec-pwd-eye  { position: absolute; right: .8rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text3); cursor: pointer; padding: .2rem; font-size: .82rem; }
+.sec-row { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
+.sec-warning { background: rgba(220,38,38,.07); border: 1px solid rgba(220,38,38,.2); border-radius: 10px; padding: .75rem 1rem; font-size: .8rem; color: var(--text2); margin-bottom: 1.25rem; }
+.sec-info    { background: rgba(245,166,35,.07); border: 1px solid rgba(245,166,35,.2); border-radius: 10px; padding: .75rem 1rem; font-size: .8rem; color: var(--text2); margin-bottom: 1.25rem; }
+.pin-dots { display: flex; gap: .35rem; align-items: center; margin-bottom: .35rem; }
+.pin-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--gold); }
+@media(max-width:600px){ .sec-row { grid-template-columns: 1fr; } }
+</style>
+
+<div class="sec-wrap">
+  <div style="margin-bottom:1.5rem">
+    <h1 style="font-size:1.4rem;font-weight:800"><i class="fas fa-shield-alt" style="color:var(--gold);margin-right:.45rem"></i>Security Settings</h1>
+    <p style="font-size:.84rem;color:var(--text3);margin:0">Manage two-factor authentication, withdrawal PIN, and your password.</p>
+  </div>
+
+  <!-- ─── 1. Two-Factor Authentication ─── -->
+  <div class="sec-section">
+    <div class="sec-section-title">
+      <i class="fas fa-mobile-alt" style="color:var(--gold)"></i>
+      Two-Factor Authentication (2FA)
+      <% if (user.twoFAEnabled) { %>
+        <span class="sec-badge-on"><i class="fas fa-check" style="margin-right:.25rem"></i>ON</span>
+      <% } else { %>
+        <span class="sec-badge-off">OFF</span>
+      <% } %>
+    </div>
+    <div class="sec-section-sub">
+      When enabled, you'll receive a 6-digit code on your email every time you sign in. Adds a strong extra layer of protection.
+    </div>
+
+    <% if (!user.twoFAEnabled) { %>
+    <div class="sec-info">
+      <i class="fas fa-info-circle" style="color:var(--gold);margin-right:.4rem"></i>
+      2FA is currently <strong>disabled</strong>. Enable it to protect your account even if your password is compromised.
+    </div>
+    <% } else { %>
+    <div class="sec-info" style="background:rgba(5,150,105,.07);border-color:rgba(5,150,105,.2)">
+      <i class="fas fa-check-circle" style="color:#059669;margin-right:.4rem"></i>
+      2FA is <strong>active</strong>. You will be asked for a verification code on every login.
+    </div>
+    <% } %>
+
+    <form method="POST" action="/security/toggle-2fa">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <label class="sec-label">Confirm your password to <%= user.twoFAEnabled ? 'disable' : 'enable' %> 2FA</label>
+      <div class="sec-pwd-wrap" style="max-width:320px;margin-bottom:1rem">
+        <input type="password" name="password" class="sec-input" placeholder="Your current password" required autocomplete="current-password" id="pwd2fa">
+        <button type="button" class="sec-pwd-eye" onclick="secEye('pwd2fa','eye2fa')"><i class="fas fa-eye" id="eye2fa"></i></button>
+      </div>
+      <button type="submit" class="btn <%= user.twoFAEnabled ? 'btn-danger' : 'btn-success' %>" style="padding:.65rem 1.75rem;">
+        <i class="fas fa-<%= user.twoFAEnabled ? 'times' : 'check' %>"></i>
+        <%= user.twoFAEnabled ? 'Disable 2FA' : 'Enable 2FA' %>
+      </button>
+    </form>
+  </div>
+
+  <!-- ─── 2. Withdrawal PIN ─── -->
+  <div class="sec-section">
+    <div class="sec-section-title">
+      <i class="fas fa-lock" style="color:var(--gold)"></i>
+      Withdrawal PIN
+      <% if (user.withdrawPin) { %>
+        <span class="sec-badge-on"><i class="fas fa-check" style="margin-right:.25rem"></i>SET</span>
+      <% } else { %>
+        <span class="sec-badge-off">NOT SET</span>
+      <% } %>
+    </div>
+    <div class="sec-section-sub">
+      A 4–6 digit PIN required on every withdrawal, in addition to your email OTP code. Required before you can make any withdrawal.
+    </div>
+
+    <% if (!user.withdrawPin) { %>
+    <div class="sec-warning">
+      <i class="fas fa-exclamation-triangle" style="color:var(--red);margin-right:.4rem"></i>
+      <strong>No withdrawal PIN set.</strong> You must set a PIN before you can request a withdrawal.
+    </div>
+    <% } else { %>
+    <div style="margin-bottom:1.25rem">
+      <div class="pin-dots"><% for(var i=0;i<5;i++){ %><span class="pin-dot"></span><% } %></div>
+      <div style="font-size:.78rem;color:var(--text3)">PIN is set and active on your account.</div>
+    </div>
+    <% } %>
+
+    <!-- Set / Change PIN -->
+    <form method="POST" action="/security/set-pin">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <div style="font-weight:700;font-size:.85rem;color:var(--text2);margin-bottom:.8rem">
+        <i class="fas fa-<%= user.withdrawPin ? 'sync-alt' : 'plus-circle' %>" style="color:var(--gold);margin-right:.35rem"></i>
+        <%= user.withdrawPin ? 'Change PIN' : 'Set PIN' %>
+      </div>
+      <div class="sec-row" style="margin-bottom:.9rem">
+        <div>
+          <label class="sec-label">New PIN (4–6 digits)</label>
+          <input type="password" name="pin" class="sec-input" placeholder="••••" maxlength="6" inputmode="numeric" pattern="[0-9]{4,6}" required id="pinInput">
+        </div>
+        <div>
+          <label class="sec-label">Confirm PIN</label>
+          <input type="password" name="pin_confirm" class="sec-input" placeholder="••••" maxlength="6" inputmode="numeric" pattern="[0-9]{4,6}" required>
+        </div>
+      </div>
+      <div style="margin-bottom:1rem">
+        <label class="sec-label">Confirm your account password</label>
+        <div class="sec-pwd-wrap" style="max-width:320px">
+          <input type="password" name="password" class="sec-input" placeholder="Your current password" required autocomplete="current-password" id="pwdPin">
+          <button type="button" class="sec-pwd-eye" onclick="secEye('pwdPin','eyePin')"><i class="fas fa-eye" id="eyePin"></i></button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="padding:.65rem 1.75rem;">
+        <i class="fas fa-save"></i> <%= user.withdrawPin ? 'Update PIN' : 'Save PIN' %>
+      </button>
+    </form>
+
+    <% if (user.withdrawPin) { %>
+    <hr class="sec-divider">
+    <form method="POST" action="/security/remove-pin" onsubmit="return confirm('Remove your withdrawal PIN? You will not be able to withdraw until you set a new one.')">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <div style="font-weight:700;font-size:.85rem;color:var(--red);margin-bottom:.8rem"><i class="fas fa-trash-alt" style="margin-right:.35rem"></i>Remove PIN</div>
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+        <div class="sec-pwd-wrap" style="min-width:220px">
+          <input type="password" name="password" class="sec-input" placeholder="Confirm your password" required autocomplete="current-password" id="pwdRmPin">
+          <button type="button" class="sec-pwd-eye" onclick="secEye('pwdRmPin','eyeRm')"><i class="fas fa-eye" id="eyeRm"></i></button>
+        </div>
+        <button type="submit" class="btn btn-danger" style="padding:.65rem 1.4rem;"><i class="fas fa-trash-alt"></i> Remove PIN</button>
+      </div>
+    </form>
+    <% } %>
+  </div>
+
+  <!-- ─── 3. Change Password ─── -->
+  <div class="sec-section">
+    <div class="sec-section-title">
+      <i class="fas fa-key" style="color:var(--gold)"></i>
+      Change Password
+    </div>
+    <div class="sec-section-sub">
+      Choose a strong password you don't use elsewhere. Changing your password will log you out.
+    </div>
+
+    <form method="POST" action="/security/change-password">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <div style="margin-bottom:.9rem">
+        <label class="sec-label">Current Password</label>
+        <div class="sec-pwd-wrap" style="max-width:380px">
+          <input type="password" name="current_password" class="sec-input" placeholder="Enter current password" required autocomplete="current-password" id="pwdCur">
+          <button type="button" class="sec-pwd-eye" onclick="secEye('pwdCur','eyeCur')"><i class="fas fa-eye" id="eyeCur"></i></button>
+        </div>
+      </div>
+      <div class="sec-row" style="max-width:600px;margin-bottom:1rem">
+        <div>
+          <label class="sec-label">New Password</label>
+          <div class="sec-pwd-wrap">
+            <input type="password" name="new_password" class="sec-input" placeholder="Min. 8 characters" required minlength="8" autocomplete="new-password" id="pwdNew">
+            <button type="button" class="sec-pwd-eye" onclick="secEye('pwdNew','eyeNew')"><i class="fas fa-eye" id="eyeNew"></i></button>
+          </div>
+        </div>
+        <div>
+          <label class="sec-label">Confirm New Password</label>
+          <div class="sec-pwd-wrap">
+            <input type="password" name="confirm_password" class="sec-input" placeholder="Repeat new password" required autocomplete="new-password" id="pwdConf">
+            <button type="button" class="sec-pwd-eye" onclick="secEye('pwdConf','eyeConf')"><i class="fas fa-eye" id="eyeConf"></i></button>
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-warning" style="padding:.65rem 1.75rem;" onclick="return confirm('Change your password? You will be logged out.')">
+        <i class="fas fa-key"></i> Update Password
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+function secEye(inputId, eyeId) {
+  var inp = document.getElementById(inputId);
+  var eye = document.getElementById(eyeId);
+  if (inp.type === 'password') { inp.type = 'text';     eye.className = 'fas fa-eye-slash'; }
+  else                         { inp.type = 'password'; eye.className = 'fas fa-eye'; }
+}
+// PIN digits only
+var pinInput = document.getElementById('pinInput');
+if (pinInput) pinInput.addEventListener('input', function(){ this.value = this.value.replace(/\D/g,''); });
+</script>
+
+<%- include('partials/footer') %>
