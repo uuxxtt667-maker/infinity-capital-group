@@ -11,23 +11,6 @@ router.get('/', (req, res) => {
   res.render('security', { csrf: generateCSRF(req) });
 });
 
-/* ── POST /security/toggle-2fa ─────────────────── */
-router.post('/toggle-2fa', async (req, res) => {
-  if (!verifyCSRF(req)) { req.flash('error', 'Invalid request.'); return res.redirect('/security'); }
-  const user = res.locals.user;
-  const { password } = req.body;
-
-  if (!bcrypt.compareSync(password || '', user.password)) {
-    req.flash('error', 'Incorrect password. 2FA setting unchanged.');
-    return res.redirect('/security');
-  }
-
-  const newState = !user.twoFAEnabled;
-  await db.users.updateAsync({ _id: user._id }, { $set: { twoFAEnabled: newState } });
-  req.flash('success', `Two-factor authentication ${newState ? 'enabled' : 'disabled'}.`);
-  res.redirect('/security');
-});
-
 /* ── POST /security/set-pin ─────────────────────── */
 router.post('/set-pin', async (req, res) => {
   if (!verifyCSRF(req)) { req.flash('error', 'Invalid request.'); return res.redirect('/security'); }

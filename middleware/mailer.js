@@ -19,19 +19,16 @@ async function sendOTP(to, otp, purpose, siteName) {
   const subjects = {
     verify:  `[${site}] Email Verification Code`,
     reset:   `[${site}] Password Reset Code`,
-    '2fa':   `[${site}] Login Security Code`,
     withdraw:`[${site}] Withdrawal Verification Code`,
   };
   const headings = {
     verify:  'Verify Your Email Address',
     reset:   'Reset Your Password',
-    '2fa':   'Login Verification Code',
     withdraw:'Withdrawal Confirmation Code',
   };
   const bodies = {
     verify:  `You're almost there! Enter the code below to verify your email address and activate your account.`,
     reset:   `We received a request to reset your password. Enter the code below to continue.`,
-    '2fa':   `Someone (hopefully you) is signing in to your account. Enter this code to complete login.`,
     withdraw:`A withdrawal has been requested from your account. Enter this code along with your PIN to confirm.`,
   };
 

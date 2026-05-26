@@ -33,51 +33,10 @@
 <div class="sec-wrap">
   <div style="margin-bottom:1.5rem">
     <h1 style="font-size:1.4rem;font-weight:800"><i class="fas fa-shield-alt" style="color:var(--gold);margin-right:.45rem"></i>Security Settings</h1>
-    <p style="font-size:.84rem;color:var(--text3);margin:0">Manage two-factor authentication, withdrawal PIN, and your password.</p>
+    <p style="font-size:.84rem;color:var(--text3);margin:0">Manage your withdrawal PIN and account password.</p>
   </div>
 
-  <!-- ─── 1. Two-Factor Authentication ─── -->
-  <div class="sec-section">
-    <div class="sec-section-title">
-      <i class="fas fa-mobile-alt" style="color:var(--gold)"></i>
-      Two-Factor Authentication (2FA)
-      <% if (user.twoFAEnabled) { %>
-        <span class="sec-badge-on"><i class="fas fa-check" style="margin-right:.25rem"></i>ON</span>
-      <% } else { %>
-        <span class="sec-badge-off">OFF</span>
-      <% } %>
-    </div>
-    <div class="sec-section-sub">
-      When enabled, you'll receive a 6-digit code on your email every time you sign in. Adds a strong extra layer of protection.
-    </div>
-
-    <% if (!user.twoFAEnabled) { %>
-    <div class="sec-info">
-      <i class="fas fa-info-circle" style="color:var(--gold);margin-right:.4rem"></i>
-      2FA is currently <strong>disabled</strong>. Enable it to protect your account even if your password is compromised.
-    </div>
-    <% } else { %>
-    <div class="sec-info" style="background:rgba(5,150,105,.07);border-color:rgba(5,150,105,.2)">
-      <i class="fas fa-check-circle" style="color:#059669;margin-right:.4rem"></i>
-      2FA is <strong>active</strong>. You will be asked for a verification code on every login.
-    </div>
-    <% } %>
-
-    <form method="POST" action="/security/toggle-2fa">
-      <input type="hidden" name="_csrf" value="<%= csrf %>">
-      <label class="sec-label">Confirm your password to <%= user.twoFAEnabled ? 'disable' : 'enable' %> 2FA</label>
-      <div class="sec-pwd-wrap" style="max-width:320px;margin-bottom:1rem">
-        <input type="password" name="password" class="sec-input" placeholder="Your current password" required autocomplete="current-password" id="pwd2fa">
-        <button type="button" class="sec-pwd-eye" onclick="secEye('pwd2fa','eye2fa')"><i class="fas fa-eye" id="eye2fa"></i></button>
-      </div>
-      <button type="submit" class="btn <%= user.twoFAEnabled ? 'btn-danger' : 'btn-success' %>" style="padding:.65rem 1.75rem;">
-        <i class="fas fa-<%= user.twoFAEnabled ? 'times' : 'check' %>"></i>
-        <%= user.twoFAEnabled ? 'Disable 2FA' : 'Enable 2FA' %>
-      </button>
-    </form>
-  </div>
-
-  <!-- ─── 2. Withdrawal PIN ─── -->
+  <!-- ─── 1. Withdrawal PIN ─── -->
   <div class="sec-section">
     <div class="sec-section-title">
       <i class="fas fa-lock" style="color:var(--gold)"></i>
@@ -149,7 +108,7 @@
     <% } %>
   </div>
 
-  <!-- ─── 3. Change Password ─── -->
+  <!-- ─── 2. Change Password ─── -->
   <div class="sec-section">
     <div class="sec-section-title">
       <i class="fas fa-key" style="color:var(--gold)"></i>
