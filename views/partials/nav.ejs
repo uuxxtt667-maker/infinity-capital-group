@@ -25,44 +25,79 @@
   </div>
 </nav>
 
-<% if (!user) { %>
+<!-- ── LIVE CRYPTO TICKER (Binance real-time) ── -->
 <div class="ticker-bar">
-  <div class="ticker-track">
-    <span class="ticker-item"><span class="t-pair">BTC/USD</span><span class="t-price" id="t-btc">67,420</span><span class="t-change up" id="tc-btc">▲2.4%</span></span>
-    <span class="ticker-item"><span class="t-pair">ETH/USD</span><span class="t-price" id="t-eth">3,512</span><span class="t-change up" id="tc-eth">▲1.8%</span></span>
-    <span class="ticker-item"><span class="t-pair">EUR/USD</span><span class="t-price" id="t-eur">1.0842</span><span class="t-change dn" id="tc-eur">▼0.3%</span></span>
-    <span class="ticker-item"><span class="t-pair">GBP/USD</span><span class="t-price" id="t-gbp">1.2714</span><span class="t-change up" id="tc-gbp">▲0.2%</span></span>
-    <span class="ticker-item"><span class="t-pair">S&amp;P 500</span><span class="t-price" id="t-sp">5,842</span><span class="t-change up" id="tc-sp">▲0.9%</span></span>
-    <span class="ticker-item"><span class="t-pair">NASDAQ</span><span class="t-price" id="t-nas">18,412</span><span class="t-change up" id="tc-nas">▲1.2%</span></span>
-    <span class="ticker-item"><span class="t-pair">XAU/USD</span><span class="t-price" id="t-xau">2,318</span><span class="t-change up" id="tc-xau">▲0.6%</span></span>
-    <span class="ticker-item"><span class="t-pair">SOL/USD</span><span class="t-price" id="t-sol">142.6</span><span class="t-change up" id="tc-sol">▲3.1%</span></span>
-    <span class="ticker-item"><span class="t-pair">BTC/USD</span><span class="t-price">67,420</span><span class="t-change up">▲2.4%</span></span>
-    <span class="ticker-item"><span class="t-pair">ETH/USD</span><span class="t-price">3,512</span><span class="t-change up">▲1.8%</span></span>
-    <span class="ticker-item"><span class="t-pair">EUR/USD</span><span class="t-price">1.0842</span><span class="t-change dn">▼0.3%</span></span>
-    <span class="ticker-item"><span class="t-pair">GBP/USD</span><span class="t-price">1.2714</span><span class="t-change up">▲0.2%</span></span>
-    <span class="ticker-item"><span class="t-pair">S&amp;P 500</span><span class="t-price">5,842</span><span class="t-change up">▲0.9%</span></span>
-    <span class="ticker-item"><span class="t-pair">XAU/USD</span><span class="t-price">2,318</span><span class="t-change up">▲0.6%</span></span>
-    <span class="ticker-item"><span class="t-pair">SOL/USD</span><span class="t-price">142.6</span><span class="t-change up">▲3.1%</span></span>
+  <div class="ticker-track" id="nav-ticker-track">
+    <!-- JS builds 2× set for seamless loop -->
   </div>
 </div>
-<% } else { %>
-<div class="ticker-bar">
-  <div class="ticker-track">
-    <span class="ticker-item"><span class="t-pair">BTC/USD</span><span class="t-price" id="dt-btc">$67,420</span><span class="t-change up" id="dtc-btc">▲2.4%</span></span>
-    <span class="ticker-item"><span class="t-pair">ETH/USD</span><span class="t-price" id="dt-eth">$3,512</span><span class="t-change up" id="dtc-eth">▲1.8%</span></span>
-    <span class="ticker-item"><span class="t-pair">EUR/USD</span><span class="t-price" id="dt-eur">1.0842</span><span class="t-change dn" id="dtc-eur">▼0.3%</span></span>
-    <span class="ticker-item"><span class="t-pair">S&amp;P 500</span><span class="t-price" id="dt-sp">5,842</span><span class="t-change up" id="dtc-sp">▲0.9%</span></span>
-    <span class="ticker-item"><span class="t-pair">XAU/USD</span><span class="t-price" id="dt-xau">$2,318</span><span class="t-change up" id="dtc-xau">▲0.6%</span></span>
-    <span class="ticker-item"><span class="t-pair">SOL/USD</span><span class="t-price" id="dt-sol">$142.6</span><span class="t-change up" id="dtc-sol">▲3.1%</span></span>
-    <span class="ticker-item"><span class="t-pair">BTC/USD</span><span class="t-price">$67,420</span><span class="t-change up">▲2.4%</span></span>
-    <span class="ticker-item"><span class="t-pair">ETH/USD</span><span class="t-price">$3,512</span><span class="t-change up">▲1.8%</span></span>
-    <span class="ticker-item"><span class="t-pair">EUR/USD</span><span class="t-price">1.0842</span><span class="t-change dn">▼0.3%</span></span>
-    <span class="ticker-item"><span class="t-pair">S&amp;P 500</span><span class="t-price">5,842</span><span class="t-change up">▲0.9%</span></span>
-    <span class="ticker-item"><span class="t-pair">XAU/USD</span><span class="t-price">$2,318</span><span class="t-change up">▲0.6%</span></span>
-    <span class="ticker-item"><span class="t-pair">SOL/USD</span><span class="t-price">$142.6</span><span class="t-change up">▲3.1%</span></span>
-  </div>
-</div>
-<% } %>
+<script>
+(function(){
+  var NT=[
+    {sym:'BTC/USDT', pair:'BTCUSDT', price:77525, chg:2.41},
+    {sym:'ETH/USDT', pair:'ETHUSDT', price:2116,  chg:1.82},
+    {sym:'BNB/USDT', pair:'BNBUSDT', price:661,   chg:0.93},
+    {sym:'SOL/USDT', pair:'SOLUSDT', price:86,    chg:3.14},
+    {sym:'XRP/USDT', pair:'XRPUSDT', price:1.36,  chg:-0.67},
+    {sym:'DOGE/USDT',pair:'DOGEUSDT',price:0.1029,chg:-1.04},
+    {sym:'ADA/USDT', pair:'ADAUSDT', price:0.2458,chg:1.22},
+    {sym:'TRX/USDT', pair:'TRXUSDT', price:0.3666,chg:0.55},
+    {sym:'AVAX/USDT',pair:'AVAXUSDT',price:9.42,  chg:-1.23},
+    {sym:'TON/USDT', pair:'TONUSDT', price:1.81,  chg:2.10}
+  ];
+  var ntMap={};
+  NT.forEach(function(c){ ntMap[c.pair]=c; });
+
+  function ntFmt(p){
+    if(p>=10000) return '$'+p.toLocaleString('en-US',{maximumFractionDigits:0});
+    if(p>=100)   return '$'+p.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+    if(p>=1)     return '$'+p.toFixed(3);
+    if(p>=0.01)  return '$'+p.toFixed(4);
+    return '$'+p.toFixed(6);
+  }
+  function ntBuild(){
+    var h='';
+    function row(c,sfx){
+      var up=c.chg>=0;
+      return '<span class="ticker-item">'+
+        '<span class="t-pair">'+c.sym+'</span>'+
+        '<span class="t-price"'+(sfx?' id="nt-px-'+c.pair+'"':'')+'>'+ntFmt(c.price)+'</span>'+
+        '<span class="t-change '+(up?'up':'dn')+'"'+(sfx?' id="nt-chg-'+c.pair+'"':'')+'>'+
+          (up?'▲':'▼')+Math.abs(c.chg).toFixed(2)+'%'+
+        '</span></span>';
+    }
+    NT.forEach(function(c){ h+=row(c,true); });
+    NT.forEach(function(c){ h+=row(c,false); });
+    return h;
+  }
+  var track=document.getElementById('nav-ticker-track');
+  if(track) track.innerHTML=ntBuild();
+
+  var ntStreams=NT.map(function(c){ return c.pair.toLowerCase()+'@miniTicker'; }).join('/');
+  var ntRetry=1000;
+  function ntWS(){
+    try{
+      var ws=new WebSocket('wss://stream.binance.com:9443/stream?streams='+ntStreams);
+      ws.onmessage=function(e){
+        try{
+          var msg=JSON.parse(e.data),d=msg.data||msg;
+          var price=parseFloat(d.c),open=parseFloat(d.o),chg=(price-open)/open*100;
+          var sym=(d.s||'').toUpperCase(),c=ntMap[sym]; if(!c) return;
+          c.price=price; c.chg=chg;
+          var pxEl=document.getElementById('nt-px-'+sym);
+          var chgEl=document.getElementById('nt-chg-'+sym);
+          if(pxEl) pxEl.textContent=ntFmt(price);
+          if(chgEl){ chgEl.textContent=(chg>=0?'▲':'▼')+Math.abs(chg).toFixed(2)+'%'; chgEl.className='t-change '+(chg>=0?'up':'dn'); }
+          ntRetry=1000;
+        }catch(_){}
+      };
+      ws.onclose=function(){ ntRetry=Math.min(ntRetry*1.5,30000); setTimeout(ntWS,ntRetry); };
+      ws.onerror=function(){ ws.close(); };
+    }catch(_){}
+  }
+  ntWS();
+})();
+</script>
 
 <% if (success && success.length) { %><div class="alert alert-success"><i class="fas fa-check-circle"></i> <%- success[0] %></div><% } %>
 <% if (error && error.length)   { %><div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> <%- error[0] %></div><% } %>
