@@ -18,6 +18,12 @@ const DEFAULTS = {
   /* ── Live-price API keys ── */
   alphaVantageKey:    '',   /* Alpha Vantage  — forex / gold / stocks */
   iexCloudKey:        '',   /* IEX Cloud      — stocks (SPY/QQQ/USO)  */
+  /* ── Email / SMTP ── */
+  smtpHost:           '',
+  smtpPort:           587,
+  smtpUser:           '',
+  smtpPass:           '',
+  smtpFrom:           '',
 };
 
 const CUSTOMIZE_DEFAULTS = {

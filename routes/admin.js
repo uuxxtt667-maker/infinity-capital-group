@@ -346,8 +346,11 @@ router.get('/settings', (req, res) => {
 
 router.post('/settings', (req, res) => {
   const { siteName, announcement, usdtBep20Address, usdtErc20Address, usdtSolAddress, usdtTrc20Address,
-          minDeposit, minWithdrawal, referralRate, alphaVantageKey, iexCloudKey } = req.body;
+          minDeposit, minWithdrawal, referralRate, alphaVantageKey, iexCloudKey,
+          smtpHost, smtpPort, smtpUser, smtpPass, smtpFrom } = req.body;
   const maintenanceMode = req.body.maintenanceMode === 'on';
+  // preserve existing smtpPass if field left blank (password masking)
+  const existing = require('../middleware/settings').getSettings();
   saveSettings({
     siteName:           siteName              || 'APEXINVEST',
     maintenanceMode,
@@ -361,6 +364,11 @@ router.post('/settings', (req, res) => {
     referralRate:       parseFloat(referralRate)     || 10,
     alphaVantageKey:    (alphaVantageKey  || '').trim(),
     iexCloudKey:        (iexCloudKey      || '').trim(),
+    smtpHost:           (smtpHost   || '').trim(),
+    smtpPort:           parseInt(smtpPort)    || 587,
+    smtpUser:           (smtpUser   || '').trim(),
+    smtpPass:           smtpPass ? smtpPass.trim() : (existing.smtpPass || ''),
+    smtpFrom:           (smtpFrom   || '').trim(),
   });
   req.flash('success', 'Settings saved successfully.');
   res.redirect('/admin/settings');
