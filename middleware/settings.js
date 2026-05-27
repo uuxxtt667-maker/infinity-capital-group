@@ -5,6 +5,7 @@ const SETTINGS_FILE = path.join(__dirname, '../data/settings.json');
 
 const DEFAULTS = {
   siteName:           'APEXINVEST',
+  siteUrl:            '',
   maintenanceMode:    false,
   announcement:       '',
   /* USDT deposit addresses per network */

@@ -46,6 +46,7 @@ app.use((req, res, next) => {
 });
 
 // Routes
+app.use('/',             require('./routes/sitemap'));   // sitemap.xml + robots.txt
 app.use('/',             require('./routes/index'));
 app.use('/',             require('./routes/auth'));
 app.use('/dashboard',    require('./routes/dashboard'));

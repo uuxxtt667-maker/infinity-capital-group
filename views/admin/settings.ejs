@@ -25,6 +25,18 @@
         <div class="card" style="margin-bottom:1.5rem;">
           <div class="card-header"><span class="card-title"><i class="fas fa-globe"></i> General</span></div>
           <div class="form-group"><label class="form-label">Site Name</label><input type="text" name="siteName" class="form-control" required value="<%= settings.siteName %>"></div>
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-globe" style="color:var(--blue);margin-right:.3rem;font-size:.85rem;"></i>
+              Site URL <span style="color:var(--text-muted);font-weight:400;font-size:.8rem;">(used for sitemap.xml &amp; SEO)</span>
+            </label>
+            <input type="url" name="siteUrl" class="form-control" placeholder="https://yourdomain.com" value="<%= settings.siteUrl || '' %>">
+            <p class="form-text">
+              Full URL without trailing slash — e.g. <code>https://infinitycapitalgroup.com</code>
+              &nbsp;|&nbsp; <a href="/sitemap.xml" target="_blank" style="color:var(--blue)"><i class="fas fa-sitemap"></i> View sitemap.xml</a>
+              &nbsp;|&nbsp; <a href="/robots.txt" target="_blank" style="color:var(--blue)"><i class="fas fa-robot"></i> View robots.txt</a>
+            </p>
+          </div>
           <div class="form-group"><label class="form-label">Announcement <span style="color:var(--text-muted);font-weight:400;">(shown on dashboard — leave blank to hide)</span></label><textarea name="announcement" class="form-control" rows="2" placeholder="e.g. Scheduled maintenance on Sunday…"><%= settings.announcement %></textarea></div>
           <div class="form-group" style="display:flex;align-items:center;gap:.75rem;">
             <input type="checkbox" name="maintenanceMode" id="maintenanceMode" <%= settings.maintenanceMode?'checked':''%>>

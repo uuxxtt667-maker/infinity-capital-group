@@ -369,7 +369,7 @@ router.get('/settings', (req, res) => {
 });
 
 router.post('/settings', (req, res) => {
-  const { siteName, announcement, usdtBep20Address, usdtErc20Address, usdtSolAddress, usdtTrc20Address,
+  const { siteName, siteUrl, announcement, usdtBep20Address, usdtErc20Address, usdtSolAddress, usdtTrc20Address,
           minDeposit, minWithdrawal, referralRate, alphaVantageKey, iexCloudKey,
           smtpHost, smtpPort, smtpUser, smtpPass, smtpFrom } = req.body;
   const maintenanceMode = req.body.maintenanceMode === 'on';
@@ -377,6 +377,7 @@ router.post('/settings', (req, res) => {
   const existing = require('../middleware/settings').getSettings();
   saveSettings({
     siteName:           siteName              || 'APEXINVEST',
+    siteUrl:            (siteUrl || '').trim().replace(/\/+$/, ''),
     maintenanceMode,
     announcement:       announcement          || '',
     usdtBep20Address:   usdtBep20Address      || '',
