@@ -1,0 +1,36 @@
+<style>
+.site-statsbar{padding:.85rem 1.5rem 0;background:var(--bg2);border-bottom:1px solid var(--border);}
+.site-statsbar-inner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:.75rem;padding-bottom:.85rem;}
+.sb-pill{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:.8rem 1rem;display:flex;align-items:center;gap:.75rem;transition:transform .15s,box-shadow .15s;}
+.sb-pill:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.08);}
+.sb-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.sb-val{font-size:1.15rem;font-weight:900;color:var(--text);line-height:1.1;font-variant-numeric:tabular-nums;}
+.sb-lbl{font-size:.65rem;color:var(--text3);font-weight:600;margin-top:.1rem;text-transform:uppercase;letter-spacing:.04em;}
+@media(max-width:900px){.site-statsbar-inner{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:580px){.site-statsbar-inner{grid-template-columns:1fr 1fr;}}
+@media(max-width:360px){.site-statsbar-inner{grid-template-columns:1fr;}}
+</style>
+<div class="site-statsbar">
+  <div class="site-statsbar-inner">
+    <div class="sb-pill">
+      <div class="sb-icon" style="background:rgba(245,166,35,.12);color:var(--gold)"><i class="fas fa-wallet"></i></div>
+      <div><div class="sb-val"><%- siteCustomize.stat1Val %></div><div class="sb-lbl"><%- siteCustomize.stat1Lbl %></div></div>
+    </div>
+    <div class="sb-pill">
+      <div class="sb-icon" style="background:rgba(61,142,240,.12);color:var(--blue)"><i class="fas fa-users"></i></div>
+      <div><div class="sb-val"><%- siteCustomize.stat2Val %></div><div class="sb-lbl"><%- siteCustomize.stat2Lbl %></div></div>
+    </div>
+    <div class="sb-pill">
+      <div class="sb-icon" style="background:rgba(0,230,118,.12);color:var(--green)"><i class="fas fa-globe"></i></div>
+      <div><div class="sb-val"><%- siteCustomize.stat3Val %></div><div class="sb-lbl"><%- siteCustomize.stat3Lbl %></div></div>
+    </div>
+    <div class="sb-pill">
+      <div class="sb-icon" style="background:rgba(155,89,182,.12);color:var(--purple)"><i class="fas fa-percentage"></i></div>
+      <div><div class="sb-val"><%- siteCustomize.stat4Val %></div><div class="sb-lbl"><%- siteCustomize.stat4Lbl %></div></div>
+    </div>
+    <div class="sb-pill">
+      <div class="sb-icon" style="background:rgba(0,212,255,.1);color:#00d4ff"><i class="fas fa-server"></i></div>
+      <div><div class="sb-val"><%- siteCustomize.stat5Val %></div><div class="sb-lbl"><%- siteCustomize.stat5Lbl %></div></div>
+    </div>
+  </div>
+</div>
