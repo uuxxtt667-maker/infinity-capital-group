@@ -112,22 +112,25 @@ router.get('/plans', async (req, res) => {
   if (req.query.edit) {
     editPlan = await db.plans.findOneAsync({ _id: req.query.edit });
   }
-  res.render('admin/plans', { plans, editPlan });
+  const settings = getSettings();
+  res.render('admin/plans', { plans, editPlan, globalReferralRate: settings.referralRate || 10 });
 });
 
 router.post('/plans/save', async (req, res) => {
-  const { plan_id, name, price, maxPrice, annualRoi, durationDays, withdrawalFreq, features, color, icon } = req.body;
+  const { plan_id, name, price, maxPrice, annualRoi, durationDays, withdrawalFreq, features, color, icon, referralCommission } = req.body;
   const active = req.body.active === 'on';
+  const refComm = referralCommission !== undefined && referralCommission !== '' ? parseFloat(referralCommission) : null;
   const data = {
-    name:          name || 'Unnamed Plan',
-    price:         parseFloat(price)     || 0,
-    maxPrice:      parseFloat(maxPrice)  || 0,
-    annualRoi:     parseFloat(annualRoi) || 0,
-    durationDays:  parseInt(durationDays)|| 365,
-    withdrawalFreq:withdrawalFreq        || 'Monthly',
-    features:      (features || '').trim(),
-    color:         color || '#3d8ef0',
-    icon:          icon  || 'fas fa-star',
+    name:               name || 'Unnamed Plan',
+    price:              parseFloat(price)     || 0,
+    maxPrice:           parseFloat(maxPrice)  || 0,
+    annualRoi:          parseFloat(annualRoi) || 0,
+    durationDays:       parseInt(durationDays)|| 365,
+    withdrawalFreq:     withdrawalFreq        || 'Monthly',
+    features:           (features || '').trim(),
+    color:              color || '#3d8ef0',
+    icon:               icon  || 'fas fa-star',
+    referralCommission: refComm,
     active,
   };
   if (plan_id) {
@@ -184,14 +187,23 @@ router.post('/plan-requests/action', async (req, res) => {
         description: `Plan activated: ${plan.name}`,
         createdAt:   new Date(),
       });
-      /* Referral commission */
+      /* Referral commission — use per-plan rate if set, else global rate */
       const investor = await db.users.findOneAsync({ _id: planReq.userId });
       if (investor && investor.referredBy) {
         const settings  = getSettings();
-        const rate      = (settings.referralRate || 10) / 100;
+        const planRate  = (plan.referralCommission !== null && plan.referralCommission !== undefined)
+                          ? plan.referralCommission
+                          : (settings.referralRate || 10);
+        const rate      = planRate / 100;
         const commission = +(planReq.amountUsd * rate).toFixed(4);
         await db.users.updateAsync({ _id: investor.referredBy }, { $inc: { balance: commission, referralEarnings: commission } });
-        await db.transactions.insertAsync({ userId: investor.referredBy, type: 'referral_earning', amount: commission, description: 'Referral plan commission', createdAt: new Date() });
+        await db.transactions.insertAsync({
+          userId:      investor.referredBy,
+          type:        'referral_earning',
+          amount:      commission,
+          description: `Referral commission — ${plan.name} plan (${planRate}%)`,
+          createdAt:   new Date(),
+        });
       }
     }
     await db.planRequests.updateAsync({ _id: request_id }, { $set: { status: 'approved', processedAt: new Date() } });
@@ -247,10 +259,19 @@ router.post('/deposits/action', async (req, res) => {
         const depositor = await db.users.findOneAsync({ _id: dep.userId });
         if (depositor && depositor.referredBy) {
           const settings   = getSettings();
-          const rate        = (settings.referralRate || 10) / 100;
-          const commission  = +(dep.amountUsd * rate).toFixed(4);
+          const planRate   = (plan.referralCommission !== null && plan.referralCommission !== undefined)
+                             ? plan.referralCommission
+                             : (settings.referralRate || 10);
+          const rate       = planRate / 100;
+          const commission = +(dep.amountUsd * rate).toFixed(4);
           await db.users.updateAsync({ _id: depositor.referredBy }, { $inc: { balance: commission, referralEarnings: commission } });
-          await db.transactions.insertAsync({ userId: depositor.referredBy, type: 'referral_earning', amount: commission, description: 'Referral deposit commission', createdAt: new Date() });
+          await db.transactions.insertAsync({
+            userId:      depositor.referredBy,
+            type:        'referral_earning',
+            amount:      commission,
+            description: `Referral commission — ${plan.name} plan (${planRate}%)`,
+            createdAt:   new Date(),
+          });
         }
       }
     }

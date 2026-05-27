@@ -255,7 +255,14 @@
         <% feats.forEach(function(f) { %>
         <li><i class="fas fa-check"></i> <%= f %></li>
         <% }); %>
-        <li><i class="fas fa-check"></i> Referral commissions</li>
+        <% var refRate = (p.referralCommission !== undefined && p.referralCommission !== null && p.referralCommission !== '') ? p.referralCommission : null; %>
+        <li><i class="fas fa-user-friends" style="color:#3d8ef0"></i>
+          <% if (refRate !== null) { %>
+            <strong style="color:#3d8ef0"><%= refRate %>% referral commission</strong> — instant payout
+          <% } else { %>
+            Referral commission — instant payout
+          <% } %>
+        </li>
       </ul>
 
       <!-- Earnings box -->
@@ -331,6 +338,10 @@
         <li><i class="fas fa-check" style="color:<%= ec %>"></i> Capital protection guarantee</li>
         <li><i class="fas fa-check" style="color:<%= ec %>"></i> Compound interest option</li>
         <% } %>
+        <% var elRefRate = (elitePlan.referralCommission !== undefined && elitePlan.referralCommission !== null && elitePlan.referralCommission !== '') ? elitePlan.referralCommission : null; %>
+        <li><i class="fas fa-user-friends" style="color:<%= ec %>"></i>
+          <% if (elRefRate !== null) { %><strong><%= elRefRate %>% referral commission</strong> — instant<% } else { %>Referral commission — instant<% } %>
+        </li>
       </ul>
       <div style="text-align:center;">
         <% if (user) { %>

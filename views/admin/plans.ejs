@@ -90,6 +90,22 @@
             </div>
           </div>
 
+          <!-- Referral Commission -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-user-friends" style="color:var(--blue);margin-right:.3rem;font-size:.85rem;"></i>
+              Referral Commission (%)
+            </label>
+            <div style="position:relative;">
+              <input type="number" name="referralCommission" class="form-control"
+                min="0" max="100" step="0.01"
+                placeholder="e.g. 10"
+                value="<%= editPlan ? (editPlan.referralCommission !== undefined ? editPlan.referralCommission : '') : '' %>">
+              <span style="position:absolute;right:.8rem;top:50%;transform:translateY(-50%);color:var(--text3);font-size:.82rem;">%</span>
+            </div>
+            <p class="form-text">Commission credited <strong>instantly to referrer's balance</strong> when this plan is activated. Leave blank to use global rate (<%= typeof globalReferralRate !== 'undefined' ? globalReferralRate : '10' %>%).</p>
+          </div>
+
           <!-- Withdrawal Frequency -->
           <div class="form-group">
             <label class="form-label">Withdrawal Frequency</label>
@@ -186,7 +202,7 @@
               </div>
 
               <!-- Stats row -->
-              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin-top:1rem;">
+              <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:.65rem;margin-top:1rem;">
                 <div style="background:var(--bg2);border-radius:8px;padding:.55rem .75rem;text-align:center;">
                   <div style="font-size:.66rem;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.2rem;">Annual ROI</div>
                   <div style="font-size:1.2rem;font-weight:900;color:<%= p.color||'#3d8ef0' %>;"><%= annRoi %>%</div>
@@ -202,6 +218,16 @@
                 <div style="background:var(--bg2);border-radius:8px;padding:.55rem .75rem;text-align:center;">
                   <div style="font-size:.66rem;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.2rem;">Duration</div>
                   <div style="font-size:1rem;font-weight:800;"><%= p.durationDays %> days</div>
+                </div>
+                <div style="background:rgba(61,142,240,.08);border:1px solid rgba(61,142,240,.18);border-radius:8px;padding:.55rem .75rem;text-align:center;">
+                  <div style="font-size:.66rem;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.2rem;"><i class="fas fa-user-friends"></i> Ref Rate</div>
+                  <div style="font-size:1rem;font-weight:900;color:var(--blue);">
+                    <% if (p.referralCommission !== undefined && p.referralCommission !== null && p.referralCommission !== '') { %>
+                      <%= p.referralCommission %>%
+                    <% } else { %>
+                      <span style="font-size:.8rem;color:var(--text3)">Global</span>
+                    <% } %>
+                  </div>
                 </div>
               </div>
 

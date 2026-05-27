@@ -26,3 +26,4 @@ Thumbs.db
 # Cloudflared binary
 cloudflared
 data/users.db~
+*.db~
