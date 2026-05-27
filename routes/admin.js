@@ -459,12 +459,34 @@ router.post('/customize/content', (req, res) => {
     'perfBadge','perfMonths',
     'perfCryptoPts','perfCryptoReturn','perfStocksPts','perfStocksReturn',
     'perfForexPts','perfForexReturn','perfREPts','perfREReturn',
+    // Testimonials
+    'test1Name','test1Role','test1Stars','test1Text',
+    'test2Name','test2Role','test2Stars','test2Text',
+    'test3Name','test3Role','test3Stars','test3Text',
   ];
   const data = {};
   allContentFields.forEach(f => { if (req.body[f] !== undefined) data[f] = req.body[f]; });
   saveCustomize(data);
   req.flash('success', 'Content updated.');
   res.redirect('/admin/customize?tab=content&page=' + (req.body._page || 'hero'));
+});
+
+router.post('/customize/advanced', (req, res) => {
+  const advancedFields = [
+    'telegramLink','whatsappLink',
+    'socialTwitter','socialFacebook','socialInstagram','socialLinkedIn','socialYouTube','socialTikTok',
+    'seoDescription','seoKeywords','faviconUrl','ogImage',
+    'floatingBtnPosition','floatingTelegramLink','floatingWhatsappLink',
+    'popupTitle','popupText','popupBtnText','popupBtnLink','popupDelay','popupBg',
+    'customCss','customJs',
+  ];
+  const data = {};
+  advancedFields.forEach(f => { data[f] = req.body[f] !== undefined ? req.body[f] : ''; });
+  data.floatingBtnsEnabled = req.body.floatingBtnsEnabled === 'true' ? 'true' : 'false';
+  data.popupEnabled        = req.body.popupEnabled        === 'true' ? 'true' : 'false';
+  saveCustomize(data);
+  req.flash('success', 'Advanced settings updated.');
+  res.redirect('/admin/customize?tab=advanced');
 });
 
 router.post('/customize/reset', (req, res) => {
@@ -474,7 +496,8 @@ router.post('/customize/reset', (req, res) => {
     colors:      ['colorBg','colorBg2','colorCard','colorBorder','colorPrimary','colorGold','colorGreen','colorRed','colorPurple','colorText','colorText2','colorText3'],
     fonts:       ['fontFamily','fontUrl','fontSizeBase'],
     backgrounds: ['bgHome','bgOverlayHome','colorBgHome','bgDashboard','bgOverlayDashboard','colorBgDashboard','bgPlans','bgOverlayPlans','colorBgPlans','bgDeposit','bgOverlayDeposit','bgWithdraw','bgOverlayWithdraw','bgLogin','bgOverlayLogin','bgRegister','bgOverlayRegister','bgAdmin','bgOverlayAdmin','bgAbout','bgOverlayAbout','bgHow','bgOverlayHow','bgAnalytics','bgOverlayAnalytics','bgPortfolio','bgOverlayPortfolio','bgContact','bgOverlayContact','bgHeroImages','bgHeroSlideInterval','bgHeroSlideOverlay','bgBottomImages','bgBottomSlideInterval','bgBottomSlideOverlay'],
-    content:     ['navInvestNow','navSignIn','heroBadge','heroTitle','heroSubtitle','heroCta1','heroCta2','stat1Val','stat1Lbl','stat2Val','stat2Lbl','stat3Val','stat3Lbl','stat4Val','stat4Lbl','stat5Val','stat5Lbl','aboutTitle','aboutSubtitle','aboutCard1Title','aboutCard1Desc','aboutCard2Title','aboutCard2Desc','aboutCard3Title','aboutCard3Desc','aboutCard4Title','aboutCard4Desc','howTitle','howSubtitle','step1Title','step1Desc','step2Title','step2Desc','step3Title','step3Desc','step4Title','step4Desc','feat1Title','feat1Desc','feat2Title','feat2Desc','feat3Title','feat3Desc','feat4Title','feat4Desc','feat5Title','feat5Desc','analyticsTitle','analyticsSubtitle','portfolioTitle','portfolioSubtitle','contactTitle','contactSubtitle','contactPhone','contactFormTitle','plansTitle','plansSubtitle','loginTitle','loginSubtitle','registerTitle','registerSubtitle','mixTotal','mix1Name','mix1Pct','mix2Name','mix2Pct','mix3Name','mix3Pct','mix4Name','mix4Pct','mix5Name','mix5Pct','portTotal','portGrowthPct','portGrowthLabel','port1Name','port1Pct','port1USD','port2Name','port2Pct','port2USD','port3Name','port3Pct','port3USD','port4Name','port4Pct','port4USD','port5Name','port5Pct','port5USD','hold1Name','hold1Pct','hold1Chg','hold2Name','hold2Pct','hold2Chg','hold3Name','hold3Pct','hold3Chg','hold4Name','hold4Pct','hold4Chg','hold5Name','hold5Pct','hold5Chg','perfBadge','perfMonths','perfCryptoPts','perfCryptoReturn','perfStocksPts','perfStocksReturn','perfForexPts','perfForexReturn','perfREPts','perfREReturn'],
+    content:     ['navInvestNow','navSignIn','heroBadge','heroTitle','heroSubtitle','heroCta1','heroCta2','stat1Val','stat1Lbl','stat2Val','stat2Lbl','stat3Val','stat3Lbl','stat4Val','stat4Lbl','stat5Val','stat5Lbl','aboutTitle','aboutSubtitle','aboutCard1Title','aboutCard1Desc','aboutCard2Title','aboutCard2Desc','aboutCard3Title','aboutCard3Desc','aboutCard4Title','aboutCard4Desc','howTitle','howSubtitle','step1Title','step1Desc','step2Title','step2Desc','step3Title','step3Desc','step4Title','step4Desc','feat1Title','feat1Desc','feat2Title','feat2Desc','feat3Title','feat3Desc','feat4Title','feat4Desc','feat5Title','feat5Desc','analyticsTitle','analyticsSubtitle','portfolioTitle','portfolioSubtitle','contactTitle','contactSubtitle','contactPhone','contactFormTitle','plansTitle','plansSubtitle','loginTitle','loginSubtitle','registerTitle','registerSubtitle','mixTotal','mix1Name','mix1Pct','mix2Name','mix2Pct','mix3Name','mix3Pct','mix4Name','mix4Pct','mix5Name','mix5Pct','portTotal','portGrowthPct','portGrowthLabel','port1Name','port1Pct','port1USD','port2Name','port2Pct','port2USD','port3Name','port3Pct','port3USD','port4Name','port4Pct','port4USD','port5Name','port5Pct','port5USD','hold1Name','hold1Pct','hold1Chg','hold2Name','hold2Pct','hold2Chg','hold3Name','hold3Pct','hold3Chg','hold4Name','hold4Pct','hold4Chg','hold5Name','hold5Pct','hold5Chg','perfBadge','perfMonths','perfCryptoPts','perfCryptoReturn','perfStocksPts','perfStocksReturn','perfForexPts','perfForexReturn','perfREPts','perfREReturn','test1Name','test1Role','test1Stars','test1Text','test2Name','test2Role','test2Stars','test2Text','test3Name','test3Role','test3Stars','test3Text'],
+    advanced:    ['telegramLink','whatsappLink','socialTwitter','socialFacebook','socialInstagram','socialLinkedIn','socialYouTube','socialTikTok','seoDescription','seoKeywords','faviconUrl','ogImage','floatingBtnsEnabled','floatingBtnPosition','floatingTelegramLink','floatingWhatsappLink','floatingBtnsEnabled','popupEnabled','popupTitle','popupText','popupBtnText','popupBtnLink','popupDelay','popupBg','customCss','customJs'],
   };
   const keys = section && sectionMap[section] ? sectionMap[section] : Object.keys(CUSTOMIZE_DEFAULTS);
   const reset = {};

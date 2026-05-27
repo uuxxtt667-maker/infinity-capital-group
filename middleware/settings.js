@@ -177,6 +177,47 @@ const CUSTOMIZE_DEFAULTS = {
   perfStocksReturn: '+19%',   perfStocksPts: '0,8,12,16,21,19',
   perfForexReturn:  '+8.7%',  perfForexPts:  '0,3,5,7,8,8.7',
   perfREReturn:     '+16%',   perfREPts:     '0,5,9,12,14,16',
+
+  /* ── Testimonials ────────────────────────────────────────── */
+  test1Name: 'James Robertson', test1Role: 'Crypto Investor', test1Stars: '5',
+  test1Text: 'Incredible platform! I\'ve been earning consistent returns every week. The withdrawal process is fast and transparent.',
+  test2Name: 'Sarah Mitchell',  test2Role: 'Forex Trader',    test2Stars: '5',
+  test2Text: 'I was skeptical at first, but after 3 months my investment has grown beyond my expectations. Highly recommended!',
+  test3Name: 'David Chen',      test3Role: 'Stock Investor',  test3Stars: '5',
+  test3Text: 'Best investment platform I\'ve used. The team is professional, support is excellent, and returns are real.',
+
+  /* ── Advanced — Social Links ─────────────────────────────── */
+  socialTwitter:   '',
+  socialFacebook:  '',
+  socialInstagram: '',
+  socialLinkedIn:  '',
+  socialYouTube:   '',
+  socialTikTok:    '',
+
+  /* ── Advanced — SEO ──────────────────────────────────────── */
+  seoDescription: 'A professional investment platform for Crypto, Forex, Stocks & Real Estate. Earn daily returns with expert fund management.',
+  seoKeywords:    'investment, crypto, forex, stocks, real estate, daily returns, passive income',
+  faviconUrl:     '',
+  ogImage:        '',
+
+  /* ── Advanced — Floating Contact Buttons ─────────────────── */
+  floatingBtnsEnabled:  'false',
+  floatingBtnPosition:  'right',
+  floatingTelegramLink: '',
+  floatingWhatsappLink: '',
+
+  /* ── Advanced — Custom Code ──────────────────────────────── */
+  customCss: '',
+  customJs:  '',
+
+  /* ── Advanced — Promo Popup ──────────────────────────────── */
+  popupEnabled:  'false',
+  popupDelay:    '3',
+  popupTitle:    '🎁 Welcome Bonus!',
+  popupText:     'Sign up today and get a <strong>10% bonus</strong> on your first deposit. Limited time offer!',
+  popupBtnText:  'Claim Bonus',
+  popupBtnLink:  '/register',
+  popupBg:       '#161b22',
 };
 
 function getSettings() {

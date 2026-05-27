@@ -146,6 +146,7 @@ router.post('/verify', requireLogin, async (req, res) => {
   }
 
   // Process withdrawal
+  const createdAt = new Date();
   await db.users.updateAsync({ _id: user._id }, { $inc: { balance: -pw.amount, totalWithdrawn: pw.amount } });
   const wd = await db.withdrawals.insertAsync({
     userId:       user._id,
@@ -155,17 +156,33 @@ router.post('/verify', requireLogin, async (req, res) => {
     networkLabel: pw.networkLabel,
     walletAddress: pw.wallet,
     status:       'pending',
-    createdAt:    new Date(),
+    createdAt,
   });
   await db.transactions.insertAsync({
     userId: user._id, type: 'withdrawal', amount: pw.amount,
     description: `Withdrawal via USDT ${pw.networkStd}`,
-    refId: wd._id, createdAt: new Date(),
+    refId: wd._id, createdAt,
   });
 
+  // Store success data for confirmation page
+  req.session.lastWithdrawal = {
+    refId:        wd._id,
+    amount:       pw.amount,
+    networkLabel: pw.networkLabel,
+    networkStd:   pw.networkStd,
+    wallet:       pw.wallet,
+    submittedAt:  createdAt.toISOString(),
+  };
   delete req.session.pendingWithdrawal;
-  req.flash('success', `Withdrawal of $${pw.amount.toFixed(2)} submitted. Processing within 24 hours.`);
-  res.redirect('/transactions');
+  req.session.save(() => res.redirect('/withdraw/success'));
+});
+
+/* ── GET /withdraw/success ─────────────────── */
+router.get('/success', requireLogin, (req, res) => {
+  const wd = req.session.lastWithdrawal;
+  if (!wd) return res.redirect('/transactions');
+  delete req.session.lastWithdrawal;
+  res.render('withdraw-success', { wd });
 });
 
 /* ── POST /withdraw/verify/resend ──────────── */
