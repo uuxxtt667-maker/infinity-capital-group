@@ -94,8 +94,8 @@ const CUSTOMIZE_DEFAULTS = {
   /* Stats Bar */
   stat1Val:'$48M+',   stat1Lbl:'Assets Managed',
   stat2Val:'12,400+', stat2Lbl:'Active Investors',
-  stat3Val:'50+',     stat3Lbl:'Markets Available',
-  stat4Val:'50%',     stat4Lbl:'Lower Fees Than Avg',
+  stat3Val:'50% Max', stat3Lbl:'Annual Return',
+  stat4Val:'100%',    stat4Lbl:'Payout on Time',
   stat5Val:'99.9%',   stat5Lbl:'Platform Uptime',
 
   /* About Us */

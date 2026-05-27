@@ -190,15 +190,10 @@
 
 <!-- STATS BAR -->
 <div class="pl-stats">
-  <div class="pl-stat"><div class="pl-stat-val" style="color:#f5a623">$48M+</div><div class="pl-stat-lbl">Assets Managed</div></div>
-  <div class="pl-stat"><div class="pl-stat-val" style="color:#3d8ef0">12,400+</div><div class="pl-stat-lbl">Active Investors</div></div>
-  <div class="pl-stat">
-    <div class="pl-stat-val" style="color:#9b59b6">
-      <%= elitePlan ? (elitePlan.annualRoi !== undefined ? elitePlan.annualRoi : (elitePlan.dailyRoi||0)) : (paidPlans.length ? (paidPlans[paidPlans.length-1].annualRoi !== undefined ? paidPlans[paidPlans.length-1].annualRoi : (paidPlans[paidPlans.length-1].dailyRoi||0)) : 0) %>% Max
-    </div>
-    <div class="pl-stat-lbl">Annual ROI</div>
-  </div>
-  <div class="pl-stat"><div class="pl-stat-val" style="color:#00e676">100%</div><div class="pl-stat-lbl">On-Time Payouts</div></div>
+  <div class="pl-stat"><div class="pl-stat-val" style="color:#f5a623"><%- siteCustomize.stat1Val %></div><div class="pl-stat-lbl"><%- siteCustomize.stat1Lbl %></div></div>
+  <div class="pl-stat"><div class="pl-stat-val" style="color:#3d8ef0"><%- siteCustomize.stat2Val %></div><div class="pl-stat-lbl"><%- siteCustomize.stat2Lbl %></div></div>
+  <div class="pl-stat"><div class="pl-stat-val" style="color:#9b59b6"><%- siteCustomize.stat3Val %></div><div class="pl-stat-lbl"><%- siteCustomize.stat3Lbl %></div></div>
+  <div class="pl-stat"><div class="pl-stat-val" style="color:#00e676"><%- siteCustomize.stat4Val %></div><div class="pl-stat-lbl"><%- siteCustomize.stat4Lbl %></div></div>
 </div>
 
 <div class="pl-wrap">
