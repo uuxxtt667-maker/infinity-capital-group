@@ -320,14 +320,72 @@ router.post('/withdrawals/action', async (req, res) => {
 // ── Transactions ─────────────────────────────────────────────
 router.get('/transactions', async (req, res) => {
   const typeFilter = req.query.type || 'all';
-  let txs = await db.transactions.findAsync(typeFilter === 'all' ? {} : { type: typeFilter });
-  txs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  txs = txs.slice(0, 200);
-  for (const t of txs) {
-    const u = await db.users.findOneAsync({ _id: t.userId });
-    t.username = (u || {}).username || '?';
+  const q          = (req.query.q || '').trim();
+
+  /* ── User search mode ── */
+  let searchUser     = null;
+  let userDeposits   = [];
+  let userWithdrawals = [];
+  let userPlanReqs   = [];
+
+  if (q) {
+    const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    searchUser = await db.users.findOneAsync({
+      $or: [{ username: { $regex: re } }, { email: { $regex: re } }],
+    });
+    if (!searchUser) {
+      /* try exact _id */
+      searchUser = await db.users.findOneAsync({ _id: q });
+    }
   }
-  res.render('admin/transactions', { txs, typeFilter });
+
+  /* ── Fetch transactions ── */
+  let txFilter = typeFilter === 'all' ? {} : { type: typeFilter };
+  if (searchUser) txFilter.userId = searchUser._id;
+
+  let txs = await db.transactions.findAsync(txFilter);
+  txs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  if (!searchUser) txs = txs.slice(0, 200);
+
+  for (const t of txs) {
+    if (searchUser) {
+      t.username = searchUser.username;
+    } else {
+      const u = await db.users.findOneAsync({ _id: t.userId });
+      t.username = (u || {}).username || '?';
+    }
+  }
+
+  /* ── Extra data for searched user ── */
+  if (searchUser) {
+    userDeposits    = await db.deposits.findAsync({ userId: searchUser._id });
+    userDeposits.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    userWithdrawals = await db.withdrawals.findAsync({ userId: searchUser._id });
+    userWithdrawals.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    userPlanReqs    = await db.planRequests.findAsync({ userId: searchUser._id });
+    userPlanReqs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    /* Attach plan name to each plan request */
+    for (const pr of userPlanReqs) {
+      const pl = await db.plans.findOneAsync({ _id: pr.planId });
+      pr.planDisplayName = (pl || {}).name || pr.planName || '?';
+    }
+
+    /* Current active plan */
+    if (searchUser.planId) {
+      const activePlan = await db.plans.findOneAsync({ _id: searchUser.planId });
+      searchUser.planName = (activePlan || {}).name || '—';
+    } else {
+      searchUser.planName = '—';
+    }
+  }
+
+  res.render('admin/transactions', {
+    txs, typeFilter, q,
+    searchUser, userDeposits, userWithdrawals, userPlanReqs,
+  });
 });
 
 // ── Ads ──────────────────────────────────────────────────────

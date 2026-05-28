@@ -20,10 +20,208 @@
   </nav>
   <div class="admin-main">
     <div class="page-header"><h1><i class="fas fa-exchange-alt"></i> Transactions</h1></div>
+
+    <!-- ── SEARCH BAR ── -->
+    <form method="GET" action="/admin/transactions" style="margin-bottom:1.25rem;">
+      <input type="hidden" name="type" value="<%= typeFilter %>">
+      <div style="display:flex;gap:.65rem;align-items:center;">
+        <div style="position:relative;flex:1;max-width:420px;">
+          <i class="fas fa-search" style="position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--text3);font-size:.85rem;pointer-events:none;"></i>
+          <input type="text" name="q" value="<%= q %>"
+            placeholder="Search by username or email…"
+            style="width:100%;padding:.6rem .9rem .6rem 2.3rem;border:1px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--text);font-size:.88rem;outline:none;box-sizing:border-box;"
+            autocomplete="off">
+        </div>
+        <button type="submit" class="btn btn-primary" style="padding:.6rem 1.3rem;font-size:.88rem;">
+          <i class="fas fa-search"></i> Search
+        </button>
+        <% if (q) { %>
+        <a href="/admin/transactions" class="btn btn-outline" style="padding:.6rem 1rem;font-size:.88rem;">
+          <i class="fas fa-times"></i> Clear
+        </a>
+        <% } %>
+      </div>
+    </form>
+
+    <!-- ── USER NOT FOUND ── -->
+    <% if (q && !searchUser) { %>
+    <div style="background:rgba(244,63,94,.07);border:1px solid rgba(244,63,94,.2);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:.75rem;">
+      <i class="fas fa-user-slash" style="color:#f43f5e;font-size:1.2rem;"></i>
+      <div>
+        <strong style="color:var(--text);">No user found</strong>
+        <div style="font-size:.82rem;color:var(--text3);">No user matches "<%= q %>". Try their exact username or email address.</div>
+      </div>
+    </div>
+    <% } %>
+
+    <!-- ── USER PROFILE CARD (search result) ── -->
+    <% if (searchUser) { %>
+    <% const isPlanActive = searchUser.planExpires && new Date(searchUser.planExpires) > new Date(); %>
+    <div class="card" style="margin-bottom:1.25rem;border-left:4px solid var(--blue);">
+      <div class="card-header" style="flex-wrap:wrap;gap:.5rem;">
+        <span class="card-title">
+          <i class="fas fa-user-circle" style="color:var(--blue)"></i>
+          <%= searchUser.username %>
+          <span style="font-size:.78rem;font-weight:400;color:var(--text3);margin-left:.35rem;"><%= searchUser.email %></span>
+        </span>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
+          <%- searchUser.isActive ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Suspended</span>' %>
+          <%- searchUser.isAdmin  ? '<span class="badge badge-warning">Admin</span>'  : '' %>
+          <a href="/admin/users?edit=<%= searchUser._id %>" class="btn btn-outline btn-sm"><i class="fas fa-edit"></i> Edit User</a>
+        </div>
+      </div>
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:.65rem;padding:1rem 1.25rem;border-bottom:1px solid var(--border);">
+        <div style="background:var(--bg2);border-radius:9px;padding:.6rem .9rem;text-align:center;">
+          <div style="font-size:.63rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem;">Balance</div>
+          <div style="font-size:1.1rem;font-weight:900;color:var(--green);">$<%= (searchUser.balance||0).toFixed(2) %></div>
+        </div>
+        <div style="background:var(--bg2);border-radius:9px;padding:.6rem .9rem;text-align:center;">
+          <div style="font-size:.63rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem;">Total Invested</div>
+          <div style="font-size:1.1rem;font-weight:900;color:var(--blue);">$<%= (searchUser.totalInvested||0).toFixed(2) %></div>
+        </div>
+        <div style="background:var(--bg2);border-radius:9px;padding:.6rem .9rem;text-align:center;">
+          <div style="font-size:.63rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem;">Total Withdrawn</div>
+          <div style="font-size:1.1rem;font-weight:900;color:var(--gold);">$<%= (searchUser.totalWithdrawn||0).toFixed(2) %></div>
+        </div>
+        <div style="background:var(--bg2);border-radius:9px;padding:.6rem .9rem;text-align:center;">
+          <div style="font-size:.63rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem;">Referral Earned</div>
+          <div style="font-size:1.1rem;font-weight:900;color:var(--purple);">$<%= (searchUser.referralEarnings||0).toFixed(2) %></div>
+        </div>
+        <div style="background:var(--bg2);border-radius:9px;padding:.6rem .9rem;text-align:center;">
+          <div style="font-size:.63rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem;">Active Plan</div>
+          <div style="font-size:.88rem;font-weight:900;color:<%= isPlanActive ? 'var(--green)' : 'var(--text3)' %>;">
+            <%= isPlanActive ? searchUser.planName : 'None' %>
+          </div>
+          <% if (isPlanActive) { %>
+          <div style="font-size:.62rem;color:var(--text3);">Exp: <%= new Date(searchUser.planExpires).toLocaleDateString() %></div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Sub-tabs for user history -->
+      <div style="padding:.75rem 1.25rem 0;display:flex;gap:.35rem;flex-wrap:wrap;border-bottom:1px solid var(--border);" id="uTabBar">
+        <button class="utab-btn active" onclick="showUtab('txs',this)"><i class="fas fa-exchange-alt"></i> Transactions (<%= txs.length %>)</button>
+        <button class="utab-btn" onclick="showUtab('deps',this)"><i class="fas fa-plus-circle"></i> Deposits (<%= userDeposits.length %>)</button>
+        <button class="utab-btn" onclick="showUtab('wds',this)"><i class="fas fa-minus-circle"></i> Withdrawals (<%= userWithdrawals.length %>)</button>
+        <button class="utab-btn" onclick="showUtab('plans',this)"><i class="fas fa-layer-group"></i> Plan Requests (<%= userPlanReqs.length %>)</button>
+      </div>
+
+      <style>
+      .utab-btn{background:none;border:none;padding:.55rem .9rem .7rem;font-size:.8rem;font-weight:700;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;}
+      .utab-btn:hover{color:var(--text);}
+      .utab-btn.active{color:var(--blue);border-bottom-color:var(--blue);}
+      .utab-panel{display:none;}.utab-panel.active{display:block;}
+      </style>
+
+      <!-- Transactions tab -->
+      <div class="utab-panel active" id="utab-txs">
+        <% if (!txs.length) { %>
+        <div class="empty-state"><i class="fas fa-receipt"></i><p>No transactions found.</p></div>
+        <% } else { %>
+        <div class="table-responsive"><table class="table">
+          <thead><tr><th>Type</th><th>Amount</th><th>Description</th><th>Date</th></tr></thead>
+          <tbody>
+            <% txs.forEach(t=>{ %>
+            <% const typeColors={deposit:'success',withdrawal:'danger',plan_purchase:'info',referral_earning:'warning',roi:'cyan',manual:'secondary',click:'muted'}; %>
+            <tr>
+              <td><span class="badge badge-<%= typeColors[t.type]||'secondary' %>" style="font-size:.72rem;text-transform:capitalize;"><%= (t.type||'').replace(/_/g,' ') %></span></td>
+              <td class="<%= (t.amount||0)>=0?'text-success':'text-danger' %> font-bold"><%= (t.amount||0)>=0?'+':'' %>$<%= Math.abs(t.amount||0).toFixed(4) %></td>
+              <td style="font-size:.82rem;color:var(--text-muted);max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= t.description||'—' %></td>
+              <td style="font-size:.8rem;color:var(--text-muted);white-space:nowrap;"><%= new Date(t.createdAt).toLocaleString() %></td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table></div>
+        <div style="padding:.6rem 1rem;font-size:.8rem;color:var(--text-muted);border-top:1px solid var(--border);"><%= txs.length %> transactions</div>
+        <% } %>
+      </div>
+
+      <!-- Deposits tab -->
+      <div class="utab-panel" id="utab-deps">
+        <% if (!userDeposits.length) { %>
+        <div class="empty-state"><i class="fas fa-plus-circle"></i><p>No deposits found.</p></div>
+        <% } else { %>
+        <div class="table-responsive"><table class="table">
+          <thead><tr><th>Amount</th><th>Network</th><th>Status</th><th>Plan</th><th>Date</th></tr></thead>
+          <tbody>
+            <% userDeposits.forEach(d=>{ %>
+            <tr>
+              <td class="font-bold text-success">$<%= (d.amountUsd||0).toFixed(2) %></td>
+              <td style="font-size:.82rem;"><%= d.cryptoType||'—' %></td>
+              <td>
+                <% const dColors={confirmed:'success',pending:'warning',rejected:'danger'}; %>
+                <span class="badge badge-<%= dColors[d.status]||'secondary' %>"><%= d.status||'—' %></span>
+              </td>
+              <td style="font-size:.82rem;"><%= d.planId && d.planId !== 'plan1' ? (d.planName||d.planId) : '—' %></td>
+              <td style="font-size:.8rem;color:var(--text-muted);white-space:nowrap;"><%= new Date(d.createdAt).toLocaleString() %></td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table></div>
+        <div style="padding:.6rem 1rem;font-size:.8rem;color:var(--text-muted);border-top:1px solid var(--border);"><%= userDeposits.length %> deposits</div>
+        <% } %>
+      </div>
+
+      <!-- Withdrawals tab -->
+      <div class="utab-panel" id="utab-wds">
+        <% if (!userWithdrawals.length) { %>
+        <div class="empty-state"><i class="fas fa-minus-circle"></i><p>No withdrawals found.</p></div>
+        <% } else { %>
+        <div class="table-responsive"><table class="table">
+          <thead><tr><th>Amount</th><th>Network</th><th>Wallet</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>
+            <% userWithdrawals.forEach(w=>{ %>
+            <tr>
+              <td class="font-bold text-danger">$<%= (w.amountUsd||0).toFixed(2) %></td>
+              <td style="font-size:.82rem;"><%= w.networkLabel||w.cryptoType||'—' %></td>
+              <td style="font-family:monospace;font-size:.76rem;color:var(--text3);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="<%= w.walletAddress||'' %>"><%= w.walletAddress||'—' %></td>
+              <td>
+                <% const wColors={completed:'success',pending:'warning',processing:'info',rejected:'danger'}; %>
+                <span class="badge badge-<%= wColors[w.status]||'secondary' %>"><%= w.status||'—' %></span>
+              </td>
+              <td style="font-size:.8rem;color:var(--text-muted);white-space:nowrap;"><%= new Date(w.createdAt).toLocaleString() %></td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table></div>
+        <div style="padding:.6rem 1rem;font-size:.8rem;color:var(--text-muted);border-top:1px solid var(--border);"><%= userWithdrawals.length %> withdrawals</div>
+        <% } %>
+      </div>
+
+      <!-- Plan Requests tab -->
+      <div class="utab-panel" id="utab-plans">
+        <% if (!userPlanReqs.length) { %>
+        <div class="empty-state"><i class="fas fa-layer-group"></i><p>No plan requests found.</p></div>
+        <% } else { %>
+        <div class="table-responsive"><table class="table">
+          <thead><tr><th>Plan</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>
+            <% userPlanReqs.forEach(pr=>{ %>
+            <tr>
+              <td class="font-bold"><%= pr.planDisplayName %></td>
+              <td class="text-success font-bold">$<%= (pr.amountUsd||0).toFixed(2) %></td>
+              <td>
+                <% const prColors={approved:'success',pending:'warning',rejected:'danger'}; %>
+                <span class="badge badge-<%= prColors[pr.status]||'secondary' %>"><%= pr.status||'—' %></span>
+              </td>
+              <td style="font-size:.8rem;color:var(--text-muted);white-space:nowrap;"><%= new Date(pr.createdAt).toLocaleString() %></td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table></div>
+        <div style="padding:.6rem 1rem;font-size:.8rem;color:var(--text-muted);border-top:1px solid var(--border);"><%= userPlanReqs.length %> plan requests</div>
+        <% } %>
+      </div>
+    </div>
+
+    <% } else { %>
+
+    <!-- ── GLOBAL TRANSACTIONS LIST (no search) ── -->
     <div class="tabs mb-3">
-      <% [['all','All'],['deposit','Deposits'],['withdrawal','Withdrawals'],['plan_purchase','Plans'],['referral_earning','Referrals'],['roi','ROI'],['manual','Manual'],['click','Clicks']].forEach(([t,l])=>{%>
-      <a href="/admin/transactions?type=<%= t %>" class="tab-btn <%= typeFilter===t?'active':'' %>" style="text-decoration:none;"><%= l %></a>
-      <%})%>
+      <% [['all','All'],['deposit','Deposits'],['withdrawal','Withdrawals'],['plan_purchase','Plans'],['referral_earning','Referrals'],['roi','ROI'],['manual','Manual']].forEach(([t,l])=>{ %>
+      <a href="/admin/transactions?type=<%= t %><%= q ? '&q='+encodeURIComponent(q) : '' %>" class="tab-btn <%= typeFilter===t?'active':'' %>" style="text-decoration:none;"><%= l %></a>
+      <% }); %>
     </div>
     <div class="card">
       <% if (!txs.length) { %>
@@ -32,25 +230,37 @@
       <div class="table-responsive"><table class="table">
         <thead><tr><th>User</th><th>Type</th><th>Amount</th><th>Description</th><th>Date</th></tr></thead>
         <tbody>
-          <% txs.forEach(t=>{%>
+          <% txs.forEach(t=>{ %>
+          <% const typeColors={deposit:'success',withdrawal:'danger',plan_purchase:'info',referral_earning:'warning',roi:'cyan',manual:'secondary',click:'muted'}; %>
           <tr>
-            <td><strong><%= t.username %></strong></td>
             <td>
-              <% const typeColors = {deposit:'success',withdrawal:'danger',plan_purchase:'info',referral_earning:'warning',roi:'cyan',manual:'secondary',click:'muted'}; %>
-              <span class="badge badge-<%= typeColors[t.type]||'secondary' %>" style="font-size:.72rem;text-transform:capitalize;"><%= (t.type||'').replace(/_/g,' ') %></span>
+              <a href="/admin/transactions?q=<%= encodeURIComponent(t.username) %>" style="font-weight:700;color:var(--blue);text-decoration:none;" title="View <%= t.username %>'s full history">
+                <%= t.username %>
+              </a>
             </td>
-            <td class="<%= (t.amount||0)>=0?'text-success':'text-danger' %> font-bold">
-              <%= (t.amount||0)>=0?'+':'' %>$<%= Math.abs(t.amount||0).toFixed(4) %>
-            </td>
+            <td><span class="badge badge-<%= typeColors[t.type]||'secondary' %>" style="font-size:.72rem;text-transform:capitalize;"><%= (t.type||'').replace(/_/g,' ') %></span></td>
+            <td class="<%= (t.amount||0)>=0?'text-success':'text-danger' %> font-bold"><%= (t.amount||0)>=0?'+':'' %>$<%= Math.abs(t.amount||0).toFixed(4) %></td>
             <td style="font-size:.82rem;color:var(--text-muted);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= t.description||'—' %></td>
             <td style="font-size:.8rem;color:var(--text-muted);white-space:nowrap;"><%= new Date(t.createdAt).toLocaleString() %></td>
           </tr>
-          <%})%>
+          <% }); %>
         </tbody>
       </table></div>
-      <div style="padding:.75rem 1rem;font-size:.82rem;color:var(--text-muted);border-top:1px solid var(--border);">Showing latest <%= txs.length %> transactions</div>
+      <div style="padding:.75rem 1rem;font-size:.82rem;color:var(--text-muted);border-top:1px solid var(--border);">Showing latest <%= txs.length %> transactions — click a username to view their full history</div>
       <% } %>
     </div>
+    <% } %>
+
   </div>
 </div>
+
+<script>
+function showUtab(id, btn) {
+  document.querySelectorAll('.utab-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.utab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('utab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+
 <%- include('../partials/footer') %>
