@@ -95,10 +95,7 @@
           Your balance: <strong style="color:#f43f5e">$<%= (balance||0).toFixed(2) %></strong> &mdash;
           you need <strong>$<%= Math.max(0, minAmt - balance).toFixed(2) %></strong> more.
         </div>
-        <a href="/deposit?plan=<%= plan._id %>" class="btn btn-gold">
-          <i class="fas fa-plus-circle"></i> Deposit Funds
-        </a>
-        <a href="/plans" class="btn btn-outline" style="margin-left:.5rem">View Other Plans</a>
+        <a href="/plans" class="btn btn-outline">View Other Plans</a>
       </div>
 
       <% } else { %>

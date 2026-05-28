@@ -69,8 +69,8 @@ router.post('/', requireLogin, async (req, res) => {
   /* Re-read balance fresh to avoid race conditions */
   const freshUser = await db.users.findOneAsync({ _id: user._id });
   if ((freshUser.balance || 0) < amount) {
-    req.flash('error', `Insufficient balance. You have $${(freshUser.balance || 0).toFixed(2)} — deposit more funds.`);
-    return res.redirect('/deposit');
+    req.flash('error', `Insufficient balance. You have $${(freshUser.balance || 0).toFixed(2)} available — need $${Math.max(0, amount - (freshUser.balance || 0)).toFixed(2)} more.`);
+    return res.redirect(`/invest?plan=${planId}`);
   }
 
   /* Block if another pending request already exists */
