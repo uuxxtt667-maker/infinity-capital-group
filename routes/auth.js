@@ -11,8 +11,8 @@ function gen6() { return String(Math.floor(100000 + Math.random() * 900000)); }
    LOGIN
 ════════════════════════════════════════════ */
 router.get('/login', (req, res) => {
-  if (req.session.userId) return res.redirect('/dashboard');
-  res.render('login', { csrf: generateCSRF(req) });
+  if (req.session.userId) return res.redirect(safeNext(req.query.next, '/dashboard'));
+  res.render('login', { csrf: generateCSRF(req), next: req.query.next || '' });
 });
 
 router.post('/login', async (req, res) => {
@@ -21,7 +21,7 @@ router.post('/login', async (req, res) => {
   const user = await db.users.findOneAsync({ $or: [{ username: login }, { email: login }] });
   if (!user || !user.isActive || !bcrypt.compareSync(password, user.password)) {
     req.flash('error', 'Invalid credentials.');
-    return res.redirect('/login');
+    return res.redirect('/login' + (req.body.next ? '?next=' + encodeURIComponent(req.body.next) : ''));
   }
   // Email not yet verified → resend OTP and redirect to verify page
   if (user.emailVerified === false) {
@@ -35,8 +35,14 @@ router.post('/login', async (req, res) => {
   }
   req.session.userId = user._id;
   req.flash('success', `Welcome back, ${user.username}!`);
-  res.redirect('/dashboard');
+  res.redirect(safeNext(req.body.next, '/dashboard'));
 });
+
+/* only allow relative same-origin redirects */
+function safeNext(url, fallback) {
+  if (url && typeof url === 'string' && url.startsWith('/') && !url.startsWith('//')) return url;
+  return fallback;
+}
 
 /* ════════════════════════════════════════════
    REGISTER

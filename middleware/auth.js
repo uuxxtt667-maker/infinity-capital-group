@@ -16,7 +16,10 @@ async function loadUser(req, res, next) {
 }
 
 function requireLogin(req, res, next) {
-  if (!res.locals.user) return res.redirect('/login');
+  if (!res.locals.user) {
+    const next_ = encodeURIComponent(req.originalUrl);
+    return res.redirect('/login?next=' + next_);
+  }
   next();
 }
 

@@ -138,6 +138,9 @@
 
     <form method="POST" action="/login" autocomplete="on">
       <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <% if (typeof next !== 'undefined' && next) { %>
+      <input type="hidden" name="next" value="<%= next %>">
+      <% } %>
 
       <label class="lp-label" for="lp-login">Username or Email</label>
       <div class="lp-input-wrap">

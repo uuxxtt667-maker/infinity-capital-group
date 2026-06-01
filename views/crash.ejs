@@ -1,0 +1,305 @@
+<%
+  pageTitle = 'Crash Game';
+  var isLoggedIn = !!user;
+  var userCurrency = 'PKR';
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+  <title>Crash Game | <%= siteName %></title>
+  <% if(siteCustomize.faviconUrl){ %>
+  <link rel="icon" href="<%= siteCustomize.faviconUrl %>">
+  <% } %>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/crash.css">
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header class="cg-header">
+  <a href="/" class="cg-logo">CR<span>A</span>SH</a>
+  <nav class="cg-header-nav">
+    <a href="/crash"        class="cg-hnav active"><i class="fas fa-rocket"></i> Game</a>
+    <a href="/deposit"      class="cg-hnav"><i class="fas fa-plus-circle"></i> Deposit</a>
+    <a href="/withdraw"     class="cg-hnav"><i class="fas fa-minus-circle"></i> Withdraw</a>
+    <a href="/transactions" class="cg-hnav"><i class="fas fa-clock-rotate-left"></i> History</a>
+    <% if(isLoggedIn){ %>
+    <a href="/dashboard"    class="cg-hnav"><i class="fas fa-user"></i> Profile</a>
+    <% } %>
+  </nav>
+  <div class="cg-header-btns">
+    <% if(isLoggedIn){ %>
+      <div class="cg-balance-chip"><i class="fas fa-wallet"></i> <span class="cg-balance-val">PKR 0.00</span></div>
+      <a href="/logout" class="cg-btn-login"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    <% } else { %>
+      <a href="/login"   class="cg-btn-login"><i class="fas fa-user"></i> Login</a>
+      <a href="/deposit" class="cg-btn-deposit"><i class="fas fa-wallet"></i> Deposit</a>
+    <% } %>
+  </div>
+</header>
+
+<!-- ── Multiplier History ── -->
+<div class="cg-history" id="historyBar">
+  <!-- filled by JS -->
+</div>
+
+<!-- ── Main layout ── -->
+<div class="cg-main">
+
+  <!-- LEFT COLUMN -->
+  <div class="cg-left">
+
+    <!-- Game Canvas -->
+    <div class="cg-game-panel">
+      <div class="cg-canvas-wrap">
+        <canvas id="crashCanvas"></canvas>
+
+        <!-- Multiplier overlay -->
+        <div class="cg-multiplier-overlay">
+          <div id="multiValue" class="cg-multi-value waiting">1.00x</div>
+          <div id="multiLabel" class="cg-multi-label">NEXT ROUND SOON</div>
+        </div>
+
+        <!-- Countdown overlay -->
+        <div class="cg-countdown-overlay" id="cdOverlay">
+          <div class="cg-countdown-num" id="cdNum">7</div>
+          <div class="cg-countdown-text">PLACE YOUR BETS</div>
+        </div>
+
+        <!-- Crash overlay -->
+        <div class="cg-crash-overlay" id="crashOverlay">
+          <div class="cg-crash-text">CRASHED!</div>
+          <div class="cg-crash-sub">Next round starting soon...</div>
+        </div>
+      </div>
+
+      <!-- Cash Out -->
+      <div class="cg-cashout-wrap">
+        <button class="cg-cashout-btn waiting-state" id="cashoutBtn" disabled>
+          <span class="cg-cashout-label">CASH OUT</span>
+          <span class="cg-cashout-multiplier" id="cashoutMulti">1.00x</span>
+        </button>
+      </div>
+
+      <!-- Stats row -->
+      <div class="cg-stats-row">
+        <div class="cg-stat"><i class="fas fa-users"></i> PLAYERS <strong id="liveCount">245</strong></div>
+        <div class="cg-stat"><i class="fas fa-wifi"></i> PING <strong id="pingVal">78ms</strong></div>
+      </div>
+    </div>
+
+    <!-- Bet Panels -->
+    <div class="cg-bets-row">
+
+      <!-- BET 1 -->
+      <div class="cg-bet-panel">
+        <div class="cg-bet-header green">
+          BET 1
+          <span class="cg-bet-active-badge" id="betBadge1" style="display:none"><i class="fas fa-circle" style="font-size:.5rem"></i> ACTIVE</span>
+        </div>
+        <div class="cg-bet-body">
+          <div>
+            <div class="cg-field-label"><span>Bet Amount</span><span><%= userCurrency %></span></div>
+            <div class="cg-amount-ctrl">
+              <button class="cg-ctrl-btn" id="betMinus1"><i class="fas fa-minus"></i></button>
+              <input class="cg-amount-input" id="betAmt1" type="number" value="500" min="10">
+              <button class="cg-ctrl-btn" id="betPlus1"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="cg-presets" style="margin-top:.4rem">
+              <button class="cg-preset" data-amt-preset="1" data-val="100">100</button>
+              <button class="cg-preset active" data-amt-preset="1" data-val="500">500</button>
+              <button class="cg-preset" data-amt-preset="1" data-val="1000">1,000</button>
+              <button class="cg-preset" data-amt-preset="1" data-val="5000">5,000</button>
+            </div>
+          </div>
+          <div>
+            <div class="cg-field-label"><span>Auto Cash Out</span><span><%= userCurrency %></span></div>
+            <div class="cg-amount-ctrl">
+              <button class="cg-ctrl-btn" id="autoMinus1"><i class="fas fa-minus"></i></button>
+              <input class="cg-amount-input" id="autoCash1" type="number" value="2.00" min="1.1" step="0.1">
+              <button class="cg-ctrl-btn" id="autoPlus1"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="cg-presets" style="margin-top:.4rem">
+              <button class="cg-preset" data-auto-preset="1" data-val="1.5">1.5x</button>
+              <button class="cg-preset active" data-auto-preset="1" data-val="2.0">2.0x</button>
+              <button class="cg-preset" data-auto-preset="1" data-val="5.0">5.0x</button>
+              <button class="cg-preset" data-auto-preset="1" data-val="10.0">10.0x</button>
+            </div>
+          </div>
+          <button class="cg-place-btn green-btn" id="placeBtn1" disabled>
+            PLACE BET<br><span class="cg-potential">POTENTIAL: PKR 1,000</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- BET 2 -->
+      <div class="cg-bet-panel">
+        <div class="cg-bet-header purple">
+          BET 2
+          <span class="cg-bet-active-badge purple" id="betBadge2" style="display:none"><i class="fas fa-circle" style="font-size:.5rem"></i> ACTIVE</span>
+        </div>
+        <div class="cg-bet-body">
+          <div>
+            <div class="cg-field-label"><span>Bet Amount</span><span><%= userCurrency %></span></div>
+            <div class="cg-amount-ctrl">
+              <button class="cg-ctrl-btn" id="betMinus2"><i class="fas fa-minus"></i></button>
+              <input class="cg-amount-input" id="betAmt2" type="number" value="500" min="10">
+              <button class="cg-ctrl-btn" id="betPlus2"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="cg-presets" style="margin-top:.4rem">
+              <button class="cg-preset" data-amt-preset="2" data-val="100">100</button>
+              <button class="cg-preset purple-active" data-amt-preset="2" data-val="500">500</button>
+              <button class="cg-preset" data-amt-preset="2" data-val="1000">1,000</button>
+              <button class="cg-preset" data-amt-preset="2" data-val="5000">5,000</button>
+            </div>
+          </div>
+          <div>
+            <div class="cg-field-label"><span>Auto Cash Out</span><span><%= userCurrency %></span></div>
+            <div class="cg-amount-ctrl">
+              <button class="cg-ctrl-btn" id="autoMinus2"><i class="fas fa-minus"></i></button>
+              <input class="cg-amount-input" id="autoCash2" type="number" value="2.00" min="1.1" step="0.1">
+              <button class="cg-ctrl-btn" id="autoPlus2"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="cg-presets" style="margin-top:.4rem">
+              <button class="cg-preset" data-auto-preset="2" data-val="1.5">1.5x</button>
+              <button class="cg-preset purple-active" data-auto-preset="2" data-val="2.0">2.0x</button>
+              <button class="cg-preset" data-auto-preset="2" data-val="5.0">5.0x</button>
+              <button class="cg-preset" data-auto-preset="2" data-val="10.0">10.0x</button>
+            </div>
+          </div>
+          <button class="cg-place-btn purple-btn" id="placeBtn2" disabled>
+            PLACE BET<br><span class="cg-potential">POTENTIAL: PKR 1,000</span>
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /.cg-bets-row -->
+
+    <!-- Mobile-only right panels -->
+    <div class="cg-mobile-right">
+
+      <!-- Live Players (mobile) -->
+      <div class="cg-players-panel">
+        <div class="cg-panel-header">
+          <span class="cg-panel-title">LIVE PLAYERS</span>
+          <span class="cg-live-dot" id="liveCountMob">245</span>
+        </div>
+        <table class="cg-players-table" style="width:100%">
+          <thead><tr><th>Player</th><th>Bet</th><th style="text-align:right">Cashout</th></tr></thead>
+          <tbody id="livePlayersTbody2"></tbody>
+        </table>
+        <div class="cg-view-all">View All <i class="fas fa-chevron-right"></i></div>
+      </div>
+
+      <!-- Deposit/Withdraw (mobile) -->
+      <div class="cg-pay-panel">
+        <div class="cg-pay-tabs">
+          <button class="cg-pay-tab active green" data-color="green">Deposit</button>
+          <button class="cg-pay-tab" data-color="purple">Withdraw</button>
+        </div>
+        <div class="cg-pay-label">Select Method</div>
+        <a href="/deposit" class="cg-pay-method">
+          <div class="cg-pay-method-left">
+            <div class="cg-pay-icon jazz-icon">J</div>
+            <div class="cg-pay-method-name">JazzCash</div>
+          </div>
+          <i class="fas fa-chevron-right cg-pay-chevron"></i>
+        </a>
+        <a href="/deposit" class="cg-pay-method">
+          <div class="cg-pay-method-left">
+            <div class="cg-pay-icon easy-icon">E</div>
+            <div class="cg-pay-method-name">EasyPaisa</div>
+          </div>
+          <i class="fas fa-chevron-right cg-pay-chevron"></i>
+        </a>
+      </div>
+
+    </div><!-- /.cg-mobile-right -->
+
+  </div><!-- /.cg-left -->
+
+  <!-- RIGHT COLUMN (desktop only) -->
+  <div class="cg-right">
+
+    <!-- Live Players -->
+    <div class="cg-players-panel">
+      <div class="cg-panel-header">
+        <span class="cg-panel-title">LIVE PLAYERS</span>
+        <span class="cg-live-dot" id="liveCount">245</span>
+      </div>
+      <table class="cg-players-table">
+        <thead><tr><th>Player</th><th>Bet</th><th style="text-align:right">Cashout</th></tr></thead>
+        <tbody id="livePlayersTbody"></tbody>
+      </table>
+      <div class="cg-view-all">View All <i class="fas fa-chevron-right"></i></div>
+    </div>
+
+    <!-- Deposit / Withdraw -->
+    <div class="cg-pay-panel">
+      <div class="cg-pay-tabs">
+        <button class="cg-pay-tab active green" data-color="green">Deposit</button>
+        <button class="cg-pay-tab" data-color="purple">Withdraw</button>
+      </div>
+      <div class="cg-pay-label">Select Method</div>
+      <a href="/deposit" class="cg-pay-method">
+        <div class="cg-pay-method-left">
+          <div class="cg-pay-icon jazz-icon">J</div>
+          <div class="cg-pay-method-name">JazzCash</div>
+        </div>
+        <i class="fas fa-chevron-right cg-pay-chevron"></i>
+      </a>
+      <a href="/deposit" class="cg-pay-method">
+        <div class="cg-pay-method-left">
+          <div class="cg-pay-icon easy-icon">E</div>
+          <div class="cg-pay-method-name">EasyPaisa</div>
+        </div>
+        <i class="fas fa-chevron-right cg-pay-chevron"></i>
+      </a>
+    </div>
+
+  </div><!-- /.cg-right -->
+
+</div><!-- /.cg-main -->
+
+<!-- ── Bottom Navigation ── -->
+<nav class="cg-bottom-nav">
+  <a href="/crash"    class="cg-nav-item active"><i class="fas fa-rocket"></i> Game</a>
+  <a href="/deposit"  class="cg-nav-item"><i class="fas fa-money-bill-wave"></i> Deposit</a>
+  <a href="/withdraw" class="cg-nav-item"><i class="fas fa-arrow-up-from-bracket"></i> Withdraw</a>
+  <a href="/transactions" class="cg-nav-item"><i class="fas fa-clock-rotate-left"></i> History</a>
+  <% if(isLoggedIn){ %>
+  <a href="/dashboard" class="cg-nav-item"><i class="fas fa-user"></i> Profile</a>
+  <% } else { %>
+  <a href="/login" class="cg-nav-item"><i class="fas fa-user"></i> Profile</a>
+  <% } %>
+</nav>
+
+<!-- Toast -->
+<div class="cg-toast" id="cgToast"></div>
+
+<script>
+  var CRASH_BALANCE = <%= isLoggedIn ? (user.balance || 5000) : 5000 %>;
+  var CRASH_CURRENCY = '<%= userCurrency %>';
+</script>
+<script src="/js/crash.js"></script>
+
+<script>
+/* sync mobile live players tbody */
+(function(){
+  const main = document.getElementById('livePlayersTbody');
+  const mob  = document.getElementById('livePlayersTbody2');
+  if (!main || !mob) return;
+  const obs = new MutationObserver(() => { mob.innerHTML = main.innerHTML; });
+  obs.observe(main, { childList: true, subtree: true });
+  const countMain = document.getElementById('liveCount');
+  const countMob  = document.getElementById('liveCountMob');
+  if (countMain && countMob) {
+    new MutationObserver(() => { countMob.textContent = countMain.textContent; })
+      .observe(countMain, { childList: true, characterData: true, subtree: true });
+  }
+})();
+</script>
+</body>
+</html>
