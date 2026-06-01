@@ -27,6 +27,7 @@ db.users.ensureIndex({ fieldName: 'referralCode', unique: true });
 db.clicks.ensureIndex({ fieldName: 'key', unique: true }); // userId+adId+date
 
 async function seed() {
+  /* ── Seed plans ── */
   const planCount = await db.plans.countAsync({});
   if (planCount === 0) {
     await db.plans.insertAsync([
@@ -46,20 +47,28 @@ async function seed() {
       { title: 'NFT Marketplace',        url: 'https://example.com/ad5', credit: 0.001, viewSeconds: 30, clicksAvailable: 9999, clicksDone: 0, minPlanId: 'plan1', active: true },
       { title: 'BlockChain Academy',     url: 'https://example.com/ad6', credit: 0.001, viewSeconds: 30, clicksAvailable: 9999, clicksDone: 0, minPlanId: 'plan1', active: true },
     ]);
-    const adminHash = bcrypt.hashSync('Admin@1234', 12);
+  }
+
+  /* ── Always ensure admin user exists (runs on every startup) ── */
+  const adminExists = await db.users.findOneAsync({ isAdmin: true });
+  if (!adminExists) {
+    const adminPass = process.env.ADMIN_PASSWORD || 'Admin@1234';
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@cryptoptc.com';
+    const adminHash = bcrypt.hashSync(adminPass, 10);
     await db.users.insertAsync({
-      username: 'admin', email: 'admin@cryptoptc.com',
+      username: 'admin', email: adminEmail,
       password: adminHash, referralCode: 'ADMIN001',
       referredBy: null, planId: 'plan1', planExpires: null,
       balance: 0, totalEarned: 0, totalWithdrawn: 0,
       totalInvested: 0, referralEarnings: 0,
       clicksToday: 0, lastClickReset: null,
-      isAdmin: true, isActive: true, createdAt: new Date(),
+      isAdmin: true, isActive: true, emailVerified: true,
+      createdAt: new Date(),
     });
-    console.log('Database seeded. Admin login: admin / Admin@1234');
+    console.log(`\n✅ Admin created — username: admin  password: ${adminPass}\n`);
   }
 
-  /* Migration: ensure Diamond & Elite exist for already-seeded DBs */
+  /* ── Migration: ensure Diamond & Elite exist ── */
   for (const plan of [
     { _id: 'plan6', name: 'Diamond', price: 20000, dailyClicks: 250, clickValue: 0.060, dailyRoi: 18, durationDays: 365, color: '#9b59b6', icon: 'fas fa-diamond', active: true },
     { _id: 'plan7', name: 'Elite',   price: 50000, dailyClicks: 500, clickValue: 0.100, dailyRoi: 20, durationDays: 365, color: '#f5a623', icon: 'fas fa-crown',   active: true },
