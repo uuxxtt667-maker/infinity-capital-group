@@ -13,13 +13,35 @@ function generateCode(len = 8) {
   return crypto.randomBytes(8).toString('hex').slice(0, len).toUpperCase();
 }
 
+/*
+ * Stateless HMAC-based CSRF — works without session persistence.
+ * Token = timestamp.HMAC(secret, timestamp)
+ * Valid for 2 hours. No session read/write needed.
+ */
+const CSRF_SECRET = process.env.SESSION_SECRET || 'ptc-csrf-hmac-key-2024';
+const CSRF_TTL    = 2 * 60 * 60 * 1000; // 2 hours
+
 function generateCSRF(req) {
-  if (!req.session.csrf) req.session.csrf = crypto.randomBytes(32).toString('hex');
-  return req.session.csrf;
+  const ts    = Date.now();
+  const hmac  = crypto.createHmac('sha256', CSRF_SECRET).update(String(ts)).digest('hex');
+  return ts + '.' + hmac;
 }
 
 function verifyCSRF(req) {
-  return req.body._csrf && req.session.csrf && req.body._csrf === req.session.csrf;
+  const token = (req.body && req.body._csrf) || '';
+  if (!token) return false;
+  const dot = token.indexOf('.');
+  if (dot === -1) return false;
+  const ts  = parseInt(token.slice(0, dot), 10);
+  const sig = token.slice(dot + 1);
+  if (isNaN(ts) || Date.now() - ts > CSRF_TTL) return false;
+  const expected = crypto.createHmac('sha256', CSRF_SECRET).update(String(ts)).digest('hex');
+  /* constant-time compare */
+  try {
+    return crypto.timingSafeEqual(Buffer.from(sig, 'hex'), Buffer.from(expected, 'hex'));
+  } catch (_) {
+    return sig === expected;
+  }
 }
 
 function isPlanActive(user) {

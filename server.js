@@ -21,16 +21,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
 
-const isProduction = process.env.NODE_ENV === 'production';
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'ptc-secret-key-change-in-production',
-  resave: false,
-  saveUninitialized: false,
+  secret: process.env.SESSION_SECRET || 'ptc-secret-key-2024',
+  resave: true,
+  saveUninitialized: true,
+  rolling: true,
   cookie: {
-    maxAge: 7 * 24 * 60 * 60 * 1000,   // 7 days
+    maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
     sameSite: 'lax',
-    secure: false,                        // false = works on both HTTP and HTTPS
+    secure: false,
   },
 }));
 
