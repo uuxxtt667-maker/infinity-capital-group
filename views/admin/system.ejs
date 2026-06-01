@@ -1,0 +1,132 @@
+<% pageTitle = 'Admin — System Info' %>
+<%- include('../partials/head') %>
+<%- include('../partials/nav') %>
+<div class="admin-layout">
+  <nav class="admin-sidebar">
+    <div class="sidebar-title">Admin Panel</div>
+    <a href="/admin"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
+    <a href="/admin/plans"><i class="fas fa-layer-group"></i> Plans</a>
+    <a href="/admin/plan-requests"><i class="fas fa-tasks"></i> Plan Requests <% if(adminPendingPlanReqs>0){%><span style="background:var(--danger);color:#fff;border-radius:10px;padding:1px 7px;font-size:.68rem;font-weight:700;margin-left:.3rem;"><%= adminPendingPlanReqs %></span><%}%></a>
+    <a href="/admin/deposits"><i class="fas fa-plus-circle"></i> Deposits <% if(adminPendingDeposits>0){%><span style="background:var(--danger);color:#fff;border-radius:10px;padding:1px 7px;font-size:.68rem;font-weight:700;margin-left:.3rem;"><%= adminPendingDeposits %></span><%}%></a>
+    <a href="/admin/withdrawals"><i class="fas fa-minus-circle"></i> Withdrawals <% if(adminPendingWithdrawals>0){%><span style="background:var(--danger);color:#fff;border-radius:10px;padding:1px 7px;font-size:.68rem;font-weight:700;margin-left:.3rem;"><%= adminPendingWithdrawals %></span><%}%></a>
+    <a href="/admin/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
+    <div class="sidebar-title">Site</div>
+    <a href="/admin/settings"><i class="fas fa-cog"></i> Settings</a>
+    <a href="/admin/customize"><i class="fas fa-paint-brush"></i> Customizer</a>
+    <a href="/admin/profile"><i class="fas fa-user-shield"></i> Profile &amp; Security</a>
+    <a href="/admin/system" class="active"><i class="fas fa-server"></i> System Info</a>
+    <a href="/dashboard"><i class="fas fa-home"></i> Front End</a>
+    <a href="/logout" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </nav>
+  <div class="admin-main">
+    <div class="page-header"><h1><i class="fas fa-server"></i> System Info</h1></div>
+
+    <!-- DB counts -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;">
+      <div class="card" style="text-align:center;padding:1.25rem;">
+        <div style="font-size:2rem;font-weight:900;color:var(--blue);"><%= counts.users %></div>
+        <div style="font-size:.8rem;color:var(--text3);margin-top:.25rem;text-transform:uppercase;letter-spacing:.05em;">Users</div>
+      </div>
+      <div class="card" style="text-align:center;padding:1.25rem;">
+        <div style="font-size:2rem;font-weight:900;color:var(--green);"><%= counts.deps %></div>
+        <div style="font-size:.8rem;color:var(--text3);margin-top:.25rem;text-transform:uppercase;letter-spacing:.05em;">Deposits</div>
+      </div>
+      <div class="card" style="text-align:center;padding:1.25rem;">
+        <div style="font-size:2rem;font-weight:900;color:var(--gold);"><%= counts.wds %></div>
+        <div style="font-size:.8rem;color:var(--text3);margin-top:.25rem;text-transform:uppercase;letter-spacing:.05em;">Withdrawals</div>
+      </div>
+      <div class="card" style="text-align:center;padding:1.25rem;">
+        <div style="font-size:2rem;font-weight:900;color:var(--purple);"><%= counts.txs %></div>
+        <div style="font-size:.8rem;color:var(--text3);margin-top:.25rem;text-transform:uppercase;letter-spacing:.05em;">Transactions</div>
+      </div>
+      <div class="card" style="text-align:center;padding:1.25rem;">
+        <div style="font-size:2rem;font-weight:900;color:var(--text);"><%= counts.prs %></div>
+        <div style="font-size:.8rem;color:var(--text3);margin-top:.25rem;text-transform:uppercase;letter-spacing:.05em;">Plan Requests</div>
+      </div>
+      <div class="card" style="text-align:center;padding:1.25rem;">
+        <div style="font-size:2rem;font-weight:900;color:var(--text);"><%= counts.plans %></div>
+        <div style="font-size:.8rem;color:var(--text3);margin-top:.25rem;text-transform:uppercase;letter-spacing:.05em;">Plans</div>
+      </div>
+    </div>
+
+    <!-- Data directory status -->
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div class="card-header"><span class="card-title"><i class="fas fa-database"></i> Database Storage</span></div>
+      <div style="padding:1rem 1.25rem;">
+
+        <% if (!dataEnvSet) { %>
+        <div style="background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.25);border-radius:10px;padding:.9rem 1.1rem;margin-bottom:1rem;display:flex;gap:.75rem;align-items:flex-start;">
+          <i class="fas fa-exclamation-triangle" style="color:var(--danger);margin-top:.15rem;font-size:1.1rem;flex-shrink:0;"></i>
+          <div>
+            <strong style="color:var(--danger);">DATA_DIR not set — data will be lost on Hostinger redeployment!</strong>
+            <div style="font-size:.82rem;color:var(--text2);margin-top:.4rem;line-height:1.6;">
+              Go to <strong>Hostinger hPanel → Your Site → Environment Variables</strong> and add:<br>
+              <code style="background:var(--bg2);padding:2px 8px;border-radius:4px;font-size:.85rem;">DATA_DIR</code>
+              = <code style="background:var(--bg2);padding:2px 8px;border-radius:4px;font-size:.85rem;">/home/u&lt;your-id&gt;/ptcdata</code><br>
+              <span style="font-size:.78rem;color:var(--text3);">Replace with your actual Hostinger username path. This folder persists across deployments.</span>
+            </div>
+          </div>
+        </div>
+        <% } else { %>
+        <div style="background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.2);border-radius:10px;padding:.75rem 1rem;margin-bottom:1rem;display:flex;gap:.65rem;align-items:center;">
+          <i class="fas fa-check-circle" style="color:var(--green);font-size:1rem;"></i>
+          <strong style="color:var(--green);">DATA_DIR is set — data will persist across deployments.</strong>
+        </div>
+        <% } %>
+
+        <table class="table" style="margin-bottom:0;">
+          <tbody>
+            <tr><td style="color:var(--text3);font-size:.82rem;width:160px;">Data Directory</td><td style="font-family:monospace;font-size:.82rem;word-break:break-all;"><%= dataDir %></td></tr>
+            <tr><td style="color:var(--text3);font-size:.82rem;">DATA_DIR Env</td><td><%= dataEnvSet ? '<span class="badge badge-success">Set</span>' : '<span class="badge badge-danger">Not set</span>' %></td></tr>
+            <tr><td style="color:var(--text3);font-size:.82rem;">Admin Account</td><td style="font-size:.82rem;"><%= adminEmail %></td></tr>
+            <tr><td style="color:var(--text3);font-size:.82rem;">Node Version</td><td style="font-size:.82rem;"><%= nodeVersion %></td></tr>
+            <tr><td style="color:var(--text3);font-size:.82rem;">Environment</td><td><span class="badge badge-<%= nodeEnv==='production'?'success':'info' %>"><%= nodeEnv %></span></td></tr>
+            <tr><td style="color:var(--text3);font-size:.82rem;">Uptime</td><td style="font-size:.82rem;"><%= uptime %></td></tr>
+            <tr><td style="color:var(--text3);font-size:.82rem;">Memory</td><td style="font-size:.82rem;"><%= memMB %> MB</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DB files -->
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="fas fa-file-alt"></i> Database Files</span></div>
+      <% if (!dbFiles.length) { %>
+      <div class="empty-state"><i class="fas fa-folder-open"></i><p>No database files found in <code><%= dataDir %></code></p></div>
+      <% } else { %>
+      <div class="table-responsive"><table class="table">
+        <thead><tr><th>File</th><th>Size</th><th>Last Modified</th></tr></thead>
+        <tbody>
+          <% dbFiles.forEach(function(f){ %>
+          <tr>
+            <td style="font-family:monospace;font-size:.82rem;"><i class="fas fa-database" style="color:var(--blue);margin-right:.4rem;font-size:.75rem;"></i><%= f.name %></td>
+            <td style="font-size:.82rem;color:var(--text2);"><%= f.size %></td>
+            <td style="font-size:.8rem;color:var(--text3);"><%= f.modified %></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table></div>
+      <% } %>
+    </div>
+
+    <!-- Setup instructions -->
+    <div class="card" style="margin-top:1.5rem;">
+      <div class="card-header"><span class="card-title"><i class="fas fa-tools"></i> Hostinger Setup Instructions</span></div>
+      <div style="padding:1rem 1.25rem;font-size:.85rem;line-height:1.8;color:var(--text2);">
+        <ol style="padding-left:1.25rem;margin:0;">
+          <li>In <strong>Hostinger hPanel</strong>, open your Node.js app → <strong>Environment Variables</strong></li>
+          <li>Add variable: <code style="background:var(--bg2);padding:1px 7px;border-radius:4px;">DATA_DIR</code> = <code style="background:var(--bg2);padding:1px 7px;border-radius:4px;">/home/u&lt;your-hostinger-user-id&gt;/ptcdata</code></li>
+          <li>Click Save, then <strong>Redeploy</strong> the app</li>
+          <li>The database files will now be stored in that persistent folder</li>
+          <li>Future deployments will NOT wipe your user data</li>
+        </ol>
+        <div style="margin-top:.75rem;padding:.75rem 1rem;background:rgba(61,142,240,.07);border:1px solid rgba(61,142,240,.18);border-radius:8px;font-size:.8rem;">
+          <i class="fas fa-info-circle" style="color:var(--blue);margin-right:.35rem;"></i>
+          <strong>How to find your Hostinger user ID:</strong> Check Hostinger hPanel → Files → File Manager. Your home path shows as <code>/home/u123456789/</code>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

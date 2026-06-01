@@ -675,4 +675,50 @@ router.post('/profile/generate-recovery-key', async (req, res) => {
   res.redirect('/admin/profile');
 });
 
+// ── System Info (data directory + DB counts) ─────────────────
+router.get('/system', async (req, res, next) => {
+  try {
+    const path = require('path');
+    const fs   = require('fs');
+    const dataDir = process.env.DATA_DIR
+      ? path.resolve(process.env.DATA_DIR)
+      : path.join(__dirname, '../data');
+
+    // Count every collection
+    const [users, deps, wds, txs, prs, plans] = await Promise.all([
+      db.users.countAsync({}),
+      db.deposits.countAsync({}),
+      db.withdrawals.countAsync({}),
+      db.transactions.countAsync({}),
+      db.planRequests.countAsync({}),
+      db.plans.countAsync({}),
+    ]);
+
+    // List .db files with sizes
+    let dbFiles = [];
+    try {
+      dbFiles = fs.readdirSync(dataDir)
+        .filter(f => f.endsWith('.db') || f === 'settings.json')
+        .map(f => {
+          const stat = fs.statSync(path.join(dataDir, f));
+          return { name: f, size: (stat.size / 1024).toFixed(1) + ' KB', modified: stat.mtime.toLocaleString() };
+        });
+    } catch (_) {}
+
+    const adminUser = await db.users.findOneAsync({ isAdmin: true });
+
+    res.render('admin/system', {
+      dataDir,
+      dbFiles,
+      counts: { users, deps, wds, txs, prs, plans },
+      nodeVersion: process.version,
+      nodeEnv: process.env.NODE_ENV || 'development',
+      uptime: Math.floor(process.uptime() / 60) + ' min',
+      memMB: (process.memoryUsage().rss / 1024 / 1024).toFixed(1),
+      adminEmail: adminUser ? adminUser.email : 'NOT FOUND',
+      dataEnvSet: !!process.env.DATA_DIR,
+    });
+  } catch (err) { next(err); }
+});
+
 module.exports = router;

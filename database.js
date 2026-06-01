@@ -2,12 +2,18 @@ const Datastore = require('@seald-io/nedb');
 const bcrypt    = require('bcryptjs');
 const path      = require('path');
 
-/* DATA_DIR env var lets Hostinger/VPS point to a persistent storage path */
+/*
+ * DATA_DIR — persistent storage for database files.
+ * On Hostinger: set DATA_DIR in Environment Variables panel to a path
+ * outside the deployment directory, e.g. /home/u123456789/ptcdata
+ * On fresh deploys Hostinger wipes the deployment folder but NOT the home dir.
+ */
 const dir = process.env.DATA_DIR
   ? path.resolve(process.env.DATA_DIR)
   : path.join(__dirname, 'data');
+
 require('fs').mkdirSync(dir, { recursive: true });
-console.log('[db] data directory:', dir);
+console.log('\n[db] ✅ Database directory:', dir, '\n');
 
 const db = {
   users:        new Datastore({ filename: path.join(dir, 'users.db'),        autoload: true }),
