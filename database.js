@@ -2,8 +2,12 @@ const Datastore = require('@seald-io/nedb');
 const bcrypt    = require('bcryptjs');
 const path      = require('path');
 
-const dir = path.join(__dirname, 'data');
+/* DATA_DIR env var lets Hostinger/VPS point to a persistent storage path */
+const dir = process.env.DATA_DIR
+  ? path.resolve(process.env.DATA_DIR)
+  : path.join(__dirname, 'data');
 require('fs').mkdirSync(dir, { recursive: true });
+console.log('[db] data directory:', dir);
 
 const db = {
   users:        new Datastore({ filename: path.join(dir, 'users.db'),        autoload: true }),

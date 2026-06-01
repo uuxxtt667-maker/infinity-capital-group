@@ -30,33 +30,38 @@ app.use(flash());
 // Expose helpers and flash to all views
 app.use(loadUser);
 app.use(async (req, res, next) => {
-  res.locals.success  = req.flash('success');
-  res.locals.error    = req.flash('error');
-  res.locals.info     = req.flash('info');
-  res.locals.fmt      = formatMoney;
-  res.locals.fmtDate  = formatDate;
-  res.locals.badge    = statusBadge;
-  res.locals.planActive = isPlanActive;
-  const _settings       = getSettings();
-  const _customize      = getCustomize();
-  res.locals.siteName   = _settings.siteName || 'APEXINVEST';
-  res.locals.siteCustomize = _customize;
-  res.locals.path       = req.path;
-  /* Pending counts for admin badge — only query on admin routes */
-  if (req.path.startsWith('/admin') && res.locals.user && res.locals.user.isAdmin) {
-    const { db: _db } = require('./database');
-    const [_deps, _wds, _prs] = await Promise.all([
-      _db.deposits.countAsync({ status: 'pending' }),
-      _db.withdrawals.countAsync({ status: 'pending' }),
-      _db.planRequests.countAsync({ status: 'pending' }),
-    ]);
-    res.locals.adminPendingDeposits    = _deps;
-    res.locals.adminPendingWithdrawals = _wds;
-    res.locals.adminPendingPlanReqs    = _prs;
-  } else {
+  try {
+    res.locals.success  = req.flash('success');
+    res.locals.error    = req.flash('error');
+    res.locals.info     = req.flash('info');
+    res.locals.fmt      = formatMoney;
+    res.locals.fmtDate  = formatDate;
+    res.locals.badge    = statusBadge;
+    res.locals.planActive = isPlanActive;
+    const _settings       = getSettings();
+    const _customize      = getCustomize();
+    res.locals.siteName   = _settings.siteName || 'APEXINVEST';
+    res.locals.siteCustomize = _customize;
+    res.locals.path       = req.path;
+    /* Pending counts for admin sidebar badges */
     res.locals.adminPendingDeposits    = 0;
     res.locals.adminPendingWithdrawals = 0;
     res.locals.adminPendingPlanReqs    = 0;
+    if (req.path.startsWith('/admin') && res.locals.user && res.locals.user.isAdmin) {
+      try {
+        const { db: _db } = require('./database');
+        const [_deps, _wds, _prs] = await Promise.all([
+          _db.deposits.countAsync({ status: 'pending' }),
+          _db.withdrawals.countAsync({ status: 'pending' }),
+          _db.planRequests.countAsync({ status: 'pending' }),
+        ]);
+        res.locals.adminPendingDeposits    = _deps  || 0;
+        res.locals.adminPendingWithdrawals = _wds   || 0;
+        res.locals.adminPendingPlanReqs    = _prs   || 0;
+      } catch (_) { /* keep zeros on DB error — never block the request */ }
+    }
+  } catch (err) {
+    console.error('[middleware] error:', err.message);
   }
   next();
 });
@@ -126,6 +131,12 @@ app.post('/admin-recover', async (req, res) => {
 
 // 404
 app.use((req, res) => res.status(404).send('<h2>404 — Page not found. <a href="/">Go home</a></h2>'));
+
+// Global error handler — catches any unhandled async errors in routes
+app.use((err, req, res, next) => {
+  console.error('[error]', err.message, err.stack);
+  res.status(500).send(`<h2>Server Error</h2><pre style="color:red">${err.message}</pre><a href="/">Go home</a>`);
+});
 
 const PORT = process.env.PORT || 3001;
 seed().then(() => {

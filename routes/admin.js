@@ -9,7 +9,8 @@ const { getSettings, saveSettings, getCustomize, saveCustomize, CUSTOMIZE_DEFAUL
 router.use(requireAdmin);
 
 // ── Dashboard ────────────────────────────────────────────────
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
+  try {
   const users       = await db.users.findAsync({ isAdmin: false });
   const deposits    = await db.deposits.findAsync({});
   const withdrawals = await db.withdrawals.findAsync({});
@@ -37,10 +38,12 @@ router.get('/', async (req, res) => {
     recentUsers,
     recentDeps,
   });
+  } catch (err) { next(err); }
 });
 
 // ── Users ────────────────────────────────────────────────────
-router.get('/users', async (req, res) => {
+router.get('/users', async (req, res, next) => {
+  try {
   const q          = req.query.q || '';
   const statusFilter = req.query.status || 'all';
   let users        = await db.users.findAsync({});
@@ -56,6 +59,7 @@ router.get('/users', async (req, res) => {
   }
   const plans = await db.plans.findAsync({ active: true });
   res.render('admin/users', { users, q, statusFilter, plans });
+  } catch (err) { next(err); }
 });
 
 router.post('/users/toggle', async (req, res) => {
