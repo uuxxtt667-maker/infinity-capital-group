@@ -7,9 +7,9 @@
     <a href="/admin" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
     <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
     <a href="/admin/plans"><i class="fas fa-layer-group"></i> Plans</a>
-    <a href="/admin/plan-requests"><i class="fas fa-tasks"></i> Plan Requests</a>
-    <a href="/admin/deposits"><i class="fas fa-plus-circle"></i> Deposits</a>
-    <a href="/admin/withdrawals"><i class="fas fa-minus-circle"></i> Withdrawals</a>
+    <a href="/admin/plan-requests"><i class="fas fa-tasks"></i> Plan Requests <% if(adminPendingPlanReqs>0){%><span style="background:var(--danger);color:#fff;border-radius:10px;padding:1px 7px;font-size:.68rem;font-weight:700;margin-left:.3rem;"><%= adminPendingPlanReqs %></span><%}%></a>
+    <a href="/admin/deposits"><i class="fas fa-plus-circle"></i> Deposits <% if(adminPendingDeposits>0){%><span style="background:var(--danger);color:#fff;border-radius:10px;padding:1px 7px;font-size:.68rem;font-weight:700;margin-left:.3rem;"><%= adminPendingDeposits %></span><%}%></a>
+    <a href="/admin/withdrawals"><i class="fas fa-minus-circle"></i> Withdrawals <% if(adminPendingWithdrawals>0){%><span style="background:var(--danger);color:#fff;border-radius:10px;padding:1px 7px;font-size:.68rem;font-weight:700;margin-left:.3rem;"><%= adminPendingWithdrawals %></span><%}%></a>
     <a href="/admin/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
     <div class="sidebar-title">Site</div>
     <a href="/admin/settings"><i class="fas fa-cog"></i> Settings</a>

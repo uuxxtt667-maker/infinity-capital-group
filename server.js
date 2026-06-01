@@ -29,7 +29,7 @@ app.use(flash());
 
 // Expose helpers and flash to all views
 app.use(loadUser);
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   res.locals.success  = req.flash('success');
   res.locals.error    = req.flash('error');
   res.locals.info     = req.flash('info');
@@ -42,6 +42,22 @@ app.use((req, res, next) => {
   res.locals.siteName   = _settings.siteName || 'APEXINVEST';
   res.locals.siteCustomize = _customize;
   res.locals.path       = req.path;
+  /* Pending counts for admin badge — only query on admin routes */
+  if (req.path.startsWith('/admin') && res.locals.user && res.locals.user.isAdmin) {
+    const { db: _db } = require('./database');
+    const [_deps, _wds, _prs] = await Promise.all([
+      _db.deposits.countAsync({ status: 'pending' }),
+      _db.withdrawals.countAsync({ status: 'pending' }),
+      _db.planRequests.countAsync({ status: 'pending' }),
+    ]);
+    res.locals.adminPendingDeposits    = _deps;
+    res.locals.adminPendingWithdrawals = _wds;
+    res.locals.adminPendingPlanReqs    = _prs;
+  } else {
+    res.locals.adminPendingDeposits    = 0;
+    res.locals.adminPendingWithdrawals = 0;
+    res.locals.adminPendingPlanReqs    = 0;
+  }
   next();
 });
 
@@ -60,6 +76,7 @@ app.use('/referrals',    require('./routes/referrals'));
 app.use('/transactions', require('./routes/transactions'));
 app.use('/admin',        require('./routes/admin'));
 app.use('/markets',      require('./routes/markets'));
+app.use('/crash',        require('./routes/crash'));
 app.use('/',             require('./routes/prices'));
 
 // ── Admin account recovery (no login required) ───────────────

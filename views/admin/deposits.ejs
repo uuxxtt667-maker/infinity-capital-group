@@ -8,7 +8,7 @@
     <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
     <a href="/admin/plans"><i class="fas fa-layer-group"></i> Plans</a>
     <a href="/admin/plan-requests"><i class="fas fa-tasks"></i> Plan Requests</a>
-    <a href="/admin/deposits" class="active"><i class="fas fa-plus-circle"></i> Deposits</a>
+    <a href="/admin/deposits" class="active"><i class="fas fa-plus-circle"></i> Deposits <% if(pendingCount>0){%><span style="background:var(--danger);color:#fff;border-radius:10px;padding:1px 7px;font-size:.68rem;font-weight:700;margin-left:.3rem;"><%= pendingCount %></span><%}%></a>
     <a href="/admin/withdrawals"><i class="fas fa-minus-circle"></i> Withdrawals</a>
     <a href="/admin/transactions"><i class="fas fa-exchange-alt"></i> Transactions</a>
     <div class="sidebar-title">Site</div>
@@ -19,48 +19,86 @@
     <a href="/logout" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </nav>
   <div class="admin-main">
-    <div class="page-header"><h1><i class="fas fa-plus-circle"></i> Deposits</h1></div>
-    <div class="tabs mb-3">
-      <% [['pending','Pending'],['confirmed','Confirmed'],['rejected','Rejected'],['all','All']].forEach(([s,l])=>{%>
-      <a href="/admin/deposits?status=<%= s %>" class="tab-btn <%= filter===s?'active':'' %>" style="text-decoration:none;"><%= l %></a>
-      <%})%>
+    <div class="page-header">
+      <h1><i class="fas fa-plus-circle"></i> Deposits</h1>
     </div>
+
+    <% if (pendingCount > 0 && filter !== 'pending') { %>
+    <div style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.35);border-radius:10px;padding:.85rem 1.1rem;margin-bottom:1.1rem;display:flex;align-items:center;gap:.75rem;">
+      <i class="fas fa-bell" style="color:var(--gold);font-size:1.1rem;"></i>
+      <span><strong style="color:var(--gold);"><%= pendingCount %> deposit<%= pendingCount>1?'s':'' %> waiting for review</strong></span>
+      <a href="/admin/deposits?status=pending" class="btn btn-sm" style="margin-left:auto;background:var(--gold);color:#000;font-weight:700;padding:.3rem .85rem;">Review Now</a>
+    </div>
+    <% } %>
+
+    <% if (pendingCount > 0 && filter === 'pending') { %>
+    <div style="background:rgba(244,63,94,.07);border:1px solid rgba(244,63,94,.25);border-radius:10px;padding:.85rem 1.1rem;margin-bottom:1.1rem;display:flex;align-items:center;gap:.75rem;">
+      <i class="fas fa-exclamation-circle" style="color:var(--danger);font-size:1.1rem;"></i>
+      <strong style="color:var(--danger);"><%= pendingCount %> pending deposit<%= pendingCount>1?'s':'' %> require your action</strong>
+    </div>
+    <% } %>
+
+    <div class="tabs mb-3">
+      <% [['pending','Pending'],['confirmed','Confirmed'],['rejected','Rejected'],['all','All']].forEach(function([s,l]){ %>
+      <a href="/admin/deposits?status=<%= s %>" class="tab-btn <%= filter===s?'active':'' %>" style="text-decoration:none;">
+        <%= l %>
+        <% if(s==='pending' && pendingCount>0){ %>
+        <span style="background:var(--danger);color:#fff;border-radius:10px;padding:0 6px;font-size:.65rem;font-weight:700;margin-left:.25rem;"><%= pendingCount %></span>
+        <% } %>
+      </a>
+      <% }); %>
+    </div>
+
     <div class="card">
-      <% if (!deps.length) { %><div class="empty-state"><i class="fas fa-inbox"></i><p>No deposits.</p></div>
+      <% if (!deps.length) { %>
+      <div class="empty-state"><i class="fas fa-inbox"></i><p>No <%= filter === 'all' ? '' : filter %> deposits found.</p></div>
       <% } else { %>
       <div class="table-responsive"><table class="table">
-        <thead><tr><th>User</th><th>Amount</th><th>Crypto</th><th>TX Hash / ID</th><th>Plan</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+        <thead><tr><th>User</th><th>Amount</th><th>Network</th><th>TX Hash / ID</th><th>Plan</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
         <tbody>
-          <% deps.forEach(d=>{%>
-          <tr>
-            <td><%= d.username %></td>
-            <td><strong>$<%= d.amountUsd.toFixed(2) %></strong></td>
-            <td><%= d.cryptoType %></td>
+          <% deps.forEach(function(d){ %>
+          <tr style="<%= d.status==='pending' ? 'background:rgba(245,166,35,.04);' : '' %>">
+            <td><strong><%= d.username %></strong></td>
+            <td><strong style="color:var(--green);">$<%= d.amountUsd.toFixed(2) %></strong></td>
+            <td style="font-size:.82rem;"><%= d.cryptoType %></td>
             <td style="max-width:260px;">
               <% if (d.txHash) { %>
               <div style="font-family:monospace;font-size:.72rem;word-break:break-all;color:var(--text);line-height:1.4;"><%= d.txHash %></div>
               <button type="button" data-hash="<%= d.txHash %>"
-                onclick="var h=this.dataset.hash;navigator.clipboard.writeText(h).then(()=>{this.innerHTML='<i class=\'fas fa-check\'></i> Copied';setTimeout(()=>{this.innerHTML='<i class=\'fas fa-copy\'></i> Copy'},1600)}).catch(()=>{});"
+                onclick="var h=this.dataset.hash;navigator.clipboard.writeText(h).then(()=>{this.innerHTML='<i class=\'fas fa-check\'></i> Copied';setTimeout(()=>{this.innerHTML='<i class=\'fas fa-copy\'></i> Copy'},1500)}).catch(()=>{});"
                 style="background:none;border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--blue);font-size:.68rem;padding:1px 6px;margin-top:.25rem;display:inline-flex;align-items:center;gap:.25rem;">
                 <i class="fas fa-copy"></i> Copy
               </button>
               <% } else { %>
-              <span style="color:var(--text-muted);font-size:.78rem;font-style:italic;"><i class="fas fa-hourglass-half" style="margin-right:.3rem;"></i>Not submitted yet</span>
+              <span style="color:var(--text-muted);font-size:.78rem;font-style:italic;"><i class="fas fa-hourglass-half" style="margin-right:.3rem;color:var(--gold);"></i>Awaiting TX hash</span>
               <% } %>
             </td>
             <td style="font-size:.82rem;"><%= d.planName||'—' %></td>
-            <td><%- badge(d.status)%></td>
-            <td style="font-size:.8rem;color:var(--text-muted);"><%= new Date(d.createdAt).toLocaleDateString() %></td>
+            <td><%- badge(d.status) %></td>
+            <td style="font-size:.8rem;color:var(--text-muted);white-space:nowrap;"><%= new Date(d.createdAt).toLocaleString() %></td>
             <td>
-              <% if(d.status==='pending'){%>
-              <form method="POST" action="/admin/deposits/action" style="display:inline;" onsubmit="return confirm('Confirm deposit?')"><input type="hidden" name="deposit_id" value="<%= d._id %>"><input type="hidden" name="action" value="confirm"><button class="btn btn-success btn-sm"><i class="fas fa-check"></i></button></form>
-              <form method="POST" action="/admin/deposits/action" style="display:inline;" onsubmit="return confirm('Reject?')"><input type="hidden" name="deposit_id" value="<%= d._id %>"><input type="hidden" name="action" value="reject"><button class="btn btn-danger btn-sm"><i class="fas fa-times"></i></button></form>
-              <%}%>
+              <% if (d.status === 'pending') { %>
+              <div style="display:flex;gap:.35rem;">
+                <form method="POST" action="/admin/deposits/action" onsubmit="return confirm('Confirm this deposit of $<%= d.amountUsd.toFixed(2) %> for <%= d.username %>?')">
+                  <input type="hidden" name="deposit_id" value="<%= d._id %>">
+                  <input type="hidden" name="action" value="confirm">
+                  <button class="btn btn-success btn-sm" title="Confirm deposit"><i class="fas fa-check"></i> Confirm</button>
+                </form>
+                <form method="POST" action="/admin/deposits/action" onsubmit="return confirm('Reject this deposit?')">
+                  <input type="hidden" name="deposit_id" value="<%= d._id %>">
+                  <input type="hidden" name="action" value="reject">
+                  <button class="btn btn-danger btn-sm" title="Reject deposit"><i class="fas fa-times"></i></button>
+                </form>
+              </div>
+              <% } %>
             </td>
           </tr>
-          <%})%>
+          <% }); %>
         </tbody>
       </table></div>
+      <div style="padding:.6rem 1rem;font-size:.8rem;color:var(--text-muted);border-top:1px solid var(--border);">
+        Showing <%= deps.length %> <%= filter === 'all' ? '' : filter %> deposit<%= deps.length !== 1 ? 's' : '' %>
+      </div>
       <% } %>
     </div>
   </div>
