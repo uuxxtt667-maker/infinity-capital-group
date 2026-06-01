@@ -10,6 +10,9 @@ const { getSettings, getCustomize } = require('./middleware/settings');
 
 const app = express();
 
+/* Trust Hostinger's nginx reverse proxy so cookies/sessions work on HTTPS */
+app.set('trust proxy', 1);
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -18,11 +21,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
 
+const isProduction = process.env.NODE_ENV === 'production';
 app.use(session({
-  secret: 'ptc-secret-key-change-in-production',
+  secret: process.env.SESSION_SECRET || 'ptc-secret-key-change-in-production',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 3600000 }
+  cookie: {
+    maxAge: 7 * 24 * 60 * 60 * 1000,   // 7 days
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: false,                        // false = works on both HTTP and HTTPS
+  },
 }));
 
 app.use(flash());
