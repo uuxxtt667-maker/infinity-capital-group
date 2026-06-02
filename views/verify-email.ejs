@@ -78,12 +78,14 @@
     <div class="otp-icon"><i class="fas fa-envelope-open-text"></i></div>
     <div class="otp-title">Check Your Email</div>
     <div class="otp-sub">
-      We sent a 6-digit verification code to your email address.<br>
+      We sent a 6-digit verification code to<br>
+      <strong style="color:var(--gold)"><%= pendingEmail %></strong><br>
       Enter it below to activate your account.
     </div>
 
     <form method="POST" action="/verify-email" id="otpForm">
       <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <input type="hidden" name="pending_email" value="<%= pendingEmail %>">
       <input type="hidden" name="otp" id="otpHidden">
 
       <label class="otp-label" style="text-align:center;display:block">Verification Code</label>
@@ -105,6 +107,7 @@
       Didn't receive it?
       <form method="POST" action="/verify-email/resend" style="display:inline">
         <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <input type="hidden" name="pending_email" value="<%= pendingEmail %>">
         <button type="submit" id="resendBtn">Resend code</button>
       </form>
     </div>

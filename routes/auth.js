@@ -23,15 +23,14 @@ router.post('/login', async (req, res) => {
     req.flash('error', 'Invalid credentials.');
     return res.redirect('/login' + (req.body.next ? '?next=' + encodeURIComponent(req.body.next) : ''));
   }
-  // Email not yet verified → resend OTP and redirect to verify page
+  // Email not yet verified → resend OTP, redirect with email in URL (no session needed)
   if (user.emailVerified === false) {
     const otp = gen6();
     const otpExpires = new Date(Date.now() + 15 * 60 * 1000);
     await db.users.updateAsync({ _id: user._id }, { $set: { otpCode: otp, otpExpires } });
-    req.session.pendingUserId = user._id;
     try { await sendOTP(user.email, otp, 'verify', null); } catch (e) { console.error('[mailer]', e.message); }
     req.flash('info', 'Your email is not verified. We sent a new code to ' + user.email);
-    return res.redirect('/verify-email');
+    return res.redirect('/verify-email?e=' + encodeURIComponent(user.email));
   }
   req.session.userId = user._id;
   req.flash('success', `Welcome back, ${user.username}!`);
@@ -91,51 +90,65 @@ router.post('/register', async (req, res) => {
   // Send verification email (non-blocking — failure just logs)
   try { await sendOTP(email, otp, 'verify', null); } catch (e) { console.error('[mailer]', e.message); }
 
-  req.session.pendingUserId = user._id;
+  /* Pass email in URL — no session dependency, works on any proxy */
   req.flash('info', `A verification code was sent to ${email}. Please enter it below.`);
-  res.redirect('/verify-email');
+  res.redirect('/verify-email?e=' + encodeURIComponent(email));
 });
 
 /* ════════════════════════════════════════════
-   VERIFY EMAIL
+   VERIFY EMAIL  — fully session-independent
 ════════════════════════════════════════════ */
 router.get('/verify-email', (req, res) => {
   if (req.session.userId) return res.redirect('/dashboard');
-  if (!req.session.pendingUserId) return res.redirect('/register');
-  res.render('verify-email', { csrf: generateCSRF(req) });
+  const emailParam = req.query.e || '';
+  /* Support old session-based flow for resend-from-login path */
+  const pendingEmail = emailParam || (req.session.pendingEmail || '');
+  if (!pendingEmail) return res.redirect('/register');
+  res.render('verify-email', { csrf: generateCSRF(req), pendingEmail });
 });
 
 router.post('/verify-email', async (req, res) => {
-  if (!verifyCSRF(req)) { req.flash('error', 'Invalid request.'); return res.redirect('/verify-email'); }
-  if (!req.session.pendingUserId) return res.redirect('/register');
+  if (!verifyCSRF(req)) {
+    req.flash('error', 'Invalid request.');
+    return res.redirect('/verify-email?e=' + encodeURIComponent(req.body.pending_email || ''));
+  }
 
+  const pendingEmail = (req.body.pending_email || '').trim().toLowerCase();
   const code = (req.body.otp || '').trim();
-  const user = await db.users.findOneAsync({ _id: req.session.pendingUserId });
 
-  if (!user) { req.flash('error', 'Session expired. Please register again.'); return res.redirect('/register'); }
-  if (!code || user.otpCode !== code) { req.flash('error', 'Incorrect code. Please try again.'); return res.redirect('/verify-email'); }
-  if (new Date() > new Date(user.otpExpires)) { req.flash('error', 'Code expired. Please request a new one.'); return res.redirect('/verify-email'); }
+  if (!pendingEmail) { req.flash('error', 'Session expired. Please register again.'); return res.redirect('/register'); }
+
+  const user = await db.users.findOneAsync({ email: pendingEmail });
+
+  if (!user) { req.flash('error', 'Account not found. Please register again.'); return res.redirect('/register'); }
+  if (user.emailVerified) {
+    req.session.userId = user._id;
+    return res.redirect('/dashboard');
+  }
+  if (!code || user.otpCode !== code) { req.flash('error', 'Incorrect code. Please try again.'); return res.redirect('/verify-email?e=' + encodeURIComponent(pendingEmail)); }
+  if (new Date() > new Date(user.otpExpires)) { req.flash('error', 'Code expired. Click "Resend" to get a new one.'); return res.redirect('/verify-email?e=' + encodeURIComponent(pendingEmail)); }
 
   await db.users.updateAsync({ _id: user._id }, { $set: { emailVerified: true, otpCode: null, otpExpires: null } });
-  delete req.session.pendingUserId;
   req.session.userId = user._id;
-  req.flash('success', `Email verified! Welcome to the platform, ${user.username}!`);
+  req.flash('success', `Email verified! Welcome, ${user.username}!`);
   res.redirect('/dashboard');
 });
 
-// Resend verification code
+/* Resend verification code — session-independent */
 router.post('/verify-email/resend', async (req, res) => {
-  if (!req.session.pendingUserId) return res.redirect('/register');
-  const user = await db.users.findOneAsync({ _id: req.session.pendingUserId });
-  if (!user) return res.redirect('/register');
+  const pendingEmail = (req.body.pending_email || req.query.e || '').trim().toLowerCase();
+  if (!pendingEmail) return res.redirect('/register');
+
+  const user = await db.users.findOneAsync({ email: pendingEmail });
+  if (!user || user.emailVerified) return res.redirect('/login');
 
   const otp = gen6();
   const otpExpires = new Date(Date.now() + 15 * 60 * 1000);
   await db.users.updateAsync({ _id: user._id }, { $set: { otpCode: otp, otpExpires } });
   try { await sendOTP(user.email, otp, 'verify', null); } catch (e) { console.error('[mailer]', e.message); }
 
-  req.flash('info', `A new code was sent to ${user.email}.`);
-  res.redirect('/verify-email');
+  req.flash('info', `A new code was sent to ${pendingEmail}.`);
+  res.redirect('/verify-email?e=' + encodeURIComponent(pendingEmail));
 });
 
 /* ════════════════════════════════════════════
