@@ -164,24 +164,29 @@ router.post('/verify', requireLogin, async (req, res) => {
     refId: wd._id, createdAt,
   });
 
-  // Store success data for confirmation page
-  req.session.lastWithdrawal = {
-    refId:        wd._id,
-    amount:       pw.amount,
-    networkLabel: pw.networkLabel,
-    networkStd:   pw.networkStd,
-    wallet:       pw.wallet,
-    submittedAt:  createdAt.toISOString(),
-  };
   delete req.session.pendingWithdrawal;
-  req.session.save(() => res.redirect('/withdraw/success'));
+  /* Pass ID in URL — no session dependency, works on any proxy */
+  res.redirect('/withdraw/success?id=' + wd._id);
 });
 
 /* ── GET /withdraw/success ─────────────────── */
-router.get('/success', requireLogin, (req, res) => {
-  const wd = req.session.lastWithdrawal;
-  if (!wd) return res.redirect('/transactions');
-  delete req.session.lastWithdrawal;
+router.get('/success', requireLogin, async (req, res) => {
+  const wdId = req.query.id;
+  if (!wdId) return res.redirect('/transactions');
+
+  const withdrawal = await db.withdrawals.findOneAsync({ _id: wdId, userId: res.locals.user._id });
+  if (!withdrawal) return res.redirect('/transactions');
+
+  const wd = {
+    refId:        withdrawal._id,
+    amount:       withdrawal.amountUsd,
+    networkLabel: withdrawal.networkLabel,
+    networkStd:   withdrawal.cryptoType.replace('USDT (','').replace(')',''),
+    wallet:       withdrawal.walletAddress,
+    submittedAt:  withdrawal.createdAt instanceof Date
+                    ? withdrawal.createdAt.toISOString()
+                    : new Date(withdrawal.createdAt).toISOString(),
+  };
   res.render('withdraw-success', { wd });
 });
 
