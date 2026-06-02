@@ -75,4 +75,12 @@
 <% if (siteCustomize.customJs && siteCustomize.customJs.trim()) { %>
 <script id="admin-custom-js"><%- siteCustomize.customJs %></script>
 <% } %>
+<script>
+function toggleAdminSidebar() {
+  var sb = document.querySelector('.admin-sidebar');
+  var ov = document.getElementById('adminOverlay');
+  if (sb) sb.classList.toggle('open');
+  if (ov) ov.classList.toggle('open');
+}
+</script>
 </body></html>

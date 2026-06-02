@@ -19,25 +19,53 @@
     <a href="/dashboard"><i class="fas fa-home"></i> Front End</a>
     <a href="/logout" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </nav>
+  <div class="admin-overlay" id="adminOverlay" onclick="toggleAdminSidebar()"></div>
+  <button class="admin-menu-btn" onclick="toggleAdminSidebar()"><i class="fas fa-bars"></i></button>
   <div class="admin-main">
     <div class="page-header"><h1><i class="fas fa-users"></i> Users</h1></div>
     <form method="GET" style="margin-bottom:1.5rem;"><div class="input-group" style="max-width:400px;"><input type="text" name="q" class="form-control" placeholder="Search username or email…" value="<%= q %>"><button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button></div></form>
     <div class="card"><div class="table-responsive"><table class="table">
-      <thead><tr><th>Username</th><th>Email</th><th>Plan</th><th>Balance</th><th>Invested</th><th>Status</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Username</th><th>Email</th><th>Plan</th><th>Balance</th><th>Invested</th><th>Email Verified</th><th>Status</th><th>Actions</th></tr></thead>
       <tbody>
         <% users.forEach(u=>{%>
         <tr>
-          <td><% if(u.isAdmin){%><i class="fas fa-shield-alt" style="color:var(--warning);"></i> <%}%><strong><%= u.username %></strong></td>
-          <td style="font-size:.85rem;color:var(--text-secondary);"><%= u.email %></td>
+          <td>
+            <% if(u.isAdmin){%><i class="fas fa-shield-alt" style="color:var(--warning);"></i> <%}%>
+            <strong><%= u.username %></strong>
+            <div style="font-size:.7rem;color:var(--text3);">Joined: <%= new Date(u.createdAt||0).toLocaleDateString() %></div>
+          </td>
+          <td style="font-size:.82rem;"><%= u.email %></td>
           <td><span class="badge badge-info"><%= u.planName %></span></td>
           <td class="text-success font-bold">$<%= (u.balance||0).toFixed(2) %></td>
           <td>$<%= (u.totalInvested||0).toFixed(2) %></td>
+          <td>
+            <% if(u.emailVerified === false){ %>
+              <span class="badge badge-danger" title="Cannot login until verified"><i class="fas fa-times-circle"></i> No</span>
+            <% } else { %>
+              <span class="badge badge-success"><i class="fas fa-check-circle"></i> Yes</span>
+            <% } %>
+          </td>
           <td><%- u.isActive?'<span class="badge badge-success">Active</span>':'<span class="badge badge-danger">Banned</span>'%></td>
           <td>
             <% if(!u.isAdmin){%>
-            <form method="POST" action="/admin/users/toggle" style="display:inline;"><input type="hidden" name="user_id" value="<%= u._id %>"><button class="btn btn-<%= u.isActive?'danger':'success'%> btn-sm" onclick="return confirm('<%= u.isActive?'Ban':'Unban'%> user?')" title="<%= u.isActive?'Ban':'Unban'%>"><i class="fas fa-<%= u.isActive?'ban':'check'%>"></i></button></form>
-            <button class="btn btn-success btn-sm" onclick="showCredit('<%= u._id %>','<%= u.username %>',<%= (u.balance||0).toFixed(2) %>)" title="Credit Balance"><i class="fas fa-plus"></i></button>
-            <button class="btn btn-danger btn-sm" onclick="showDebit('<%= u._id %>','<%= u.username %>',<%= (u.balance||0).toFixed(2) %>)" title="Debit Balance"><i class="fas fa-minus"></i></button>
+            <div style="display:flex;gap:.3rem;flex-wrap:wrap;">
+              <form method="POST" action="/admin/users/toggle" style="display:inline;">
+                <input type="hidden" name="user_id" value="<%= u._id %>">
+                <button class="btn btn-<%= u.isActive?'danger':'success'%> btn-sm" onclick="return confirm('<%= u.isActive?'Ban':'Unban'%> <%= u.username %>?')" title="<%= u.isActive?'Ban':'Unban'%>">
+                  <i class="fas fa-<%= u.isActive?'ban':'check'%>"></i>
+                </button>
+              </form>
+              <% if(u.emailVerified === false){ %>
+              <form method="POST" action="/admin/users/verify" style="display:inline;" onsubmit="return confirm('Manually verify email for <%= u.username %>?')">
+                <input type="hidden" name="user_id" value="<%= u._id %>">
+                <button class="btn btn-primary btn-sm" title="Verify email so user can login and deposit">
+                  <i class="fas fa-envelope-open-text"></i> Verify
+                </button>
+              </form>
+              <% } %>
+              <button class="btn btn-success btn-sm" onclick="showCredit('<%= u._id %>','<%= u.username %>',<%= (u.balance||0).toFixed(2) %>)" title="Credit Balance"><i class="fas fa-plus"></i></button>
+              <button class="btn btn-danger btn-sm" onclick="showDebit('<%= u._id %>','<%= u.username %>',<%= (u.balance||0).toFixed(2) %>)" title="Debit Balance"><i class="fas fa-minus"></i></button>
+            </div>
             <%}%>
           </td>
         </tr>

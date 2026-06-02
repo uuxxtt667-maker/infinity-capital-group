@@ -69,6 +69,16 @@ router.post('/users/toggle', async (req, res) => {
   res.redirect('/admin/users');
 });
 
+/* Admin manually verifies a user's email so they can login */
+router.post('/users/verify', async (req, res) => {
+  const u = await db.users.findOneAsync({ _id: req.body.user_id });
+  if (u && !u.isAdmin) {
+    await db.users.updateAsync({ _id: u._id }, { $set: { emailVerified: true, otpCode: null, otpExpires: null } });
+    req.flash('success', `Email verified for ${u.username}. They can now log in.`);
+  }
+  res.redirect('/admin/users');
+});
+
 router.post('/users/credit', async (req, res) => {
   const amount = parseFloat(req.body.amount);
   if (amount > 0) {

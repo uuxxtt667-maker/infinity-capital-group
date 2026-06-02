@@ -402,12 +402,24 @@ table.table tbody tr:hover{background:rgba(0,0,0,.02)}
 .footer-bottom{border-top:1px solid var(--border);padding:1.25rem 0;text-align:center;color:var(--text3);font-size:.75rem;max-width:1280px;margin:0 auto}
 
 /* ===== ADMIN ===== */
-.admin-layout{display:flex;min-height:calc(100vh - 68px)}
-.admin-sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--border);padding:1.5rem 0;flex-shrink:0}
+.admin-layout{display:flex;min-height:calc(100vh - 68px);position:relative}
+.admin-sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--border);padding:1.5rem 0;flex-shrink:0;transition:transform .25s}
 .admin-sidebar a{display:flex;align-items:center;gap:.75rem;padding:.65rem 1.5rem;color:var(--text2);font-size:.88rem;transition:all var(--tr)}
 .admin-sidebar a:hover,.admin-sidebar a.active{color:var(--gold);background:rgba(245,166,35,.06)}
 .admin-sidebar .sidebar-title{padding:.5rem 1.5rem;font-size:.68rem;text-transform:uppercase;color:var(--text3);letter-spacing:.08em;margin-top:1rem}
-.admin-main{flex:1;padding:2rem;overflow:auto;background:var(--bg)}
+.admin-main{flex:1;padding:2rem;overflow:auto;background:var(--bg);min-width:0}
+/* ── Admin mobile toggle button ── */
+.admin-menu-btn{display:none;position:fixed;bottom:1.25rem;right:1.25rem;z-index:1000;background:var(--gold);color:#000;border:none;border-radius:50%;width:48px;height:48px;font-size:1.1rem;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25);align-items:center;justify-content:center}
+.admin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:98}
+@media(max-width:768px){
+  .admin-sidebar{position:fixed;top:0;left:0;height:100%;z-index:99;transform:translateX(-100%);padding-top:4rem}
+  .admin-sidebar.open{transform:translateX(0)}
+  .admin-overlay.open{display:block}
+  .admin-main{padding:1rem .75rem;width:100%}
+  .admin-menu-btn{display:flex}
+  .page-header h1{font-size:1.2rem}
+  .table th,.table td{font-size:.78rem;padding:.45rem .5rem}
+}
 
 /* ===== MARKETS PAGE ===== */
 .market-table-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
