@@ -3,14 +3,23 @@ const bcrypt    = require('bcryptjs');
 const path      = require('path');
 
 /*
- * DATA_DIR — persistent storage for database files.
- * On Hostinger: set DATA_DIR in Environment Variables panel to a path
- * outside the deployment directory, e.g. /home/u123456789/ptcdata
- * On fresh deploys Hostinger wipes the deployment folder but NOT the home dir.
+ * DATA_DIR resolution (priority order):
+ * 1. DATA_DIR env var — explicit override
+ * 2. HOME dir + /ptcdata — auto-detected on Hostinger/Linux (survives redeployments)
+ * 3. ./data — local development fallback
+ *
+ * On Hostinger, HOME=/home/u123456789 which is OUTSIDE the deployment
+ * folder, so data persists automatically across redeploys — no config needed.
  */
-const dir = process.env.DATA_DIR
-  ? path.resolve(process.env.DATA_DIR)
-  : path.join(__dirname, 'data');
+function resolveDataDir() {
+  if (process.env.DATA_DIR) return path.resolve(process.env.DATA_DIR);
+  // Auto-detect persistent home directory on Linux/Hostinger
+  if (process.env.HOME && process.env.HOME.startsWith('/home/')) {
+    return path.join(process.env.HOME, 'ptcdata');
+  }
+  return path.join(__dirname, 'data');
+}
+const dir = resolveDataDir();
 
 require('fs').mkdirSync(dir, { recursive: true });
 console.log('\n[db] ✅ Database directory:', dir, '\n');
