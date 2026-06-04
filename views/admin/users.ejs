@@ -23,7 +23,7 @@
   <button class="admin-menu-btn" onclick="toggleAdminSidebar()"><i class="fas fa-bars"></i></button>
   <div class="admin-main">
     <div class="page-header"><h1><i class="fas fa-users"></i> Users</h1></div>
-    <form method="GET" style="margin-bottom:1.5rem;"><div class="input-group" style="max-width:400px;"><input type="text" name="q" class="form-control" placeholder="Search username or email…" value="<%= q %>"><button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button></div></form>
+    <form method="GET" style="margin-bottom:1.5rem;"><div class="input-group" style="max-width:400px;"><input type="text" name="q" class="form-control" placeholder="Search username, email, name or phone…" value="<%= q %>"><button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button></div></form>
     <div class="card"><div class="table-responsive"><table class="table">
       <thead><tr><th>Username</th><th>Email</th><th>Plan</th><th>Balance</th><th>Invested</th><th>Email Verified</th><th>Status</th><th>Actions</th></tr></thead>
       <tbody>
@@ -32,9 +32,14 @@
           <td>
             <% if(u.isAdmin){%><i class="fas fa-shield-alt" style="color:var(--warning);"></i> <%}%>
             <strong><%= u.username %></strong>
+            <% if(u.fullName){ %><div style="font-size:.74rem;color:var(--text2);"><i class="fas fa-id-card" style="opacity:.6;"></i> <%= u.fullName %></div><% } %>
             <div style="font-size:.7rem;color:var(--text3);">Joined: <%= new Date(u.createdAt||0).toLocaleDateString() %></div>
           </td>
-          <td style="font-size:.82rem;"><%= u.email %></td>
+          <td style="font-size:.82rem;">
+            <%= u.email %>
+            <% if(u.phone){ %><div style="font-size:.74rem;color:var(--text2);"><i class="fas fa-phone" style="opacity:.6;"></i> <%= u.phone %></div><% } %>
+            <% if(u.nationality){ %><div style="font-size:.7rem;color:var(--text3);"><i class="fas fa-flag" style="opacity:.6;"></i> <%= u.nationality %></div><% } %>
+          </td>
           <td><span class="badge badge-info"><%= u.planName %></span></td>
           <td class="text-success font-bold">$<%= (u.balance||0).toFixed(2) %></td>
           <td>$<%= (u.totalInvested||0).toFixed(2) %></td>

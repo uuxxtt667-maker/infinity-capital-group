@@ -53,7 +53,9 @@ router.get('/register', (req, res) => {
 
 router.post('/register', async (req, res) => {
   if (!verifyCSRF(req)) { req.flash('error', 'Invalid request. Please refresh and try again.'); return res.redirect('/register'); }
-  const { username, email, password, confirm_password, ref_code } = req.body;
+  const { username, password, confirm_password, ref_code,
+          first_name, last_name, phone, dob, gender, nationality, address } = req.body;
+  const email = (req.body.email || '').trim().toLowerCase();
 
   if (!username || username.length < 3) { req.flash('error', 'Username must be at least 3 characters.'); return res.redirect('/register'); }
   if (!/^[a-zA-Z0-9_]+$/.test(username)) { req.flash('error', 'Username may only contain letters, numbers and underscores.'); return res.redirect('/register'); }
@@ -77,12 +79,23 @@ router.post('/register', async (req, res) => {
   const otpExpires = new Date(Date.now() + 15 * 60 * 1000);
   const hash = bcrypt.hashSync(password, 12);
 
+  /* Personal / KYC details captured at signup — stored so admin can see them instantly */
+  const firstName = (first_name || '').trim();
+  const lastName  = (last_name  || '').trim();
+  const fullName  = `${firstName} ${lastName}`.trim();
+
   const user = await db.users.insertAsync({
     username, email, password: hash, referralCode: code,
     referredBy, planId: 'plan1', planExpires: null,
     balance: 0, totalEarned: 0, totalWithdrawn: 0,
     totalInvested: 0, referralEarnings: 0,
     clicksToday: 0, lastClickReset: null,
+    firstName, lastName, fullName,
+    phone:       (phone       || '').trim(),
+    dob:         (dob         || '').trim(),
+    gender:      (gender      || '').trim(),
+    nationality: (nationality || '').trim(),
+    address:     (address     || '').trim(),
     isAdmin: false, isActive: true, createdAt: new Date(),
     emailVerified: false, otpCode: otp, otpExpires,
   });

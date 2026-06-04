@@ -48,7 +48,14 @@ router.get('/users', async (req, res, next) => {
   const statusFilter = req.query.status || 'all';
   let users        = await db.users.findAsync({});
 
-  if (q) users = users.filter(u => (u.username || '').toLowerCase().includes(q.toLowerCase()) || (u.email || '').toLowerCase().includes(q.toLowerCase()));
+  if (q) {
+    const needle = q.toLowerCase();
+    users = users.filter(u =>
+      (u.username || '').toLowerCase().includes(needle) ||
+      (u.email    || '').toLowerCase().includes(needle) ||
+      (u.fullName || '').toLowerCase().includes(needle) ||
+      (u.phone    || '').toLowerCase().includes(needle));
+  }
   if (statusFilter === 'active')   users = users.filter(u => u.isActive);
   if (statusFilter === 'inactive') users = users.filter(u => !u.isActive);
 
