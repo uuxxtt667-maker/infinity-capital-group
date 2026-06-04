@@ -1276,6 +1276,52 @@ a{text-decoration:none;color:inherit}
 </section>
 <% } %>
 
+<!-- TRUSTED EXCHANGES -->
+<style>
+  .ap-tx{padding-top:4rem;padding-bottom:4rem}
+  .ap-tx-marquee{margin-top:2.75rem;overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+  .ap-tx-track{display:flex;gap:1rem;width:max-content;animation:ap-tx-scroll 34s linear infinite}
+  .ap-tx-marquee:hover .ap-tx-track{animation-play-state:paused}
+  .ap-tx-chip{display:flex;align-items:center;gap:.6rem;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:.85rem 1.5rem;font-weight:800;font-size:1.05rem;letter-spacing:-.3px;white-space:nowrap;box-shadow:0 4px 14px rgba(15,23,42,.05);filter:grayscale(100%);opacity:.6;transition:filter .35s,opacity .35s,transform .35s,box-shadow .35s}
+  .ap-tx-chip:hover{filter:grayscale(0);opacity:1;transform:translateY(-4px);box-shadow:0 10px 26px rgba(15,23,42,.12)}
+  .ap-tx-chip i{font-size:.75rem}
+  .ap-tx-note{margin-top:2rem;font-size:.75rem;color:#94a3b8}
+  @keyframes ap-tx-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+</style>
+<section class="ap-section ap-tx" style="background:<% if(typeof siteCustomize!=='undefined'&&siteCustomize.bgPlans){%>transparent<%}else{%>#f8fafc<%}%>">
+  <div class="ap-section-inner">
+    <div class="ap-eyebrow">Trusted &amp; Connected</div>
+    <h2>Trusted by the World&rsquo;s <span class="grad">Leading Exchanges</span></h2>
+    <p>We connect with top-tier global exchanges to deliver deep liquidity, secure settlement and best-in-class execution for every investment.</p>
+  </div>
+  <div class="ap-tx-marquee">
+    <%
+      var _exchanges = [
+        { name:'Binance',    color:'#F3BA2F' },
+        { name:'Coinbase',   color:'#0052FF' },
+        { name:'Kraken',     color:'#5741D9' },
+        { name:'OKX',        color:'#1a1a1a' },
+        { name:'Bybit',      color:'#F7A600' },
+        { name:'KuCoin',     color:'#23AF91' },
+        { name:'Crypto.com', color:'#0a2a66' },
+        { name:'Gemini',     color:'#00B8C4' },
+        { name:'Bitstamp',   color:'#3aa76d' },
+        { name:'HTX',        color:'#1f8fff' }
+      ];
+    %>
+    <div class="ap-tx-track">
+      <% for (var _r=0; _r<2; _r++) { %>
+        <% _exchanges.forEach(function(ex){ %>
+          <span class="ap-tx-chip"><i class="fas fa-circle" style="color:<%= ex.color %>"></i><%= ex.name %></span>
+        <% }); %>
+      <% } %>
+    </div>
+  </div>
+  <div class="ap-section-inner">
+    <p class="ap-tx-note">Logos shown represent supported exchange integrations and are property of their respective owners.</p>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer class="ap-footer">
   <div class="ap-footer-inner">
