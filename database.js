@@ -1,6 +1,7 @@
 const Datastore = require('@seald-io/nedb');
 const bcrypt    = require('bcryptjs');
 const path      = require('path');
+const crypto    = require('crypto');
 
 /*
  * DATA_DIR resolution (priority order):
@@ -90,6 +91,19 @@ async function seed() {
   ]) {
     const exists = await db.plans.findOneAsync({ _id: plan._id });
     if (!exists) await db.plans.insertAsync(plan);
+  }
+
+  /* ── Guarantee every user has a unique referral code ──
+     Registration already assigns one, but this backfills any legacy or
+     edge-case account that is missing/blank so referrals never break. */
+  const genRef = () => crypto.randomBytes(8).toString('hex').slice(0, 8).toUpperCase();
+  const allUsers = await db.users.findAsync({});
+  for (const u of allUsers) {
+    if (u.referralCode) continue;
+    let code = genRef();
+    while (await db.users.findOneAsync({ referralCode: code })) code = genRef();
+    await db.users.updateAsync({ _id: u._id }, { $set: { referralCode: code } });
+    console.log(`[seed] assigned referral code to ${u.username}: ${code}`);
   }
 }
 
