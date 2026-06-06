@@ -4,8 +4,11 @@ node_modules/
 # Database files (user data — do not commit)
 data/*.db
 
-# Settings/customize IS committed so Hostinger gets site config
-# data/settings.json  ← intentionally NOT ignored
+# Live settings/customize is written by the running app — NOT tracked,
+# so admin changes on the server never conflict with git deploys.
+# A template (data/settings.example.json) IS committed; the app copies it
+# to data/settings.json on first run if the live file is missing.
+data/settings.json
 
 # Logs
 *.log

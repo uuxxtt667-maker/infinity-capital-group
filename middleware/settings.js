@@ -1,7 +1,21 @@
 const fs   = require('fs');
 const path = require('path');
 
-const SETTINGS_FILE = path.join(__dirname, '../data/settings.json');
+const SETTINGS_FILE    = path.join(__dirname, '../data/settings.json');
+const SETTINGS_EXAMPLE = path.join(__dirname, '../data/settings.example.json');
+
+/* The live settings file is NOT tracked in git (it is written by the admin
+   customizer at runtime). On a fresh deploy it won't exist yet, so seed it
+   once from the committed template. Existing installs are left untouched. */
+(function bootstrapSettingsFile() {
+  try {
+    if (!fs.existsSync(SETTINGS_FILE) && fs.existsSync(SETTINGS_EXAMPLE)) {
+      fs.mkdirSync(path.dirname(SETTINGS_FILE), { recursive: true });
+      fs.copyFileSync(SETTINGS_EXAMPLE, SETTINGS_FILE);
+      console.log('[settings] initialised data/settings.json from template');
+    }
+  } catch (e) { /* non-fatal — getSettings falls back to DEFAULTS */ }
+})();
 
 const DEFAULTS = {
   siteName:           'APEXINVEST',
