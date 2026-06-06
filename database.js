@@ -2,6 +2,8 @@ const Datastore = require('@seald-io/nedb');
 const bcrypt    = require('bcryptjs');
 const path      = require('path');
 const crypto    = require('crypto');
+const fs        = require('fs');
+const os        = require('os');
 
 /*
  * DATA_DIR resolution (priority order):
@@ -20,9 +22,28 @@ function resolveDataDir() {
   }
   return path.join(__dirname, 'data');
 }
-const dir = resolveDataDir();
-
-require('fs').mkdirSync(dir, { recursive: true });
+/* Pick the first candidate directory we can actually create AND write to.
+   This prevents a hard crash on startup if the preferred location (e.g.
+   $HOME/ptcdata) is read-only or unavailable in the hosting container. */
+function ensureWritableDir() {
+  const candidates = [
+    resolveDataDir(),
+    path.join(__dirname, 'data'),
+    path.join(os.tmpdir(), 'ptcdata'),
+  ];
+  for (const d of candidates) {
+    try {
+      fs.mkdirSync(d, { recursive: true });
+      fs.accessSync(d, fs.constants.W_OK);
+      return d;
+    } catch (e) {
+      console.warn('[db] cannot use data dir', d, '—', e.message);
+    }
+  }
+  // Last resort: tmp dir root (always writable)
+  return os.tmpdir();
+}
+const dir = ensureWritableDir();
 console.log('\n[db] ✅ Database directory:', dir, '\n');
 
 const db = {

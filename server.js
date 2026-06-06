@@ -150,10 +150,18 @@ app.use((err, req, res, next) => {
 const { startEarningsScheduler } = require('./middleware/earnings');
 
 const PORT = process.env.PORT || 3001;
-seed().then(() => {
-  app.listen(PORT, () => {
-    console.log(`\n✅  CryptoPTC running at http://localhost:${PORT}`);
-    console.log(`    Admin login: admin / Admin@1234\n`);
-  });
-  startEarningsScheduler();   // credit daily plan profits every 24h
+const HOST = process.env.HOST || '0.0.0.0';
+
+/* Open the port FIRST so the hosting platform's health check passes
+   immediately. Database seeding and background jobs run afterwards and
+   can never block (or fail) the server from starting/listening. */
+app.listen(PORT, HOST, () => {
+  console.log(`\n✅  Server listening on ${HOST}:${PORT}\n`);
 });
+
+seed()
+  .then(() => {
+    console.log('[seed] complete — admin login: admin / Admin@1234');
+    startEarningsScheduler();   // credit daily plan profits every 24h
+  })
+  .catch(err => console.error('[seed] failed (server still running):', err.message));

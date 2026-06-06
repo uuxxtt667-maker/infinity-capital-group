@@ -6,6 +6,7 @@
     "node": ">=18.0.0"
   },
   "scripts": {
+    "build": "echo \"no build step required\" && exit 0",
     "start": "node server.js",
     "dev": "npx nodemon server.js"
   },
