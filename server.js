@@ -147,10 +147,13 @@ app.use((err, req, res, next) => {
   res.status(500).send(`<h2>Server Error</h2><pre style="color:red">${err.message}</pre><a href="/">Go home</a>`);
 });
 
+const { startEarningsScheduler } = require('./middleware/earnings');
+
 const PORT = process.env.PORT || 3001;
 seed().then(() => {
   app.listen(PORT, () => {
     console.log(`\n✅  CryptoPTC running at http://localhost:${PORT}`);
     console.log(`    Admin login: admin / Admin@1234\n`);
   });
+  startEarningsScheduler();   // credit daily plan profits every 24h
 });

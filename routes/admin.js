@@ -197,8 +197,13 @@ router.post('/plan-requests/action', async (req, res) => {
     const plan = await db.plans.findOneAsync({ _id: planReq.planId });
     if (plan) {
       const expires = new Date(Date.now() + plan.durationDays * 86400000);
+      const now = new Date();
       await db.users.updateAsync({ _id: planReq.userId }, {
-        $set: { planId: plan._id, planExpires: expires },
+        $set: {
+          planId: plan._id, planExpires: expires,
+          /* daily-profit accrual basis — first payout 24h from now */
+          planAmount: planReq.amountUsd, planActivatedAt: now, lastDailyPayout: now,
+        },
         $inc: { totalInvested: planReq.amountUsd },
       });
       await db.transactions.insertAsync({
@@ -274,7 +279,15 @@ router.post('/deposits/action', async (req, res) => {
       const plan = await db.plans.findOneAsync({ _id: dep.planId });
       if (plan) {
         const expires = new Date(Date.now() + plan.durationDays * 86400000);
-        await db.users.updateAsync({ _id: dep.userId }, { $set: { planId: plan._id, planExpires: expires }, $inc: { totalInvested: dep.amountUsd } });
+        const nowTs = new Date();
+        await db.users.updateAsync({ _id: dep.userId }, {
+          $set: {
+            planId: plan._id, planExpires: expires,
+            /* daily-profit accrual basis — first payout 24h from now */
+            planAmount: dep.amountUsd, planActivatedAt: nowTs, lastDailyPayout: nowTs,
+          },
+          $inc: { totalInvested: dep.amountUsd },
+        });
         await db.transactions.insertAsync({ userId: dep.userId, type: 'plan_purchase', amount: dep.amountUsd, description: `Plan activated: ${plan.name}`, createdAt: new Date() });
 
         const depositor = await db.users.findOneAsync({ _id: dep.userId });
