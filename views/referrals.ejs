@@ -3,7 +3,7 @@
 <%- include('partials/nav') %>
 <%- include('partials/statsbar') %>
 <div class="container">
-  <div class="page-header"><h1><i class="fas fa-users"></i> Referral Program</h1><p>Earn <%= commissionRate %>% commission on every deposit made by your referrals.</p></div>
+  <div class="page-header"><h1><i class="fas fa-users"></i> Referral Program</h1><p>Earn <%= commissionRate %>% commission whenever your referrals activate an investment plan.</p></div>
   <div class="stats-grid mb-4">
     <div class="stat-card"><div class="stat-icon cyan"><i class="fas fa-users"></i></div><div class="stat-info"><div class="stat-label">Total Referrals</div><div class="stat-value"><%= refs.length %></div></div></div>
     <div class="stat-card"><div class="stat-icon green"><i class="fas fa-dollar-sign"></i></div><div class="stat-info"><div class="stat-label">Referral Earnings</div><div class="stat-value">$<%= (user.referralEarnings||0).toFixed(4) %></div></div></div>
@@ -11,7 +11,7 @@
   </div>
   <div class="referral-box mb-4">
     <h3><i class="fas fa-link" style="color:var(--accent);"></i> Your Referral Link</h3>
-    <p>Share and earn <%= commissionRate %>% commission on all deposits.</p>
+    <p>Share and earn <%= commissionRate %>% commission on every plan your referrals activate.</p>
     <div class="copy-box mb-2" data-copy="<%= refLink %>" style="font-size:.85rem;"><%= refLink %><div class="copy-hint"><i class="fas fa-copy"></i> Click to copy</div></div>
     <div style="margin-top:.5rem;"><span style="font-size:.82rem;color:var(--text-muted);">Code: </span><span class="copy-box" data-copy="<%= user.referralCode %>" style="display:inline-block;padding:.3rem .75rem;font-size:.88rem;font-weight:700;"><%= user.referralCode %></span></div>
   </div>
