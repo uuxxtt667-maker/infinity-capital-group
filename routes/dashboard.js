@@ -2,9 +2,15 @@ const router = require('express').Router();
 const { db }  = require('../database');
 const { requireLogin } = require('../middleware/auth');
 const { getSettings }  = require('../middleware/settings');
+const { accrueUserEarnings } = require('../middleware/earnings');
 
 router.get('/', requireLogin, async (req, res) => {
   const user = res.locals.user;
+
+  /* Credit any daily profit owed since the last payout, right now.
+     Works even if the hourly background timer didn't run (idle hosting). */
+  try { await accrueUserEarnings(user); } catch (e) { console.error('[earnings] dashboard accrual:', e.message); }
+
   const transactions = await db.transactions.findAsync({ userId: user._id });
   transactions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const recentTx    = transactions.slice(0, 10);
