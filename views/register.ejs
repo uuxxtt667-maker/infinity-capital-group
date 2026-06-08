@@ -238,7 +238,6 @@
 
     <form method="POST" action="/register" id="regForm">
       <input type="hidden" name="_csrf" value="<%= csrf %>">
-      <input type="hidden" name="ref_code" value="<%= ref %>">
 
       <div class="rg-grid">
         <div class="rg-group">
@@ -322,6 +321,14 @@
         <div class="rg-inp-wrap">
           <i class="rg-inp-icon fas fa-map-marker-alt"></i>
           <input type="text" name="address" placeholder="Street, Area, City, Country">
+        </div>
+      </div>
+
+      <div class="rg-group">
+        <label class="rg-label">Referral Code <span style="color:var(--text3);font-weight:400;">(optional)</span></label>
+        <div class="rg-inp-wrap">
+          <i class="rg-inp-icon fas fa-user-friends"></i>
+          <input type="text" name="ref_code" value="<%= ref %>" placeholder="Enter your referrer's code" style="text-transform:uppercase;" autocapitalize="characters">
         </div>
       </div>
 

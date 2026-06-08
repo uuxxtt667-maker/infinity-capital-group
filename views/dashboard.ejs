@@ -54,14 +54,6 @@
         <div class="stat-sub"><a href="/plans" style="color:var(--blue)">View plans</a></div>
       </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-icon purple"><i class="fas fa-users"></i></div>
-      <div class="stat-info">
-        <div class="stat-label">Referral Earnings</div>
-        <div class="stat-value">$<%= (user.referralEarnings||0).toFixed(4) %></div>
-        <div class="stat-sub"><%= refCount %> referral<%= refCount!==1?'s':'' %></div>
-      </div>
-    </div>
   </div>
 
   <!-- Live Market Cards -->
@@ -131,12 +123,6 @@
         <p>Add funds to your account</p>
         <a href="/deposit" class="cta-arrow" style="color:var(--blue)">Open deposit &rarr;</a>
       </div>
-      <div class="cta-card cta-demo">
-        <div style="font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(0,230,118,.4);margin-bottom:.35rem">Earn More</div>
-        <h5>Refer &amp; Earn</h5>
-        <p>Earn <%= referralRate %>% on every referral deposit</p>
-        <a href="/referrals" class="cta-arrow" style="color:var(--green)">View referrals &rarr;</a>
-      </div>
     </div>
   </div>
 
@@ -199,7 +185,6 @@
       <div style="display:flex;flex-direction:column;gap:.65rem">
         <a href="/deposit"   class="btn btn-gold btn-block"><i class="fas fa-plus-circle"></i> Deposit Funds</a>
         <a href="/withdraw"  class="btn btn-outline btn-block"><i class="fas fa-minus-circle"></i> Withdraw Earnings</a>
-        <a href="/referrals" class="btn btn-outline btn-block"><i class="fas fa-users"></i> Refer &amp; Earn <%= referralRate %>%</a>
         <a href="/plans"     class="btn btn-outline btn-block"><i class="fas fa-layer-group"></i> Investment Plans</a>
         <a href="/transactions" class="btn btn-outline btn-block"><i class="fas fa-history"></i> Transaction History</a>
       </div>
