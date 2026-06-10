@@ -72,20 +72,17 @@
       </div>
 
       <% if (existingReq) { %>
-      <!-- Already has a pending request -->
-      <div class="inv-pending-box">
-        <i class="fas fa-clock" style="font-size:2rem;color:var(--gold);margin-bottom:.65rem;display:block"></i>
-        <div style="font-size:1rem;font-weight:800;color:var(--text);margin-bottom:.35rem">Request Pending Review</div>
+      <!-- Informational note — repeat purchases are allowed -->
+      <div class="inv-pending-box" style="margin-bottom:1rem">
+        <i class="fas fa-clock" style="font-size:1.4rem;color:var(--gold);margin-bottom:.4rem;display:block"></i>
         <div style="font-size:.83rem;color:var(--text2)">
-          You have a pending activation request for <strong><%= existingReq.planName %></strong> ($<%= (existingReq.amountUsd||0).toFixed(2) %>).
-          Admin will review it shortly.
+          You already have a pending request for <strong><%= existingReq.planName %></strong> ($<%= (existingReq.amountUsd||0).toFixed(2) %>).
+          You can still submit another below — each is reviewed separately.
         </div>
-        <a href="/dashboard" class="btn btn-gold" style="margin-top:1.1rem;display:inline-block">
-          <i class="fas fa-home"></i> Go to Dashboard
-        </a>
       </div>
+      <% } %>
 
-      <% } else if (!hasEnough) { %>
+      <% if (!hasEnough) { %>
       <!-- Insufficient balance -->
       <div class="inv-insufficient">
         <i class="fas fa-exclamation-triangle" style="font-size:2rem;color:#f43f5e;margin-bottom:.65rem;display:block"></i>

@@ -277,7 +277,10 @@
       <!-- CTA -->
       <% if (user) { %>
         <% if (user.planId === p._id && planActive) { %>
-          <span class="pl-btn active-plan" style="background:<%= c %>22;color:<%= c %>;border-color:<%= c %>44"><i class="fas fa-check"></i> Active Plan</span>
+          <a href="/invest?plan=<%= p._id %>" class="pl-btn active-plan"
+             style="background:<%= c %>22;color:<%= c %>;border-color:<%= c %>44">
+            <i class="fas fa-check"></i> Active — Invest Again
+          </a>
         <% } else { %>
           <a href="/invest?plan=<%= p._id %>" class="pl-btn"
              style="background:<%= isPopular ? c : c+'18' %>;color:<%= isPopular ? '#000' : c %>;border-color:<%= c %>44;">
@@ -346,7 +349,7 @@
       <div style="text-align:center;">
         <% if (user) { %>
           <% if (user.planId === elitePlan._id && planActive) { %>
-            <span class="pl-elite-btn" style="background:<%= ec %>22;color:<%= ec %>;border:1px solid <%= ec %>44;opacity:.65;cursor:default"><i class="fas fa-check"></i> Active Plan</span>
+            <a href="/invest?plan=<%= elitePlan._id %>" class="pl-elite-btn" style="background:<%= ec %>22;color:<%= ec %>;border:1px solid <%= ec %>44"><i class="fas fa-check"></i> Active — Invest Again</a>
           <% } else { %>
             <a href="/invest?plan=<%= elitePlan._id %>" class="pl-elite-btn" style="background:linear-gradient(135deg,<%= ec %>,<%= ec %>cc);color:#000;box-shadow:0 8px 28px <%= ec %>40;">
               <i class="<%= elitePlan.icon %>"></i> Join <%= elitePlan.name %> &rarr;

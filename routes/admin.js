@@ -5,6 +5,7 @@ const { db }   = require('../database');
 const { requireAdmin } = require('../middleware/auth');
 const { generateCSRF, verifyCSRF } = require('../middleware/helpers');
 const { getSettings, saveSettings, getCustomize, saveCustomize, CUSTOMIZE_DEFAULTS } = require('../middleware/settings');
+const { accrueUserEarnings } = require('../middleware/earnings');
 
 router.use(requireAdmin);
 
@@ -196,13 +197,19 @@ router.post('/plan-requests/action', async (req, res) => {
   if (action === 'approve') {
     const plan = await db.plans.findOneAsync({ _id: planReq.planId });
     if (plan) {
-      const expires = new Date(Date.now() + plan.durationDays * 86400000);
       const now = new Date();
+      const newExpires = new Date(Date.now() + plan.durationDays * 86400000);
+      /* Repeat purchases accumulate: settle earnings owed on the existing
+         principal, then add this amount to it (don't reset the base). */
+      const inv = await db.users.findOneAsync({ _id: planReq.userId });
+      try { await accrueUserEarnings(inv); } catch (e) { console.error('[earnings] pre-activation:', e.message); }
+      const principal = (inv.planAmount || 0) + planReq.amountUsd;
+      const expires   = (inv.planExpires && new Date(inv.planExpires) > newExpires) ? new Date(inv.planExpires) : newExpires;
       await db.users.updateAsync({ _id: planReq.userId }, {
         $set: {
           planId: plan._id, planExpires: expires,
-          /* daily-profit accrual basis — first payout 24h from now */
-          planAmount: planReq.amountUsd, planActivatedAt: now, lastDailyPayout: now,
+          /* daily-profit base accumulates across purchases; next payout 24h from now */
+          planAmount: principal, planActivatedAt: inv.planActivatedAt || now, lastDailyPayout: now,
         },
         $inc: { totalInvested: planReq.amountUsd },
       });
@@ -278,13 +285,19 @@ router.post('/deposits/action', async (req, res) => {
     if (dep.planId && dep.planId !== 'plan1') {
       const plan = await db.plans.findOneAsync({ _id: dep.planId });
       if (plan) {
-        const expires = new Date(Date.now() + plan.durationDays * 86400000);
         const nowTs = new Date();
+        const newExpires = new Date(Date.now() + plan.durationDays * 86400000);
+        /* Repeat purchases accumulate: settle earnings on the existing principal,
+           then add this amount to it (don't reset the base). */
+        const inv = await db.users.findOneAsync({ _id: dep.userId });
+        try { await accrueUserEarnings(inv); } catch (e) { console.error('[earnings] pre-activation:', e.message); }
+        const principal = (inv.planAmount || 0) + dep.amountUsd;
+        const expires   = (inv.planExpires && new Date(inv.planExpires) > newExpires) ? new Date(inv.planExpires) : newExpires;
         await db.users.updateAsync({ _id: dep.userId }, {
           $set: {
             planId: plan._id, planExpires: expires,
-            /* daily-profit accrual basis — first payout 24h from now */
-            planAmount: dep.amountUsd, planActivatedAt: nowTs, lastDailyPayout: nowTs,
+            /* daily-profit base accumulates across purchases; next payout 24h from now */
+            planAmount: principal, planActivatedAt: inv.planActivatedAt || nowTs, lastDailyPayout: nowTs,
           },
           $inc: { totalInvested: dep.amountUsd },
         });

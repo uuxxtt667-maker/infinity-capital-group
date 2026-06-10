@@ -73,12 +73,7 @@ router.post('/', requireLogin, async (req, res) => {
     return res.redirect(`/invest?plan=${planId}`);
   }
 
-  /* Block if another pending request already exists */
-  const existingReq = await db.planRequests.findOneAsync({ userId: user._id, status: 'pending' });
-  if (existingReq) {
-    req.flash('error', 'You already have a pending plan activation request. Please wait for it to be reviewed.');
-    return res.redirect('/dashboard');
-  }
+  /* Users may buy plans multiple times — each purchase is its own request. */
 
   /* Deduct balance (funds are held until admin decision) */
   await db.users.updateAsync({ _id: user._id }, { $inc: { balance: -amount } });
