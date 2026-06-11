@@ -36,7 +36,9 @@ async function accrueUserEarnings(user, nowMs = Date.now()) {
 
   /* Only paid, currently-active plans earn ROI */
   if (!user.planId || user.planId === 'plan1') return 0;
-  const principal = user.planAmount || 0;
+  /* Prefer the tracked plan principal; fall back to totalInvested for
+     accounts activated before planAmount tracking existed. */
+  const principal = user.planAmount || user.totalInvested || 0;
   if (principal <= 0) return 0;
 
   /* Pay from the last payout pointer, falling back to activation time */

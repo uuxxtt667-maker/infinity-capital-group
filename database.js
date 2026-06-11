@@ -126,6 +126,24 @@ async function seed() {
     await db.users.updateAsync({ _id: u._id }, { $set: { referralCode: code } });
     console.log(`[seed] assigned referral code to ${u.username}: ${code}`);
   }
+
+  /* ── Backfill daily-earnings basis for existing investors ──
+     Accounts that activated a paid plan before earnings tracking existed
+     have no planAmount / activation timestamp, so they never accrued daily
+     profit. Stamp them now so their first payout lands 24h from here. */
+  const now = new Date();
+  for (const u of allUsers) {
+    if (!u.planId || u.planId === 'plan1') continue;                 // free/no plan
+    if (u.planExpires && new Date(u.planExpires) <= now) continue;   // expired plan
+    const patch = {};
+    if (u.planAmount == null && (u.totalInvested || 0) > 0) patch.planAmount = u.totalInvested;
+    if (!u.planActivatedAt) patch.planActivatedAt = now;
+    if (!u.lastDailyPayout) patch.lastDailyPayout = now;             // first payout 24h from now
+    if (Object.keys(patch).length) {
+      await db.users.updateAsync({ _id: u._id }, { $set: patch });
+      console.log(`[seed] earnings basis set for ${u.username} (principal $${patch.planAmount ?? u.planAmount})`);
+    }
+  }
 }
 
 module.exports = { db, seed };
